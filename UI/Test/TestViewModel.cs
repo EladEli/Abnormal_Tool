@@ -27,6 +27,7 @@ namespace Abnormal_UI.UI.Test
 
         public bool InsertSeac()
         {
+            var repo = 1;
             var entityTypes = new List<UniqueEntityType>();
             entityTypes.Add(UniqueEntityType.User);
             var entityTypes2 = new List<UniqueEntityType>();
