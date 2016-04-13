@@ -1,0 +1,94 @@
+﻿<UserControl x:Class="Abnormal_UI.UI.LsbAttackUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d">
+    <DockPanel>
+        <StackPanel Orientation="Horizontal">
+            <ListBox Width="250" 
+                     Height="Auto" 
+                     Margin="20"
+                     x:Name="BoxUsers" 
+                     ItemsSource="{Binding empList}" 
+                     SelectionMode="Extended" 
+                     SelectedIndex="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="2">
+                            <TextBlock Text="{Binding name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxUsers}" 
+                       Name="SelUsersCount"
+                       Width="20" 
+                       Height="20"
+                       VerticalAlignment="Bottom"
+                       Margin="-10 0 0 20"/>
+            <ListBox Width="250" 
+                     Height="Auto" 
+                     Margin="20"
+                     x:Name="BoxMachines" 
+                     ItemsSource="{Binding machinesList}" 
+                     SelectionMode="Extended"
+                     SelectedIndex="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="2">
+                            <TextBlock Text="{Binding name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxMachines}" 
+                       Name="SelMachinesCount"
+                       Width="20" 
+                       Height="20"
+                       VerticalAlignment="Bottom"
+                       Margin="-10 0 0 20"/>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Right" >
+            <ListBox Width="200" 
+                     Height="100" 
+                     Margin="20"
+                     x:Name="BoxDCs" 
+                     ItemsSource="{Binding dcsList}" 
+                     SelectionMode="Extended"
+                     SelectedIndex="0" 
+                     HorizontalAlignment="Left">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="2">
+                            <TextBlock Text="{Binding name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock Text="abc" Name="statusTB">
+                
+            </TextBlock>
+            <StackPanel HorizontalAlignment="Left" Margin="20">
+            <Button Width="200" 
+                    Height="30" 
+                    Margin="5"
+                    Content="LSBIntense"
+                    x:Name="BtnLSBIntense" 
+                    Click="BtnLSBDintense_OnClick"/>
+            <Button Width="200" 
+                    Height="30" 
+                    Margin="5"
+                    Content="LSB Distinct"
+                    x:Name="BtnLSBDistinct" 
+                    Click="BtnLSBDistinct_OnClick"/>
+            <Button Width="200" 
+                    Height="30" 
+                    Margin="5"
+                    Content="LSB Specific"
+                    x:Name="BtnLSBSpecific" 
+                    Click="BtnLSBSpecific_OnClick"/>
+            </StackPanel>
+        </StackPanel>
+    </DockPanel>
+</UserControl>
