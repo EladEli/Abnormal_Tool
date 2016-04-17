@@ -34,6 +34,10 @@ namespace Abnormal_UI.UI
                 OnPropertyChanged();
             }
         }
+
+        private string[] Spns;
+        
+
         public AbnormalViewModel() : base()
         {
             minMachines = 1;
@@ -41,6 +45,18 @@ namespace Abnormal_UI.UI
             includeAs = true;
             includeTgs = false;
             includeEvent = false;
+            Spns = new []
+            {
+                "HOST",
+                "HTTP",
+                "CIFS",
+                "ldap",
+                "DNS",
+                "RPC"
+            };
+
+
+
         }
         public bool ActivateUsers()
         {
@@ -101,7 +117,7 @@ namespace Abnormal_UI.UI
                             if ((currentMachineCounter + rcsUsedTodayCounter) >= selectedMachinesList.Count - 1) { currentMachineCounter = 0; }
                             EntityObject currentSelectedMachine = selectedMachinesList[currentMachineCounter + i];
                             EntityObject defaultMachine = selectedMachinesList[currentMachineCounter];
-                            var activity = DocumentCreator.KerberosCreator(selectedUser, defaultMachine, selectedDcsList.FirstOrDefault(), DomainName,sourceGateway, string.Format("CIFS/{0}", currentSelectedMachine), currentSelectedMachine, "Tgs", daysToGenerate);
+                            var activity = DocumentCreator.KerberosCreator(selectedUser, defaultMachine, selectedDcsList.FirstOrDefault(), DomainName,sourceGateway, string.Format("{0}/{1}", Spns[rnd.Next(0,5)],currentSelectedMachine.name), currentSelectedMachine, "Tgs", daysToGenerate);
                             kerberosTgss.Add(activity);
                         }
                         _dbClient.InsertBatch(kerberosTgss);
@@ -144,6 +160,7 @@ namespace Abnormal_UI.UI
         }
         public bool AbnormalActivity(ObservableCollection<EntityObject> specificUser = null)
         {
+            Random rnd = new Random();
             _dbClient.ClearTestNaCollection();
             SvcCtrl.RestartService("ATACenter");
             Logger.Debug("Gone to sleep for 2 minutes of tree build");
@@ -181,7 +198,7 @@ namespace Abnormal_UI.UI
 
                         if (includeTgs)
                         {
-                            var Activity = DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine, selectedDcsList.FirstOrDefault(), DomainName,sourceGateway, string.Format("CIFS/{0}", currentSelectedMachine), currentSelectedMachine, "Tgs", 0, hoursCounter);
+                            var Activity = DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine, selectedDcsList.FirstOrDefault(), DomainName,sourceGateway, string.Format("{0}/{1}", Spns[rnd.Next(0, 5)], currentSelectedMachine.name), currentSelectedMachine, "Tgs", 0, hoursCounter);
                             networkActivitities.Add(Activity);
                         }
                         if (includeEvent)
@@ -195,7 +212,10 @@ namespace Abnormal_UI.UI
                     Logger.Debug("Expect abnormal activity on {0}",selectedUser.name);
                 }
                 _dbClient.InsertBatch(networkActivitities);
-                _dbClient.InsertBatch(ntlmEventActivitities,false,false,true);
+                if (includeEvent)
+                {
+                    _dbClient.InsertBatch(ntlmEventActivitities, false, false, true);
+                }
                 Logger.Debug("Done inserting abnormal activity");
                 SvcCtrl.StartService("ATACenter");
                 return true;

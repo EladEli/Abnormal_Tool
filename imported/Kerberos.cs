@@ -19,6 +19,10 @@ namespace Abnormal_UI.Imported
         #endregion
 
     }
+      
+
+   
+
 
     public enum KerberosEncryptionType
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Abnormal_UI.Imported;
 using MongoDB.Bson;
 
 namespace Abnormal_UI.Infra
@@ -18,10 +19,10 @@ namespace Abnormal_UI.Infra
             EntityObject targetAccount = null;
             if (targetMachine != null) { targetAccount = targetMachine; }
             else { targetAccount = domainController; }
+
             string targetSPNName = string.Format("krbtgt/{0}", domainName);
             if (targetSPN != null) { targetSPNName = targetSPN; }
             resourceIdentifier.Add("AccountId", targetAccount.id);
-
             BsonDocument resourceName = new BsonDocument();
             resourceName.Add("DomainName", domainName);
             resourceName.Add("Name", targetSPNName);
