@@ -58,7 +58,7 @@ namespace Abnormal_UI
              selectedDcsList = new ObservableCollection<EntityObject>();
              DomainName = string.Empty;
              sourceGateway = _dbClient.GetGwOids().FirstOrDefault();
-            Logger = LogManager.GetLogger("DavidTest");
+             Logger = LogManager.GetLogger("DavidTest");
         }
 
         #endregion

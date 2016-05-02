@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
-using System.Windows.Media;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 
