@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
-using System.Windows.Controls;
 using Microsoft.VisualBasic;
 using MongoDB.Bson;
 using MongoDB.Driver;

@@ -120,12 +120,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Imported\BsonConventions.cs" />
     <Compile Include="Imported\BsonSerializers.cs" />
     <Compile Include="Imported\DBClient.cs" />
     <Compile Include="Imported\EntityObject.cs" />
-    <Compile Include="Imported\Extensions.cs" />
-    <Compile Include="Imported\IAuthenticationActivity.cs" />
     <Compile Include="Imported\Kerberos.cs" />
     <Compile Include="Imported\Ldap.cs" />
     <Compile Include="Imported\MultiKey.cs" />

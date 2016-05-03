@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
+using Abnormal_UI.Imported;
 
 namespace Abnormal_UI.UI.Test
 {

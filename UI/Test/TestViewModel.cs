@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Abnormal_UI.Imported;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 
@@ -27,7 +28,6 @@ namespace Abnormal_UI.UI.Test
 
         public bool InsertSeac()
         {
-            var repo = 1;
             var entityTypes = new List<UniqueEntityType>();
             entityTypes.Add(UniqueEntityType.User);
             var entityTypes2 = new List<UniqueEntityType>();

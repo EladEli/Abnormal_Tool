@@ -51,14 +51,14 @@ namespace Abnormal_UI
         {
             _dbClient = DBClient.getDBClient();
             empList = new ObservableCollection<EntityObject>();
-             selectedEmpList = new ObservableCollection<EntityObject>();
-             machinesList = new ObservableCollection<EntityObject>();
-             selectedMachinesList = new ObservableCollection<EntityObject>();
-             dcsList = new ObservableCollection<EntityObject>();
-             selectedDcsList = new ObservableCollection<EntityObject>();
-             DomainName = string.Empty;
-             sourceGateway = _dbClient.GetGwOids().FirstOrDefault();
-             Logger = LogManager.GetLogger("DavidTest");
+            selectedEmpList = new ObservableCollection<EntityObject>();
+            machinesList = new ObservableCollection<EntityObject>();
+            selectedMachinesList = new ObservableCollection<EntityObject>();
+            dcsList = new ObservableCollection<EntityObject>();
+            selectedDcsList = new ObservableCollection<EntityObject>();
+            DomainName = string.Empty;
+            sourceGateway = _dbClient.GetGwOids().FirstOrDefault();
+            Logger = LogManager.GetLogger("TestToolboxLog");
         }
 
         #endregion

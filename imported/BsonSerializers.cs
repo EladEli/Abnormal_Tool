@@ -1,12 +1,10 @@
-﻿using Microsoft.Tri.Common.Data.Common;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using System;
-using System.Diagnostics.Contracts;
 
-namespace Microsoft.Tri.Common.Data.Serialization
+namespace Abnormal_UI.Imported
 {
 
     public class ObjectBsonSerializer<TSource, TDestination> : ClassSerializerBase<TSource>

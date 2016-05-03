@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using Abnormal_UI.Imported;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 
@@ -73,8 +74,7 @@ namespace Abnormal_UI.UI
                 return false;
             }
 
-            int userIterationCounter = 0;
-            int currentMachineCounter = 0;
+            var currentMachineCounter = 0;
             Random rnd = new Random();
             var machinesUsed = 0;
             var maxUsedMachines = 0;
@@ -82,7 +82,7 @@ namespace Abnormal_UI.UI
             foreach (var selectedUser in selectedEmpList)
             {
                 Logger.Debug("inserting normal activity for {0}",selectedUser.name);
-                for (int daysToGenerate = 1; daysToGenerate <= 23; daysToGenerate++)
+                for (var daysToGenerate = 1; daysToGenerate <= 23; daysToGenerate++)
                 {
                     var pcsUsedTodayCounter = rnd.Next(minMachines, maxMachines + 1);
                     var rcsUsedTodayCounter = rnd.Next(minMachines, maxMachines + 1);
@@ -104,7 +104,7 @@ namespace Abnormal_UI.UI
                         }
                         _dbClient.InsertBatch(kerberosAss);
                         
-                        Logger.Trace("Inserted {2} Kerberos AS activities for {0} on {1}", selectedUser.name, DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), kerberosAss.Count);
+                        Logger.Trace("Inserted {2} Kerberos AS activities for {1} on {0}", DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), selectedUser.name, kerberosAss.Count);
 
                         kerberosAss = new List<BsonDocument>();
                     }
@@ -120,7 +120,7 @@ namespace Abnormal_UI.UI
                             kerberosTgss.Add(activity);
                         }
                         _dbClient.InsertBatch(kerberosTgss);
-                        Logger.Trace("Inserted {2} Kerberos Tgs activities for {0} on {1}", selectedUser.name, DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), kerberosTgss.Count);
+                        Logger.Trace("Inserted {2} Kerberos Tgs activities for {1} on {0}", DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), selectedUser.name, kerberosTgss.Count);
 
                         kerberosTgss = new List<BsonDocument>();
                     }
@@ -139,11 +139,10 @@ namespace Abnormal_UI.UI
                             NtlmEvents.Add(activity);
                         }
                         _dbClient.InsertBatch(NtlmEvents,false,false,true);
-                        Logger.Trace("Inserted {2} Kerberos AS activities for {0} on {1}", selectedUser.name, DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), kerberosAss.Count);
+                        Logger.Trace("Inserted {2} Kerberos AS activities for {1} on {0}", DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), selectedUser.name, kerberosAss.Count);
                         NtlmEvents = new List<BsonDocument>();
                     }
                 }
-                userIterationCounter++;
                 currentMachineCounter = currentMachineCounter + maxUsedMachines;
                 
             }

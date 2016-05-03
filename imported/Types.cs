@@ -2,7 +2,7 @@
 using System.Linq;
 using MoreLinq;
 
-namespace Microsoft.Tri.Common.Data.Common
+namespace Abnormal_UI.Imported
 {
     public class DomainObjectName
     {

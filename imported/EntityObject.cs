@@ -1,4 +1,4 @@
-﻿namespace Abnormal_UI
+﻿namespace Abnormal_UI.Imported
 {
     public class EntityObject
     {

@@ -1,6 +1,6 @@
 ﻿using MoreLinq;
 
-namespace Microsoft.Tri.Common.Data.Common
+namespace Abnormal_UI.Imported
 {
     public sealed class MultiKey<TKey> where TKey : class
     {
