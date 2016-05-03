@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
@@ -67,32 +68,40 @@ namespace Abnormal_UI
 
         public void PopulateModel()
         {
-            var entityTypes = new List<UniqueEntityType>();
-            entityTypes.Add(UniqueEntityType.User);
-            var allUsers = _dbClient.GetUniqueEntity(entityTypes);
-            foreach (EntityObject oneEntity in allUsers)
+            try
             {
-                empList.Add(oneEntity);
-            }
-            empList.OrderByDescending(EntityObject => EntityObject.DnsName);
+                var entityTypes = new List<UniqueEntityType>();
+                entityTypes.Add(UniqueEntityType.User);
+                var allUsers = _dbClient.GetUniqueEntity(entityTypes);
+                foreach (EntityObject oneEntity in allUsers)
+                {
+                    empList.Add(oneEntity);
+                }
+                empList.OrderByDescending(EntityObject => EntityObject.DnsName);
 
-            var domainControllers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer, null, true);
-            foreach (var oneDC in domainControllers)
+                var domainControllers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer, null, true);
+                foreach (var oneDC in domainControllers)
+                {
+                    dcsList.Add(oneDC);
+                }
+
+                entityTypes.Clear();
+                entityTypes.Add(UniqueEntityType.Computer);
+                var allComputers = _dbClient.GetUniqueEntity(entityTypes);
+                foreach (EntityObject oneEntity in allComputers)
+                {
+                    machinesList.Add(oneEntity);
+                }
+                machinesList.OrderByDescending(EntityObject => EntityObject.DnsName);
+
+                var domain = _dbClient.GetUniqueEntity(UniqueEntityType.Domain);
+                DomainName = domain.FirstOrDefault().name;
+            }
+            catch (Exception PmException)
             {
-                dcsList.Add(oneDC);
+                Logger.Error(PmException);
             }
-
-            entityTypes.Clear();
-            entityTypes.Add(UniqueEntityType.Computer);
-            var allComputers = _dbClient.GetUniqueEntity(entityTypes);
-            foreach (EntityObject oneEntity in allComputers)
-            {
-                machinesList.Add(oneEntity);
-            }
-            machinesList.OrderByDescending(EntityObject => EntityObject.DnsName);
-
-            var domain = _dbClient.GetUniqueEntity(UniqueEntityType.Domain);
-            DomainName = domain.FirstOrDefault().name;
+            
         }
 
         #endregion

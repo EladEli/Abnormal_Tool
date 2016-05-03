@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 
@@ -13,53 +15,78 @@ namespace Abnormal_UI.UI
 
         public bool LSBIntense()
         {
-            List<BsonDocument> networkActivitities = new List<BsonDocument>();
-            if (selectedEmpList.Count < 1 || selectedMachinesList.Count < 1)
+            try
             {
+                List<BsonDocument> networkActivitities = new List<BsonDocument>();
+                if (selectedEmpList.Count < 1 || selectedMachinesList.Count < 1)
+                {
+                    return false;
+                }
+                else
+                {
+                    for (int i = 0; i < 110; i++)
+                    {
+                        networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
+                            selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
+                    }
+                    _dbClient.InsertBatch(networkActivitities);
+                    return true;
+                }
+            }
+            catch (Exception IntenseExpcetion)
+            {
+                Logger.Error(IntenseExpcetion);
                 return false;
             }
-            else
-            {
-                for (int i = 0; i < 110; i++)
-                {
-                    networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
-                        selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName,sourceGateway, 0));
-                }
-                _dbClient.InsertBatch(networkActivitities);
-                return true;
-            }
+            
         }
         public bool LSBDistinct()
         {
-            List<BsonDocument> networkActivitities = new List<BsonDocument>();
-            if (selectedEmpList.Count < 10 || selectedMachinesList.Count < 1)
+            try
             {
-                return false;
-            }
-            else
-            {
-                foreach (var user in selectedEmpList)
+                List<BsonDocument> networkActivitities = new List<BsonDocument>();
+                if (selectedEmpList.Count < 10 || selectedMachinesList.Count < 1)
                 {
-                    networkActivitities.Add(DocumentCreator.SimpleBindCreator(user, selectedMachinesList[0],
-                        selectedDcsList.FirstOrDefault(), DomainName,sourceGateway, 0));
+                    return false;
                 }
-                _dbClient.InsertBatch(networkActivitities);
-                return true;
+                else
+                {
+                    foreach (var user in selectedEmpList)
+                    {
+                        networkActivitities.Add(DocumentCreator.SimpleBindCreator(user, selectedMachinesList[0],
+                            selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
+                    }
+                    _dbClient.InsertBatch(networkActivitities);
+                    return true;
+                }
+            }
+            catch (Exception DistinctException)
+            {
+                Logger.Error(DistinctException);
+                return false;
             }
         }
         public bool LSBSingle()
         {
-            List<BsonDocument> networkActivitities = new List<BsonDocument>();
-            if (selectedEmpList.Count < 1 || selectedMachinesList[0].name == null)
+            try
             {
-                return false;
+                List<BsonDocument> networkActivitities = new List<BsonDocument>();
+                if (selectedEmpList.Count < 1 || selectedMachinesList[0].name == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
+                        selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
+                    _dbClient.InsertBatch(networkActivitities);
+                    return true;
+                }
             }
-            else
+            catch (Exception SingleException)
             {
-                networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
-                    selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName,sourceGateway, 0));
-                _dbClient.InsertBatch(networkActivitities);
-                return true;
+                Logger.Error(SingleException);
+                return false;
             }
         }
     }

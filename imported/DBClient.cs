@@ -31,27 +31,32 @@ namespace Abnormal_UI.Imported
         #region Ctors
         private DBClient()
         {
-          
-            string connectionString;
-
-            if ("mongodb://:27017" ==
-                (connectionString =
-                    string.Format("mongodb://{0}:27017",
-                        Interaction.InputBox("Please enter the server Address", "Target Server", "127.0.0.1", -1, -1))))
+            _logger = LogManager.GetLogger("TestToolboxLog");
+            try
             {
-                connectionString = "mongodb://127.0.0.1:27017";
+                string connectionString;
+                if ("mongodb://:27017" ==
+                    (connectionString =
+                        string.Format("mongodb://{0}:27017",
+                            Interaction.InputBox("Please enter the server Address", "Target Server", "127.0.0.1", -1, -1))))
+                {
+                    connectionString = "mongodb://127.0.0.1:27017";
+                }
+                _client = new MongoClient(connectionString);
+                _server = _client.GetServer();
+                _database = _server.GetDatabase("ATA");
+                _testDatabase = _server.GetDatabase("ATAActivitySimulator");
+                _uniqueEntitiesCollection = _database.GetCollection("UniqueEntity");
+                _systemProfilesCollection = _database.GetCollection("SystemProfile");
+                _gatewayIdsCollection = new List<ObjectId>(0);
+                _gatewayIdsCollection = FilterGWIds();
+                CreateActivityCollectionsOnTestDB();
             }
-
-            _client = new MongoClient(connectionString);
-            _server = _client.GetServer();
-            _database = _server.GetDatabase("ATA");
-            _testDatabase = _server.GetDatabase("ATAActivitySimulator");
-            _uniqueEntitiesCollection = _database.GetCollection("UniqueEntity");
-            _systemProfilesCollection = _database.GetCollection("SystemProfile");
-            _gatewayIdsCollection = new List<ObjectId>(0);
-            _logger = LogManager.GetLogger("DavidTest");
-            _gatewayIdsCollection = FilterGWIds();
-            CreateActivityCollectionsOnTestDB();
+            catch (Exception dbException)
+            {
+                _logger.Error(dbException);
+            }
+            
             
         }
         public static DBClient getDBClient()
