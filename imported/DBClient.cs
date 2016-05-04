@@ -7,7 +7,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using NLog;
-
 namespace Abnormal_UI.Imported
 {
     public class DBClient

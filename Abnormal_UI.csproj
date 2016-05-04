@@ -55,6 +55,12 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Tri.CenterCloud">
+      <HintPath>..\..\..\..\Desktop\Microsoft.Tri.CenterCloud.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Tri.Common">
+      <HintPath>..\..\..\..\Desktop\Microsoft.Tri.Common.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="MongoDB.Bson, Version=1.9.2.235, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -120,13 +126,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Imported\BsonSerializers.cs" />
     <Compile Include="Imported\DBClient.cs" />
     <Compile Include="Imported\EntityObject.cs" />
-    <Compile Include="Imported\Kerberos.cs" />
-    <Compile Include="Imported\Ldap.cs" />
-    <Compile Include="Imported\MultiKey.cs" />
-    <Compile Include="Imported\Types.cs" />
     <Compile Include="Infra\DocumentCreator.cs" />
     <Compile Include="Infra\SvcCtrl.cs" />
     <Compile Include="UI\Abnormal\AbnormalViewModel.cs" />
