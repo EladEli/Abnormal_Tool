@@ -5,8 +5,10 @@ using System.Linq;
 using Microsoft.VisualBasic;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Core;
 using MongoDB.Driver.Builders;
 using NLog;
+
 namespace Abnormal_UI.Imported
 {
     public class DBClient
@@ -15,11 +17,10 @@ namespace Abnormal_UI.Imported
 
         private static DBClient _dbClient;
         MongoClient _client;
-        MongoServer _server;
-        MongoDatabase _database;
-        MongoDatabase _testDatabase;
-        MongoCollection<BsonDocument> _uniqueEntitiesCollection;
-        MongoCollection<BsonDocument> _systemProfilesCollection;
+        IMongoDatabase _database;
+        IMongoDatabase _testDatabase;
+        IMongoCollection<BsonDocument> _uniqueEntitiesCollection;
+        IMongoCollection<BsonDocument> _systemProfilesCollection;
         List<ObjectId> _gatewayIdsCollection;
         List<string> _kerberosCollections;
         List<string> _ntlmEventsCollections;
@@ -42,11 +43,11 @@ namespace Abnormal_UI.Imported
                     connectionString = "mongodb://127.0.0.1:27017";
                 }
                 _client = new MongoClient(connectionString);
-                _server = _client.GetServer();
-                _database = _server.GetDatabase("ATA");
-                _testDatabase = _server.GetDatabase("ATAActivitySimulator");
-                _uniqueEntitiesCollection = _database.GetCollection("UniqueEntity");
-                _systemProfilesCollection = _database.GetCollection("SystemProfile");
+                //_server = _client.GetServer();
+                _database = _client.GetDatabase("ATA");
+                _testDatabase = _client.GetDatabase("ATAActivitySimulator");
+                _uniqueEntitiesCollection = _database.GetCollection<BsonDocument>("UniqueEntity");
+                _systemProfilesCollection = _database.GetCollection<BsonDocument>("SystemProfile");
                 _gatewayIdsCollection = new List<ObjectId>(0);
                 _gatewayIdsCollection = FilterGWIds();
                 CreateActivityCollectionsOnTestDB();
@@ -102,11 +103,11 @@ namespace Abnormal_UI.Imported
                 mongoQuery = Query.And(mongoQuery, Query.EQ("IsDomainController", true));
             }
 
-            var result = _uniqueEntitiesCollection.Find(mongoQuery);
-            foreach (var oneResult in result)
+            var result = _uniqueEntitiesCollection.Find(mongoQuery.ToBsonDocument());
+            foreach (var oneResult in result.ToEnumerable())
             {
                 EntityObject entityObject = null;
-                var resultBson = oneResult.FirstOrDefault().ToBsonDocument();
+                //var resultBson = oneResult.FirstOrDefault().ToBsonDocument();
                 if (oneResult.GetValue("Name").GetType() != typeof(BsonNull))
                 {
                     BsonArray objectType = oneResult.GetValue("_t").AsBsonArray;
@@ -133,7 +134,7 @@ namespace Abnormal_UI.Imported
         public List<ObjectId> FilterGWIds()
         {
             List<ObjectId> _gatewayIds = new List<ObjectId>();
-            foreach (var GwProfile in _systemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile")))
+            foreach (var GwProfile in _systemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument()).ToEnumerable())
             {
                 _gatewayIds.Add(GwProfile.GetElement("_id").Value.AsObjectId);
             }
@@ -148,7 +149,7 @@ namespace Abnormal_UI.Imported
         public void TriggerAbnormalModeling()
         {
             IMongoQuery mongoQuery = Query.EQ("_t", "AbnormalBehaviorDetectorProfile");
-            _systemProfilesCollection.Remove(mongoQuery);
+            _systemProfilesCollection.DeleteMany(mongoQuery.ToBsonDocument());
         }
 
         public void InsertBatch(List<BsonDocument> documents, bool isSa = false, bool isPhoto = false, bool isEvent = false)
@@ -162,7 +163,7 @@ namespace Abnormal_UI.Imported
                 collectionName = "EventActivity";
             else
                 collectionName = "NetworkActivity";
-            _testDatabase.GetCollection(collectionName).InsertBatch(documents);
+            _testDatabase.GetCollection<BsonDocument>(collectionName).InsertMany(documents);
         }
 
         public void InsertBatchTest(List<BsonDocument> documents, bool isSa = false, bool isPhoto = false, bool isEvent = false)
@@ -176,12 +177,12 @@ namespace Abnormal_UI.Imported
                 collectionName = "EventActivity";
             else
                 collectionName = "NetworkActivity";
-            _database.GetCollection(collectionName).InsertBatch(documents);
+            _database.GetCollection<BsonDocument>(collectionName).InsertMany(documents);
         }
         public void SetCenterProfileForReplay()
         {
             
-            var centerSystemProfile = _systemProfilesCollection.Find(Query.EQ("_t", "CenterSystemProfile"));
+            var centerSystemProfile = _systemProfilesCollection.Find(Query.EQ("_t", "CenterSystemProfile").ToBsonDocument()).ToEnumerable();
             foreach (var centerProfile in centerSystemProfile)
             {
                 var configurationBson = centerProfile.GetElement("Configuration").Value.AsBsonDocument;
@@ -205,7 +206,8 @@ namespace Abnormal_UI.Imported
 
                 centerProfile.Remove("Configuration");
                 centerProfile.Add("Configuration", configurationBson);
-                _systemProfilesCollection.Save(centerProfile);
+                _systemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", centerProfile["_id"]),
+                    centerProfile);
 
             }
           
@@ -214,7 +216,11 @@ namespace Abnormal_UI.Imported
         public void RenameKerbCollections()
         {
             var monthAgo = DateTime.UtcNow.Subtract(new TimeSpan(27, 0, 0, 0)).ToString("yyyyMMddhhmmss", CultureInfo.InvariantCulture);
-            _kerberosCollections = _database.GetCollectionNames().Where(collectionName => collectionName.Contains("Kerberos")).ToList();
+            _kerberosCollections =
+                _database.ListCollections()
+                    .ToList()
+                    .Select(_ => _["name"].AsString).Where(_ => _.StartsWith("Kerberos")).ToList()
+                    ;
             foreach (var collection in _kerberosCollections)
             {
                 if (collection.Contains("KerberosAs"))
@@ -236,8 +242,11 @@ namespace Abnormal_UI.Imported
         {
             var monthAgo = DateTime.UtcNow.Subtract(new TimeSpan(27, 0, 0, 0))
                 .ToString("yyyyMMddhhmmss", CultureInfo.InvariantCulture);
-            _ntlmEventsCollections =
-                _database.GetCollectionNames().Where(collectionName => collectionName.Contains("NtlmEvent")).ToList();
+            _ntlmEventsCollections = 
+                _database.ListCollections()
+                    .ToList()
+                    .Select(_ => _["name"].AsString).Where(_ => _.StartsWith("Ntlm")).ToList()
+                    ;
             foreach (var collection in _ntlmEventsCollections)
             {
                 _database.RenameCollection(collection, "NtlmEvent_" + monthAgo);
@@ -260,6 +269,7 @@ namespace Abnormal_UI.Imported
             _testDatabase.CreateCollection("NetworkActivity");
             _logger.Debug("Cleared Test NA's collection");
         }
+        
 
         //public void InsertBatchPhotos(List<BsonDocument> photos)
         //{

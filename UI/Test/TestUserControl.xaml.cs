@@ -8,7 +8,6 @@ namespace Abnormal_UI.UI.Test
     public partial class TestUserControl : UserControl
     {
         private TestViewModel _model;
-        private AbnormalViewModel _model2;
         public TestUserControl()
         {
             InitializeComponent();
@@ -56,12 +55,6 @@ namespace Abnormal_UI.UI.Test
         {
             UpdateSelected();
             _model.InsertAe();
-        }
-
-        private void Btn3_OnClick(object sender, System.Windows.RoutedEventArgs e)
-        {
-            _model2.setCenter();
-            //_model.StopService("ATACenter");
         }
     }
 }

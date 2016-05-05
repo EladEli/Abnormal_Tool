@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using Abnormal_UI.Imported;
 using MongoDB.Bson;
 
+
 namespace Abnormal_UI.Infra
 {
     public static class DocumentCreator
     {
-        //public static DBClient _dbClient = DBClient.getDBClient();
         public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0)
         {
             DateTime oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));

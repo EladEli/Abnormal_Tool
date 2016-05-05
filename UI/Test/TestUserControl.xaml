@@ -110,8 +110,7 @@
                     Height="30" 
                     Margin="5"
                     Content="Test service control"
-                    x:Name="Btn3" 
-                    Click="Btn3_OnClick"/>
+                    x:Name="Btn3"/>
                 <!--<Button Width="200" 
                     Height="30" 
                     Margin="0 5 0 20"
