@@ -43,7 +43,6 @@ namespace Abnormal_UI.Imported
                     connectionString = "mongodb://127.0.0.1:27017";
                 }
                 _client = new MongoClient(connectionString);
-                //_server = _client.GetServer();
                 _database = _client.GetDatabase("ATA");
                 _testDatabase = _client.GetDatabase("ATAActivitySimulator");
                 _uniqueEntitiesCollection = _database.GetCollection<BsonDocument>("UniqueEntity");
@@ -68,16 +67,16 @@ namespace Abnormal_UI.Imported
 
         public List<EntityObject> GetUniqueEntity(UniqueEntityType entityType, string name = null, bool getDomainController = false)
         {
-            List<UniqueEntityType> entityTypes = new List<UniqueEntityType>();
+            var entityTypes = new List<UniqueEntityType>();
             entityTypes.Add(entityType);
             return GetUniqueEntity(entityTypes, name, getDomainController);
         }
 
         public List<EntityObject> GetUniqueEntity(List<UniqueEntityType> entityTypes, string name = null, bool getDomainController = false)
         {
-            List<EntityObject> allNames = new List<EntityObject>();
+            var allNames = new List<EntityObject>();
 
-            List<IMongoQuery> queryElements = new List<IMongoQuery>();
+            var queryElements = new List<IMongoQuery>();
             IMongoQuery mongoQuery;
 
             foreach (var oneEntityType in entityTypes)
@@ -133,12 +132,7 @@ namespace Abnormal_UI.Imported
 
         public List<ObjectId> FilterGWIds()
         {
-            List<ObjectId> _gatewayIds = new List<ObjectId>();
-            foreach (var GwProfile in _systemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument()).ToEnumerable())
-            {
-                _gatewayIds.Add(GwProfile.GetElement("_id").Value.AsObjectId);
-            }
-            return _gatewayIds;
+            return _systemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument()).ToEnumerable().Select(GwProfile => GwProfile.GetElement("_id").Value.AsObjectId).ToList();
         }
 
         public List<ObjectId> GetGwOids()
@@ -221,21 +215,29 @@ namespace Abnormal_UI.Imported
                     .ToList()
                     .Select(_ => _["name"].AsString).Where(_ => _.StartsWith("Kerberos")).ToList()
                     ;
-            foreach (var collection in _kerberosCollections)
+            try
             {
-                if (collection.Contains("KerberosAs"))
+                foreach (var collection in _kerberosCollections)
                 {
-                    _database.RenameCollection(collection,
-                   "KerberosAs_" + monthAgo);
-                }
+                    if (collection.Contains("KerberosAs"))
+                    {
+                        _database.RenameCollection(collection,
+                       "KerberosAs_" + monthAgo);
+                    }
 
-                else if (collection.Contains("KerberosTgs"))
-                {
-                    _database.RenameCollection(collection,
-                    "KerberosTgs_" + monthAgo);
+                    else if (collection.Contains("KerberosTgs"))
+                    {
+                        _database.RenameCollection(collection,
+                        "KerberosTgs_" + monthAgo);
+                    }
                 }
+                _logger.Debug("Renamed Kerberos Collection");
             }
-            _logger.Debug("Renamed Kerberos Collection");
+            catch (Exception)
+            {
+                _logger.Debug("Kerberos collection already renamed");
+            }
+            
         }
 
         public void RenameNtlmEventsCollections()
@@ -247,11 +249,19 @@ namespace Abnormal_UI.Imported
                     .ToList()
                     .Select(_ => _["name"].AsString).Where(_ => _.StartsWith("Ntlm")).ToList()
                     ;
-            foreach (var collection in _ntlmEventsCollections)
+            try
             {
-                _database.RenameCollection(collection, "NtlmEvent_" + monthAgo);
-                _logger.Debug("Renamed NTLM event collection");
+                foreach (var collection in _ntlmEventsCollections)
+                {
+                    _database.RenameCollection(collection, "NtlmEvent_" + monthAgo);
+                    _logger.Debug("Renamed NTLM event collection");
+                }
             }
+            catch (Exception)
+            {
+                _logger.Debug("Ntlm collection alraedy renamed");
+            }
+            
         }
 
         public void CreateActivityCollectionsOnTestDB()
@@ -269,12 +279,6 @@ namespace Abnormal_UI.Imported
             _testDatabase.CreateCollection("NetworkActivity");
             _logger.Debug("Cleared Test NA's collection");
         }
-        
-
-        //public void InsertBatchPhotos(List<BsonDocument> photos)
-        //{
-        //    _database.GetCollection("UserPhoto").InsertBatch(photos);
-        //}
 
         #endregion
     }
