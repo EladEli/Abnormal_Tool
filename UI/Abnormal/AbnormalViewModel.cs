@@ -36,8 +36,6 @@ namespace Abnormal_UI.UI
         }
 
         private string[] Spns;
-        
-
         public AbnormalViewModel() : base()
         {
             minMachines = 1;
@@ -54,9 +52,6 @@ namespace Abnormal_UI.UI
                 "DNS",
                 "RPC"
             };
-
-
-
         }
         public bool ActivateUsers()
         {

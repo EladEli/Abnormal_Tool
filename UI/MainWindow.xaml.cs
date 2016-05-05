@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using Abnormal_UI.UI;
+using Abnormal_UI.UI.Dsa;
 using Abnormal_UI.UI.Test;
 
 namespace Abnormal_UI
@@ -12,11 +13,13 @@ namespace Abnormal_UI
     {
         private AbnormalViewModel _abnormalModel;
         private SimpleBindViewModel _sbModel;
+        private TestViewModel _testModel;
+        private DirectoryActivitiesViewModel _dsaModel;
         public AbnormalAttackUserControl _abnormalAttackWindow { get; set; }
         public LsbAttackUserControl _lsbAttackWindow { get; set; }
-
-        private TestViewModel _testModel;
         public TestUserControl _testWindow { get; set; }
+        public DirectoryActivitiesUserControl _dsaWindow { get; set; }
+
 
         public MainWindow()
         {
@@ -33,6 +36,10 @@ namespace Abnormal_UI
             _testModel = new TestViewModel();
             _testModel.PopulateModel();
             _testWindow = new TestUserControl(_testModel);
+
+            _dsaModel = new DirectoryActivitiesViewModel();
+            _dsaModel.PopulateModel();
+            _dsaWindow = new DirectoryActivitiesUserControl(_dsaModel);
 
             DataContext = this;
         }

@@ -86,16 +86,8 @@ namespace Abnormal_UI.UI
 
         private void b_Click(object sender, RoutedEventArgs e)
         {
-           // UpdateSelected();
-           // var result = _model.InsertSEAC();
-           // MessageBox.Show("Ended inserting SA's");
-
            _model.setCenter();
            MessageBox.Show("SetCenter");
-            
-
-           // MessageBox.Show(_model.GetGWIDS().ToString());
-           
         }
     }
 }

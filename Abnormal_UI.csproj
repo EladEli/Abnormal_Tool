@@ -119,11 +119,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\Dsa\DirectoryActivitiesViewModel.cs" />
+    <Compile Include="UI\Dsa\DirectoryActivitiesUserControl.xaml.cs">
+      <DependentUpon>DirectoryActivitiesUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Test\TestUserControl.xaml.cs">
       <DependentUpon>TestUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Test\TestViewModel.cs" />
     <Page Include="UI\Abnormal\AbnormalAttackUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Dsa\DirectoryActivitiesUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

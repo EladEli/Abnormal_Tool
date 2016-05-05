@@ -15,6 +15,9 @@
             <TabItem Header="Test">
                 <ContentControl Content="{Binding _testWindow, Mode=OneWay}"/>
             </TabItem>
+            <TabItem Header="Dsa" Margin="-2,-2,0,-2">
+                <ContentControl Content="{Binding __dsaWindow, Mode=OneWay}"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>
