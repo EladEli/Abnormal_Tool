@@ -10,8 +10,8 @@ namespace Abnormal_UI.Infra
     {
         public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0)
         {
-            DateTime oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
-            BsonDocument sourceAccount = new BsonDocument();
+            var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
+            var sourceAccount = new BsonDocument();
             sourceAccount.Add("DomainName", domainName);
             sourceAccount.Add("Name", userEntity.name);
 
@@ -29,7 +29,6 @@ namespace Abnormal_UI.Infra
             resourceIdentifier.Add("ResourceName", resourceName);
 
             BsonDocument networkActivityDocument = new BsonDocument();
-
             networkActivityDocument.Add("_id", new ObjectId());
             networkActivityDocument.Add("_t", new BsonArray(new string[5] { "Entity", "NetworkActivity", "Kerberos", "KerberosKdc", "Kerberos" + actionType }));
             networkActivityDocument.Add("HorizontalParentId", new ObjectId());

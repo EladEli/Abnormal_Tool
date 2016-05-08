@@ -150,7 +150,6 @@ namespace Abnormal_UI.UI
                 Logger.Debug("Gone to sleep for 1 minute of user profilling");
                 Thread.Sleep(60000);
                 Logger.Debug("Woke up!");
-                _dbClient.ClearTestNaCollection();
                 return true;
             }
             catch (Exception AcException)
@@ -222,7 +221,6 @@ namespace Abnormal_UI.UI
                     }
                     Logger.Debug("Done inserting abnormal activity");
                     SvcCtrl.StartService("ATACenter");
-                    _dbClient.ClearTestNaCollection();
                     return true;
                 }
             }

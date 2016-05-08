@@ -4,7 +4,80 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Abnormal_UI.UI.Dsa"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="535.032">
-    <StackPanel Height="300" VerticalAlignment="Top" HorizontalAlignment="Right" Width="193"/>
+             mc:Ignorable="d" d:DesignHeight="311.609">
+    <DockPanel>
+        <StackPanel Orientation="Horizontal">
+            <ListBox Width="250" 
+                     Height="Auto" 
+                     Margin="20,32,20,8"
+                     x:Name="DsaListBox" 
+                     ItemsSource="{Binding _ToComplete}"
+                     SelectionMode="Extended" 
+                     SelectedIndex="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="2">
+                            <TextBlock Text="{Binding _ToComplete}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock Text="{Binding _ToComplete}" 
+                       Name="SelUsersCount"
+                       Width="20" 
+                       Height="20"
+                       VerticalAlignment="Bottom"
+                       Margin="-10 0 0 20"/>
+            <ListBox Width="250" 
+                     Height="Auto" 
+                     Margin="20,31,20,9"
+                     ItemsSource="{Binding _ToComplete}"
+                     x:Name="CompletedListBox" 
+                     SelectionMode="Extended"
+                     SelectedIndex="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="2">
+                            <TextBlock Text="{Binding _ToComplete}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Right" >
+            <ListBox Width="200" 
+                     Height="100" 
+                     Margin="20"
+                     ItemsSource="{Binding _ToComplete}"
+                     x:Name="BoxDCs" 
+                     SelectionMode="Extended"
+                     SelectedIndex="0" 
+                     HorizontalAlignment="Left">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="2">
+                            <TextBlock Text="{Binding _toComplete}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel HorizontalAlignment="Left" Margin="20" Height="122">
+                <TextBox Width="200" 
+                    Name="UserTextBox"
+                    Height="30" 
+                    Margin="5"
+                    Text="DsaUser"/>
+                <TextBox Width="200" 
+                    Name="GroupTextBox"
+                    Height="30" 
+                    Margin="5"
+                    Text="DsaGroup"/>
+                <TextBox Width="200" 
+                    Name="ComputerTextBox"
+                    Height="30" 
+                    Margin="5"
+                    Text="DsaComputer"/>
+            </StackPanel>
+        </StackPanel>
+    </DockPanel>
 </UserControl>
