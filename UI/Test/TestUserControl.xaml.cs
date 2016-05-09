@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using Abnormal_UI.Imported;
 
@@ -22,39 +24,31 @@ namespace Abnormal_UI.UI.Test
 
         private void UpdateSelected()
         {
-            List<EntityObject> selectedEntityObjects = new List<EntityObject>();
-            foreach (EntityObject selectedItem in BoxUsers.SelectedItems)
-            {
-                selectedEntityObjects.Add(selectedItem);
-            }
+            List<EntityObject> selectedEntityObjects = BoxUsers.SelectedItems.Cast<EntityObject>().ToList();
             _model.selectedEmpList = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
 
-            foreach (EntityObject selectedItem in BoxMachines.SelectedItems)
-            {
-                selectedEntityObjects.Add(selectedItem);
-            }
+            selectedEntityObjects.AddRange(BoxMachines.SelectedItems.Cast<EntityObject>());
             _model.selectedMachinesList = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
 
-            foreach (EntityObject selectedItem in BoxDCs.SelectedItems)
-            {
-                selectedEntityObjects.Add(selectedItem);
-            }
+            selectedEntityObjects.AddRange(BoxDCs.SelectedItems.Cast<EntityObject>());
             _model.selectedDcsList = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
         }
 
-        private void Btn1_OnClick(object sender, System.Windows.RoutedEventArgs e)
+        private async void Btn1_OnClickAsync(object sender, System.Windows.RoutedEventArgs e)
         {
             UpdateSelected();
-            _model.InsertSeac();
+            Btn1.IsEnabled = false;
+            await Task.Run(() => _model.InsertSeac());
+            Btn1.IsEnabled = true;
         }
 
-        private void Btn2_OnClick(object sender, System.Windows.RoutedEventArgs e)
+        private async void Btn2_OnClickAsync(object sender, System.Windows.RoutedEventArgs e)
         {
             UpdateSelected();
-            _model.InsertAe();
+            await Task.Run(() => _model.InsertAe());
         }
     }
 }

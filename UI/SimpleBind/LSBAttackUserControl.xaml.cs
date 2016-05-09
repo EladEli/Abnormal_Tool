@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Abnormal_UI.Imported;
@@ -23,93 +25,44 @@ namespace Abnormal_UI.UI
 
         private void UpdateSelected()
         {
-            List<EntityObject> selectedEntityObjects = new List<EntityObject>();
-            foreach (EntityObject selectedItem in BoxUsers.SelectedItems)
-            {
-                selectedEntityObjects.Add(selectedItem);
-            }
+            var selectedEntityObjects = BoxUsers.SelectedItems.Cast<EntityObject>().ToList();
             _model.selectedEmpList = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
 
-            foreach (EntityObject selectedItem in BoxMachines.SelectedItems)
-            {
-                selectedEntityObjects.Add(selectedItem);
-            }
+            selectedEntityObjects.AddRange(BoxMachines.SelectedItems.Cast<EntityObject>());
             _model.selectedMachinesList = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
 
-            foreach (EntityObject selectedItem in BoxDCs.SelectedItems)
-            {
-                selectedEntityObjects.Add(selectedItem);
-            }
+            selectedEntityObjects.AddRange(BoxDCs.SelectedItems.Cast<EntityObject>());
             _model.selectedDcsList = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
         }
 
-        //private void RunLSBDistinct()
-        //{
-        //    UpdateSelected();
-        //    var result = _model.LSBDistinct();
-        //    if (result)
-        //    {
-        //        //MessageBox.Show("User activity insertion ended.");
-        //        statusTB.Dispatcher.Invoke(new Action(() => statusTB.Text = "User activity insertion ended."),
-        //            DispatcherPriority.Normal, null);
-        //    }
-        //    else
-        //    {
-        //        //MessageBox.Show("Please select at least 10 users and at least 1 machine!");
-        //        statusTB.Dispatcher.Invoke(new Action(() => statusTB.Text = "Please select at least 10 users and at least 1 machine!"),
-        //           DispatcherPriority.Normal, null);
-        //    }
-        //}
-        //private void BtnLSBDistinct_OnClick(object sender, RoutedEventArgs e)
-        //{
-        //    Thread thread = new Thread(RunLSBDistinct);
-        //    thread.Start();           
-        //}
-        private void BtnLSBDistinct_OnClick(object sender, RoutedEventArgs e)
+        private async void BtnLSBDistinct_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
-            var result = _model.LSBDistinct();
-            if (result)
-            {
-                MessageBox.Show("User activity insertion ended.");
-                //statusTB.Dispatcher.Invoke(new Action(() => statusTB.Text = "User activity insertion ended."),
-                  //  DispatcherPriority.Normal, null);
-            }
-            else
-            {
-                MessageBox.Show("Please select at least 10 users and at least 1 machine!");
-                //statusTB.Dispatcher.Invoke(new Action(() => statusTB.Text = "Please select at least 10 users and at least 1 machine!"),
-                  // DispatcherPriority.Normal, null);
-            }
+            BtnLSBDistinct.IsEnabled = false;
+            var result = await Task.Run(() => _model.LSBDistinct());
+            BtnLSBDistinct.IsEnabled = true;
+            MessageBox.Show(result
+                ? "User activity insertion ended."
+                : "Please select at least 10 users and at least 1 machine!");
         }
-        private void BtnLSBDintense_OnClick(object sender, RoutedEventArgs e)
+        private async void BtnLSBDintense_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
-            var result = _model.LSBIntense();
-            if (result)
-            {
-                MessageBox.Show("User activity insertion ended.");
-            }
-            else
-            {
-                MessageBox.Show("Please select at least 1 user and 1 machine!");
-            }
+            BtnLSBIntense.IsEnabled = false;
+            var result = await Task.Run(() => _model.LSBIntense());
+            BtnLSBIntense.IsEnabled = true;
+            MessageBox.Show(result ? "User activity insertion ended." : "Please select at least 1 user and 1 machine!");
         }
-        private void BtnLSBSpecific_OnClick(object sender, RoutedEventArgs e)
+        private async void BtnLSBSpecific_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
-            var result = _model.LSBSingle();
-            if (result)
-            {
-                MessageBox.Show("User activity insertion ended.");
-            }
-            else
-            {
-                MessageBox.Show("Please select at least 1 user and 1 machine!");
-            }
+            BtnLSBSpecific.IsEnabled = false;
+            var result = await Task.Run(() => _model.LSBSingle());
+            BtnLSBSpecific.IsEnabled = true;
+            MessageBox.Show(result ? "User activity insertion ended." : "Please select at least 1 user and 1 machine!");
         }
     }
 

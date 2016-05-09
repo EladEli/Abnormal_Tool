@@ -99,24 +99,18 @@
                     Margin="5"
                     Content="SAEC"
                     x:Name="Btn1" 
-                    Click="Btn1_OnClick"/>
+                    Click="Btn1_OnClickAsync"/>
                <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="AE"
                     x:Name="Btn2" 
-                    Click="Btn2_OnClick"/>
-                    <Button Width="200" 
+                    Click="Btn2_OnClickAsync"/>
+                <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="Test service control"
                     x:Name="Btn3"/>
-                <!--<Button Width="200" 
-                    Height="30" 
-                    Margin="0 5 0 20"
-                    Content="Auto-Abnormal"
-                    x:Name="BtnAutoAbnormal" 
-                    Click="BtnAutoAbnormal_OnClick"/>-->
             </StackPanel>
         </StackPanel>
     </DockPanel>

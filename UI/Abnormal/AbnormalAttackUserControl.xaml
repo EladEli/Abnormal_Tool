@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Abnormal_UI.UI.AbnormalAttackUserControl"
+﻿<UserControl x:Class="Abnormal_UI.UI.Abnormal.AbnormalAttackUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -106,13 +106,13 @@
                     Margin="5"
                     Content="Activate Users"
                     x:Name="BtnActivateUsers" 
-                    Click="BtnActivateUsers_OnClick"/>
+                    Click="BtnActivateUsers_OnClickAsync"/>
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="Abnormal Activity"
                     x:Name="BtnAbnormalActivity" 
-                    Click="BtnAbnormalActivity_OnClick"/>
+                    Click="BtnAbnormalActivity_OnClickAsync"/>
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
@@ -124,7 +124,7 @@
                     Margin="0 5 0 20"
                     Content="Auto-Abnormal"
                     x:Name="BtnAutoAbnormal" 
-                    Click="BtnAutoAbnormal_OnClick"/>
+                    Click="BtnAutoAbnormal_OnClickAsync"/>
             </StackPanel>
         </StackPanel>
     </DockPanel>

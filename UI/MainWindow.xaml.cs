@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Abnormal_UI.UI;
 using Abnormal_UI.UI.Dsa;
 using Abnormal_UI.UI.Test;
+using AbnormalAttackUserControl = Abnormal_UI.UI.Abnormal.AbnormalAttackUserControl;
 
 namespace Abnormal_UI
 {

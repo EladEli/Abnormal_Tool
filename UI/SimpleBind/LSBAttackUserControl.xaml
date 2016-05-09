@@ -75,19 +75,19 @@
                     Margin="5"
                     Content="LSBIntense"
                     x:Name="BtnLSBIntense" 
-                    Click="BtnLSBDintense_OnClick"/>
+                    Click="BtnLSBDintense_OnClickAsync"/>
             <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="LSB Distinct"
                     x:Name="BtnLSBDistinct" 
-                    Click="BtnLSBDistinct_OnClick"/>
+                    Click="BtnLSBDistinct_OnClickAsync"/>
             <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="LSB Specific"
                     x:Name="BtnLSBSpecific" 
-                    Click="BtnLSBSpecific_OnClick"/>
+                    Click="BtnLSBSpecific_OnClickAsync"/>
             </StackPanel>
         </StackPanel>
     </DockPanel>

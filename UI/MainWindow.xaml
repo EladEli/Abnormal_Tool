@@ -12,10 +12,10 @@
                 <ContentControl Content="{Binding _lsbAttackWindow, Mode=OneWay}"/>
             </TabItem>
 
-            <TabItem Header="Test" Height="24" VerticalAlignment="Top">
+            <TabItem Header="Test">
                 <ContentControl Content="{Binding _testWindow, Mode=OneWay}"/>
             </TabItem>
-            <TabItem Header="Dsa" Margin="-2,-2,0,-2">
+            <TabItem Header="Dsa">
                 <ContentControl Content="{Binding _dsaWindow, Mode=OneWay}"/>
             </TabItem>
         </TabControl>
