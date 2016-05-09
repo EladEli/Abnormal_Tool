@@ -7,7 +7,7 @@ using Abnormal_UI.Imported;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 
-namespace Abnormal_UI.UI
+namespace Abnormal_UI.UI.Abnormal
 {
     public class AbnormalViewModel : AttackViewModel
     {
@@ -63,16 +63,16 @@ namespace Abnormal_UI.UI
                 SvcCtrl.StopService("ATACenter");
                 _dbClient.SetCenterProfileForReplay();
                 Logger.Debug("Center profile set for replay");
-                List<BsonDocument> kerberosAss = new List<BsonDocument>();
-                List<BsonDocument> kerberosTgss = new List<BsonDocument>();
-                List<BsonDocument> NtlmEvents = new List<BsonDocument>();
+                var kerberosAss = new List<BsonDocument>();
+                var kerberosTgss = new List<BsonDocument>();
+                var NtlmEvents = new List<BsonDocument>();
                 if (selectedMachinesList.Count / selectedEmpList.Count < 2)
                 {
                     return false;
                 }
 
                 var currentMachineCounter = 0;
-                Random rnd = new Random();
+                var rnd = new Random();
                 var machinesUsed = 0;
                 var maxUsedMachines = 0;
 
@@ -108,11 +108,11 @@ namespace Abnormal_UI.UI
 
                         if (includeTgs)
                         {
-                            for (int i = 0; i <= (rcsUsedTodayCounter - 1); i++)
+                            for (var i = 0; i <= (rcsUsedTodayCounter - 1); i++)
                             {
                                 if ((currentMachineCounter + rcsUsedTodayCounter) >= selectedMachinesList.Count - 1) { currentMachineCounter = 0; }
-                                EntityObject currentSelectedMachine = selectedMachinesList[currentMachineCounter + i];
-                                EntityObject defaultMachine = selectedMachinesList[currentMachineCounter];
+                                var currentSelectedMachine = selectedMachinesList[currentMachineCounter + i];
+                                var defaultMachine = selectedMachinesList[currentMachineCounter];
                                 var activity = DocumentCreator.KerberosCreator(selectedUser, defaultMachine, selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, string.Format("{0}/{1}", Spns[rnd.Next(0, 5)], currentSelectedMachine.name), currentSelectedMachine, "Tgs", daysToGenerate);
                                 kerberosTgss.Add(activity);
                             }
@@ -123,14 +123,14 @@ namespace Abnormal_UI.UI
                         }
                         if (includeEvent)
                         {
-                            for (int i = 0; i <= (pcsUsedTodayCounter - 1); i++)
+                            for (var i = 0; i <= (pcsUsedTodayCounter - 1); i++)
                             {
                                 if ((currentMachineCounter + pcsUsedTodayCounter) >= selectedMachinesList.Count - 1)
                                 {
                                     currentMachineCounter = 0;
                                     machinesUsed = machinesUsed + selectedMachinesList.Count;
                                 }
-                                EntityObject currentSelectedMachine = selectedMachinesList[currentMachineCounter + i];
+                                var currentSelectedMachine = selectedMachinesList[currentMachineCounter + i];
                                 var activity = DocumentCreator.EventCreator(selectedUser, currentSelectedMachine,
                                     selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, daysToGenerate);
                                 NtlmEvents.Add(activity);
@@ -163,7 +163,7 @@ namespace Abnormal_UI.UI
         {
             try
             {
-                Random rnd = new Random();
+                var rnd = new Random();
                 _dbClient.ClearTestNaCollection();
                 SvcCtrl.RestartService("ATACenter");
                 Logger.Debug("Gone to sleep for 2 minutes of tree build");
@@ -171,8 +171,8 @@ namespace Abnormal_UI.UI
                 Logger.Debug("Woke up!");
                 SvcCtrl.StopService("ATACenter");
 
-                List<BsonDocument> networkActivitities = new List<BsonDocument>();
-                List<BsonDocument> ntlmEventActivitities = new List<BsonDocument>();
+                var networkActivitities = new List<BsonDocument>();
+                var ntlmEventActivitities = new List<BsonDocument>();
                 int hoursCounter = 4;
                 if (selectedEmpList.Count == 0 && specificUser == null)
                 {
@@ -239,19 +239,18 @@ namespace Abnormal_UI.UI
                 selectedMachinesList = new ObservableCollection<EntityObject> { };
                 selectedDcsList = new ObservableCollection<EntityObject> { };
 
-                for (int i = 0; i < 70; i++) { selectedEmpList.Add(empList[i]); }
-                for (int i = 0; i < 250; i++) { selectedMachinesList.Add(machinesList[i]); }
+                for (var i = 0; i < 70; i++) { selectedEmpList.Add(empList[i]); }
+                for (var i = 0; i < 250; i++) { selectedMachinesList.Add(machinesList[i]); }
                 selectedDcsList.Add(dcsList.FirstOrDefault());
 
                 ActivateUsers();
 
-                Random rnd2 = new Random();
+                var rnd2 = new Random();
                 selectedMachinesList = new ObservableCollection<EntityObject> { };
-                for (int i = 0; i < 10; i++) { selectedMachinesList.Add(machinesList[250 + i]); }
+                for (var i = 0; i < 10; i++) { selectedMachinesList.Add(machinesList[250 + i]); }
 
                 AbnormalActivity(new ObservableCollection<EntityObject> { selectedEmpList[rnd2.Next(1, 60)] });
 
-                //TriggerAbnormalModeling();
                 return selectedEmpList[0].name;
             }
             catch (Exception AutoException)

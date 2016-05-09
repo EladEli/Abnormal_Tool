@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
-using Abnormal_UI.UI;
+using Abnormal_UI.UI.Abnormal;
 using Abnormal_UI.UI.Dsa;
 using Abnormal_UI.UI.Test;
 using AbnormalAttackUserControl = Abnormal_UI.UI.Abnormal.AbnormalAttackUserControl;
+using LsbAttackUserControl = Abnormal_UI.UI.SimpleBind.LsbAttackUserControl;
 
-namespace Abnormal_UI
+namespace Abnormal_UI.UI
 {
    
     public partial class MainWindow 

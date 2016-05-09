@@ -24,7 +24,7 @@ namespace Abnormal_UI.UI.Test
 
         private void UpdateSelected()
         {
-            List<EntityObject> selectedEntityObjects = BoxUsers.SelectedItems.Cast<EntityObject>().ToList();
+            var selectedEntityObjects = BoxUsers.SelectedItems.Cast<EntityObject>().ToList();
             _model.selectedEmpList = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
 
