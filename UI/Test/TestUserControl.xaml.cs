@@ -9,7 +9,7 @@ namespace Abnormal_UI.UI.Test
 {
     public partial class TestUserControl : UserControl
     {
-        private TestViewModel _model;
+        private readonly TestViewModel _model;
         public TestUserControl()
         {
             InitializeComponent();

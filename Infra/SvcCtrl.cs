@@ -4,16 +4,16 @@ using NLog;
 
 namespace Abnormal_UI.Infra
 {
-    class SvcCtrl
+    internal class SvcCtrl
     {
-        private static Logger _logger = LogManager.GetLogger("TestToolboxLog");
+        private static readonly Logger _logger = LogManager.GetLogger("TestToolboxLog");
 
         public static bool StartService(string serviceName, int timeoutSeconds = 10)
         {
-            ServiceController service = new ServiceController(serviceName);
+            var service = new ServiceController(serviceName);
             try
             {
-                TimeSpan timeout = TimeSpan.FromSeconds(timeoutSeconds);
+                var timeout = TimeSpan.FromSeconds(timeoutSeconds);
                 service.Start();
                 service.WaitForStatus(ServiceControllerStatus.Running, timeout);
                 _logger.Debug("Started service {0}",serviceName);
@@ -28,10 +28,10 @@ namespace Abnormal_UI.Infra
 
         public static bool StopService(string serviceName, int timeoutSeconds = 10)
         {
-            ServiceController service = new ServiceController(serviceName);
+            var service = new ServiceController(serviceName);
             try
             {
-                TimeSpan timeout = TimeSpan.FromSeconds(timeoutSeconds);
+                var timeout = TimeSpan.FromSeconds(timeoutSeconds);
                 service.Stop();
                 service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
                 _logger.Debug("Stopped service {0}", serviceName);
@@ -47,10 +47,10 @@ namespace Abnormal_UI.Infra
 
         public static bool RestartService(string serviceName, int timeoutSeconds = 10)
         {
-            ServiceController service = new ServiceController(serviceName);
+            var service = new ServiceController(serviceName);
             try
             {
-                TimeSpan timeout = TimeSpan.FromSeconds(timeoutSeconds);
+                var timeout = TimeSpan.FromSeconds(timeoutSeconds);
                 service.Stop();
                 service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
                 service.Start();

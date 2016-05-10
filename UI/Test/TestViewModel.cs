@@ -10,20 +10,20 @@ namespace Abnormal_UI.UI.Test
     public class TestViewModel : AttackViewModel
     {
 
-        private int saAmount;
+        private int _saAmount;
         public int SaAmount
         {
-            get { return saAmount; }
+            get { return _saAmount; }
             set
             {
-                saAmount = value;
+                _saAmount = value;
                 OnPropertyChanged();
             }
         }
 
         public TestViewModel() : base()
         {
-            saAmount = 200;
+            _saAmount = 200;
         }
 
         public bool InsertSeac()
@@ -34,16 +34,14 @@ namespace Abnormal_UI.UI.Test
                 entityTypes.Add(UniqueEntityType.User);
                 var entityTypes2 = new List<UniqueEntityType>();
                 entityTypes2.Add(UniqueEntityType.Computer);
-                List<EntityObject> userEntity = _dbClient.GetUniqueEntity(entityTypes);
-                List<EntityObject> computerEntity = _dbClient.GetUniqueEntity(entityTypes2);
-                //List<BsonDocument> notifications = new List<BsonDocument>();
-                List<BsonDocument> suspicousActivitities = new List<BsonDocument>();
-                Random rnd = new Random();
-                for (int i = 0; i < saAmount; i++)
+                var userEntity = _dbClient.GetUniqueEntity(entityTypes);
+                var computerEntity = _dbClient.GetUniqueEntity(entityTypes2);
+                var suspicousActivitities = new List<BsonDocument>();
+                var rnd = new Random();
+                for (var i = 0; i < _saAmount; i++)
                 {
                     suspicousActivitities.Add(DocumentCreator.SAFillerSEAC(userEntity, computerEntity, rnd));
                 }
-                //_dbClient.InsertBatchSAS(suspicousActivitities);
                 _dbClient.InsertBatchTest(suspicousActivitities, true);
                 return true;
             }
@@ -58,19 +56,15 @@ namespace Abnormal_UI.UI.Test
         {
             try
             {
-                var entityTypes = new List<UniqueEntityType>();
-                entityTypes.Add(UniqueEntityType.User);
-                var entityTypes2 = new List<UniqueEntityType>();
-                entityTypes2.Add(UniqueEntityType.Computer);
-                List<EntityObject> userEntity = _dbClient.GetUniqueEntity(entityTypes);
-                List<EntityObject> computerEntity = _dbClient.GetUniqueEntity(entityTypes2);
-                //List<BsonDocument> notifications = new List<BsonDocument>();
-                List<BsonDocument> suspicousActivitities = new List<BsonDocument>();
-                for (int i = 0; i < saAmount; i++)
+                var entityTypes = new List<UniqueEntityType> {UniqueEntityType.User};
+                var entityTypes2 = new List<UniqueEntityType> {UniqueEntityType.Computer};
+                var userEntity = _dbClient.GetUniqueEntity(entityTypes);
+                var computerEntity = _dbClient.GetUniqueEntity(entityTypes2);
+                var suspicousActivitities = new List<BsonDocument>();
+                for (var i = 0; i < _saAmount; i++)
                 {
                     suspicousActivitities.Add(DocumentCreator.SAFillerAE(userEntity, computerEntity, selectedDcsList.FirstOrDefault(), DomainName));
                 }
-                //_dbClient.InsertBatchSAS(suspicousActivitities);
                 _dbClient.InsertBatchTest(suspicousActivitities, true);
                 return true;
             }

@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Abnormal_UI.Imported;
 using MongoDB.Bson;
 using NLog;
 
-namespace Abnormal_UI
+namespace Abnormal_UI.UI
 {
     public class AttackViewModel : INotifyPropertyChanged
     {

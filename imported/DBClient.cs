@@ -76,13 +76,9 @@ namespace Abnormal_UI.Imported
         {
             var allNames = new List<EntityObject>();
 
-            var queryElements = new List<IMongoQuery>();
             IMongoQuery mongoQuery;
 
-            foreach (var oneEntityType in entityTypes)
-            {
-                queryElements.Add(Query.EQ("_t", Enum.GetName(typeof(UniqueEntityType), oneEntityType)));
-            }
+            var queryElements = entityTypes.Select(oneEntityType => Query.EQ("_t", Enum.GetName(typeof (UniqueEntityType), oneEntityType))).ToList();
             if (queryElements.Count > 0)
             {
                 mongoQuery = Query.Or(queryElements);
@@ -106,11 +102,10 @@ namespace Abnormal_UI.Imported
             foreach (var oneResult in result.ToEnumerable())
             {
                 EntityObject entityObject = null;
-                //var resultBson = oneResult.FirstOrDefault().ToBsonDocument();
                 if (oneResult.GetValue("Name").GetType() != typeof(BsonNull))
                 {
-                    BsonArray objectType = oneResult.GetValue("_t").AsBsonArray;
-                    UniqueEntityType currentObjectType = UniqueEntityType.User;
+                    var objectType = oneResult.GetValue("_t").AsBsonArray;
+                    var currentObjectType = UniqueEntityType.User;
                     if (objectType[objectType.Count - 1] == Enum.GetName(typeof(UniqueEntityType), UniqueEntityType.Computer))
                     {
                         currentObjectType = UniqueEntityType.Computer;
@@ -142,7 +137,7 @@ namespace Abnormal_UI.Imported
 
         public void TriggerAbnormalModeling()
         {
-            IMongoQuery mongoQuery = Query.EQ("_t", "AbnormalBehaviorDetectorProfile");
+            var mongoQuery = Query.EQ("_t", "AbnormalBehaviorDetectorProfile");
             _systemProfilesCollection.DeleteMany(mongoQuery.ToBsonDocument());
         }
 

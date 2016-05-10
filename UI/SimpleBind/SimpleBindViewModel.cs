@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 
-namespace Abnormal_UI.UI
+namespace Abnormal_UI.UI.SimpleBind
 {
     public class SimpleBindViewModel : AttackViewModel
     {

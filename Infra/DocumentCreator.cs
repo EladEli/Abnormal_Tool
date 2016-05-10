@@ -11,58 +11,62 @@ namespace Abnormal_UI.Infra
         public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0)
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
-            var sourceAccount = new BsonDocument();
-            sourceAccount.Add("DomainName", domainName);
-            sourceAccount.Add("Name", userEntity.name);
+            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
 
             BsonDocument resourceIdentifier = new BsonDocument();
             EntityObject targetAccount = null;
             if (targetMachine != null) { targetAccount = targetMachine; }
             else { targetAccount = domainController; }
 
-            string targetSPNName = string.Format("krbtgt/{0}", domainName);
+            var targetSPNName = string.Format("krbtgt/{0}", domainName);
             if (targetSPN != null) { targetSPNName = targetSPN; }
             resourceIdentifier.Add("AccountId", targetAccount.id);
-            BsonDocument resourceName = new BsonDocument();
+            var resourceName = new BsonDocument();
             resourceName.Add("DomainName", domainName);
             resourceName.Add("Name", targetSPNName);
             resourceIdentifier.Add("ResourceName", resourceName);
 
-            BsonDocument networkActivityDocument = new BsonDocument();
-            networkActivityDocument.Add("_id", new ObjectId());
-            networkActivityDocument.Add("_t", new BsonArray(new string[5] { "Entity", "NetworkActivity", "Kerberos", "KerberosKdc", "Kerberos" + actionType }));
-            networkActivityDocument.Add("HorizontalParentId", new ObjectId());
-            networkActivityDocument.Add("StartTime", oldTime);
-            networkActivityDocument.Add("EndTime", oldTime);
-            networkActivityDocument.Add("ProcessingTime", oldTime);
-            networkActivityDocument.Add("SourceIpAddress", "[daf::daf]");
-            networkActivityDocument.Add("SourcePort", 51510);
-            networkActivityDocument.Add("SourceComputerId", computerEntity.id);
-            networkActivityDocument.Add("SourceComputerSiteId", BsonValue.Create(null));
-            networkActivityDocument.Add("SourceComputerCertainty", "High");
-            networkActivityDocument.Add("SourceComputerResolutionMethod", new BsonArray(new string[1] { "RpcNtlm" }));
-            networkActivityDocument.Add("DestinationIpAddress", "[daf::daf]");
-            networkActivityDocument.Add("DestinationPort", 88);
-            networkActivityDocument.Add("DestinationComputerId", targetAccount.id);
-            networkActivityDocument.Add("DestinationComputerSiteId", BsonValue.Create(null));
-            networkActivityDocument.Add("DestinationComputerCertainty", "High");
-            networkActivityDocument.Add("DestinationComputerResolutionMethod", new BsonArray(new string[1] { "RpcNtlm" }));
-            networkActivityDocument.Add("TransportProtocol", "Tcp");
-            networkActivityDocument.Add("SourceAccountName", sourceAccount);
-            networkActivityDocument.Add("SourceAccountId", userEntity.id);
-            networkActivityDocument.Add("SourceComputerSupportedEncryptionTypes", new BsonArray(new string[1] { "Rc4Hmac" }));
-            networkActivityDocument.Add("ResourceIdentifier", resourceIdentifier);
-            networkActivityDocument.Add("RequestTicketHash", new byte[16]);
-            networkActivityDocument.Add("RequestTicketKerberosId", new ObjectId());
-            networkActivityDocument.Add("Error", "Success");
-            networkActivityDocument.Add("NtStatus", BsonValue.Create(null));
-            networkActivityDocument.Add("ResponseTicketEncryptionType", "Aes256CtsHmacSha196");
-            networkActivityDocument.Add("ResponseTicketHash", new byte[16]);
-            networkActivityDocument.Add("IsSuccess", BsonValue.Create(false));
-            networkActivityDocument.Add("Options", new BsonArray(new string[4] { "RenewableOk", "Canonicalize", "Renewable", "Forwardable" }));
-            networkActivityDocument.Add("RequestedTicketExpiration", DateTime.UtcNow);
-            networkActivityDocument.Add("SourceGatewaySystemProfileId", sourceGateway);
-            
+            var networkActivityDocument = new BsonDocument
+            {
+                {"_id", new ObjectId()},
+                {
+                    "_t",
+                    new BsonArray(new string[5]
+                    {"Entity", "NetworkActivity", "Kerberos", "KerberosKdc", "Kerberos" + actionType})
+                },
+                {"HorizontalParentId", new ObjectId()},
+                {"StartTime", oldTime},
+                {"EndTime", oldTime},
+                {"ProcessingTime", oldTime},
+                {"SourceIpAddress", "[daf::daf]"},
+                {"SourcePort", 51510},
+                {"SourceComputerId", computerEntity.id},
+                {"SourceComputerSiteId", BsonValue.Create(null)},
+                {"SourceComputerCertainty", "High"},
+                {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"DestinationIpAddress", "[daf::daf]"},
+                {"DestinationPort", 88},
+                {"DestinationComputerId", targetAccount.id},
+                {"DestinationComputerSiteId", BsonValue.Create(null)},
+                {"DestinationComputerCertainty", "High"},
+                {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"TransportProtocol", "Tcp"},
+                {"SourceAccountName", sourceAccount},
+                {"SourceAccountId", userEntity.id},
+                {"SourceComputerSupportedEncryptionTypes", new BsonArray(new string[1] {"Rc4Hmac"})},
+                {"ResourceIdentifier", resourceIdentifier},
+                {"RequestTicketHash", new byte[16]},
+                {"RequestTicketKerberosId", new ObjectId()},
+                {"Error", "Success"},
+                {"NtStatus", BsonValue.Create(null)},
+                {"ResponseTicketEncryptionType", "Aes256CtsHmacSha196"},
+                {"ResponseTicketHash", new byte[16]},
+                {"IsSuccess", BsonValue.Create(false)},
+                {"Options", new BsonArray(new string[4] {"RenewableOk", "Canonicalize", "Renewable", "Forwardable"})},
+                {"RequestedTicketExpiration", DateTime.UtcNow},
+                {"SourceGatewaySystemProfileId", sourceGateway}
+            };
+
 
             if (actionType == "As")
             {

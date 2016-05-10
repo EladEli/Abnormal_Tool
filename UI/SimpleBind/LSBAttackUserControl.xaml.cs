@@ -10,7 +10,7 @@ namespace Abnormal_UI.UI.SimpleBind
 {
     public partial class LsbAttackUserControl
     {
-        private SimpleBindViewModel _model;
+        private readonly SimpleBindViewModel _model;
         public LsbAttackUserControl()
         {
             InitializeComponent();
