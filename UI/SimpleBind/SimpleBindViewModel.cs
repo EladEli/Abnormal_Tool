@@ -17,19 +17,25 @@ namespace Abnormal_UI.UI
         {
             try
             {
-                List<BsonDocument> networkActivitities = new List<BsonDocument>();
+                _dbClient.ClearTestNaCollection();
+                SvcCtrl.StopService("ATACenter");
+                _dbClient.SetCenterProfileForReplay();
+                Logger.Debug("Center profile set for replay");
+                var networkActivitities = new List<BsonDocument>();
                 if (selectedEmpList.Count < 1 || selectedMachinesList.Count < 1)
                 {
                     return false;
                 }
                 else
                 {
-                    for (int i = 0; i < 110; i++)
+                    for (var i = 0; i < 110; i++)
                     {
                         networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
                             selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
                     }
                     _dbClient.InsertBatch(networkActivitities);
+                    Logger.Debug("Done inserting Ldap activities");
+                    SvcCtrl.StartService("ATACenter");
                     return true;
                 }
             }
@@ -44,19 +50,21 @@ namespace Abnormal_UI.UI
         {
             try
             {
-                List<BsonDocument> networkActivitities = new List<BsonDocument>();
+                var networkActivitities = new List<BsonDocument>();
                 if (selectedEmpList.Count < 10 || selectedMachinesList.Count < 1)
                 {
                     return false;
                 }
                 else
                 {
-                    foreach (var user in selectedEmpList)
-                    {
-                        networkActivitities.Add(DocumentCreator.SimpleBindCreator(user, selectedMachinesList[0],
-                            selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
-                    }
+                    _dbClient.ClearTestNaCollection();
+                    SvcCtrl.StopService("ATACenter");
+                    _dbClient.SetCenterProfileForReplay();
+                    Logger.Debug("Center profile set for replay");
+                    networkActivitities.AddRange(selectedEmpList.Select(user => DocumentCreator.SimpleBindCreator(user, selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0)));
                     _dbClient.InsertBatch(networkActivitities);
+                    Logger.Debug("Done inserting Ldap activities");
+                    SvcCtrl.StartService("ATACenter");
                     return true;
                 }
             }
@@ -70,7 +78,7 @@ namespace Abnormal_UI.UI
         {
             try
             {
-                List<BsonDocument> networkActivitities = new List<BsonDocument>();
+                var networkActivitities = new List<BsonDocument>();
                 if (selectedEmpList.Count < 1 || selectedMachinesList[0].name == null)
                 {
                     return false;

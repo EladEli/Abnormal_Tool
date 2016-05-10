@@ -6,7 +6,7 @@ namespace Abnormal_UI.Infra
 {
     class SvcCtrl
     {
-        private static Logger _logger = LogManager.GetLogger("DavidTest");
+        private static Logger _logger = LogManager.GetLogger("TestToolboxLog");
 
         public static bool StartService(string serviceName, int timeoutSeconds = 10)
         {
