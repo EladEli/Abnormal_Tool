@@ -101,7 +101,6 @@ namespace Abnormal_UI.Imported
             var result = _uniqueEntitiesCollection.Find(mongoQuery.ToBsonDocument());
             foreach (var oneResult in result.ToEnumerable())
             {
-                EntityObject entityObject = null;
                 if (oneResult.GetValue("Name").GetType() != typeof(BsonNull))
                 {
                     var objectType = oneResult.GetValue("_t").AsBsonArray;
@@ -111,6 +110,7 @@ namespace Abnormal_UI.Imported
                         currentObjectType = UniqueEntityType.Computer;
                     }
 
+                    EntityObject entityObject = null;
                     if (objectType[objectType.Count - 1] == Enum.GetName(typeof(UniqueEntityType), UniqueEntityType.Domain))
                     {
                         entityObject = new EntityObject(oneResult.GetValue("Name").AsString, oneResult.GetValue("_id").AsString, oneResult.GetValue("DnsName").AsString, currentObjectType);
@@ -174,32 +174,32 @@ namespace Abnormal_UI.Imported
             var centerSystemProfile = _systemProfilesCollection.Find(Query.EQ("_t", "CenterSystemProfile").ToBsonDocument()).ToEnumerable();
             foreach (var centerProfile in centerSystemProfile)
             {
-                var configurationBson = centerProfile.GetElement("Configuration").Value.AsBsonDocument;
-                var uniqueEntityProfileCacheConfigurationBson =
-                    configurationBson.GetElement("UniqueEntityProfileCacheConfiguration").Value.AsBsonDocument;
-                uniqueEntityProfileCacheConfigurationBson.Remove("StoreUniqueEntityProfilesInterval");
-                uniqueEntityProfileCacheConfigurationBson.Add("StoreUniqueEntityProfilesInterval", "00:00:30");
-                configurationBson.Remove("UniqueEntityProfileCacheConfiguration");
-                configurationBson.Add("UniqueEntityProfileCacheConfiguration", uniqueEntityProfileCacheConfigurationBson);
-
-                var activitySimulatorConfigurationBson =
-                    configurationBson.GetElement("ActivitySimulatorConfiguration").Value.AsBsonDocument;
-
-                activitySimulatorConfigurationBson.Remove("DelayInterval");
-                activitySimulatorConfigurationBson.Remove("SimulationState");
-                activitySimulatorConfigurationBson.Add("DelayInterval","00:00:05");
-                activitySimulatorConfigurationBson.Add("SimulationState","Replay");
-                    
-                configurationBson.Remove("ActivitySimulatorConfiguration");
-                configurationBson.Add("ActivitySimulatorConfiguration", activitySimulatorConfigurationBson);
-
-                centerProfile.Remove("Configuration");
-                centerProfile.Add("Configuration", configurationBson);
+                var configurationBson = centerProfile["Configuration"];
+                configurationBson["UniqueEntityProfileCacheConfiguration"]["StoreUniqueEntityProfilesInterval"] =
+                    "00:00:30";
+                configurationBson["ActivitySimulatorConfiguration"]["DelayInterval"] = "00:00:05";
+                configurationBson["ActivitySimulatorConfiguration"]["SimulationState"] = "Replay";
+                centerProfile["Configuration"] = configurationBson;
                 _systemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", centerProfile["_id"]),
                     centerProfile);
 
             }
           
+        }
+
+        public void SetGatewayProfileForDsa()
+        {
+            var gatewaySystemProfile =
+                _systemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument()).ToEnumerable();
+            foreach (var gatewayProfile in gatewaySystemProfile)
+            {
+                var configurationBson = gatewayProfile["Configuration"];
+                configurationBson["DirectoryServicesResolverConfiguration"]["UpdateDirectoryEntityChangesInterval"] =
+                    "00:00:02";
+                gatewayProfile["Configuration"] = configurationBson;
+                _systemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", gatewayProfile["_id"]),
+                    gatewayProfile);
+            }
         }
 
         public void RenameKerbCollections()
@@ -266,7 +266,10 @@ namespace Abnormal_UI.Imported
                 _testDatabase.CreateCollection("NetworkActivity");
                 _testDatabase.CreateCollection("EventActivity");
             }
-            catch { }
+            catch(Exception ex)
+            {
+                _logger.Error(ex);
+            }
         }
         public void ClearTestNaCollection()
         {

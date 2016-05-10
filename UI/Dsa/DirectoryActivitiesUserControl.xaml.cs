@@ -1,13 +1,12 @@
-﻿using System.Windows.Controls;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Controls;
 
 namespace Abnormal_UI.UI.Dsa
 {
-    /// <summary>
-    /// Interaction logic for DirectoryActivitiesUserControl.xaml
-    /// </summary>
     public partial class DirectoryActivitiesUserControl : UserControl
     {
-        private DirectoryActivitiesViewModel _model;
+        private readonly DirectoryActivitiesViewModel _model;
         public DirectoryActivitiesUserControl()
         {
             InitializeComponent();
@@ -17,6 +16,25 @@ namespace Abnormal_UI.UI.Dsa
             _model = model;
             InitializeComponent();
             DataContext = _model;
+        }
+
+        private void UpdateSelected()
+        {
+            var selectedActivitiesList = DsaListBox.SelectedItems.Cast<string>().ToList();
+            _model._SelectedActivitiesList = selectedActivitiesList;
+            selectedActivitiesList.Clear();
+        }
+
+        private void ActivateDsaBtn_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            UpdateSelected();
+            _model.ActivateDsa();
+        }
+
+        private void AutoDsaBtn_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            UpdateSelected();
+            _model.AutoDsa();
         }
     }
 }

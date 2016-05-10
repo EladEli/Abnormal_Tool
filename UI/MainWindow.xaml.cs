@@ -4,8 +4,6 @@ using Abnormal_UI.UI.Abnormal;
 using Abnormal_UI.UI.Dsa;
 using Abnormal_UI.UI.SimpleBind;
 using Abnormal_UI.UI.Test;
-using AbnormalAttackUserControl = Abnormal_UI.UI.Abnormal.AbnormalAttackUserControl;
-using LsbAttackUserControl = Abnormal_UI.UI.SimpleBind.LsbAttackUserControl;
 
 namespace Abnormal_UI.UI
 {

@@ -11,16 +11,9 @@
                      Height="Auto" 
                      Margin="20,32,20,8"
                      x:Name="DsaListBox" 
-                     ItemsSource="{Binding _ToComplete}"
+                     ItemsSource="{Binding _DsaDictionary.Keys}"
                      SelectionMode="Extended" 
                      SelectedIndex="0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding _ToComplete}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
             </ListBox>
             <TextBlock Text="{Binding _ToComplete}" 
                        Name="SelUsersCount"
@@ -45,22 +38,6 @@
             </ListBox>
         </StackPanel>
         <StackPanel DockPanel.Dock="Right" >
-            <ListBox Width="200" 
-                     Height="100" 
-                     Margin="20"
-                     ItemsSource="{Binding _ToComplete}"
-                     x:Name="BoxDCs" 
-                     SelectionMode="Extended"
-                     SelectedIndex="0" 
-                     HorizontalAlignment="Left">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding _toComplete}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
             <StackPanel HorizontalAlignment="Left" Margin="20" Height="122">
                 <TextBox Width="200" 
                     Name="UserTextBox"
@@ -78,6 +55,16 @@
                     Margin="5"
                     Text="DsaComputer"/>
             </StackPanel>
+            <Button x:Name="ActivateDsaBtn" 
+                    Content="Activate Directory Services" 
+                    Width="200" 
+                    Height="30" 
+                    Margin="5" Click="ActivateDsaBtn_Click"/>
+            <Button x:Name="AutoDsaBtn" 
+                    Content="Auto Directory Services" 
+                    Width="200" 
+                    Height="30" 
+                    Margin="5" Click="AutoDsaBtn_Click"/>
         </StackPanel>
     </DockPanel>
 </UserControl>

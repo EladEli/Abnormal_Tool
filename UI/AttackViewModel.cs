@@ -29,7 +29,6 @@ namespace Abnormal_UI.UI
 
         public ObjectId sourceGateway;
 
-
         public ObservableCollection<EntityObject> empList { get; set; }
 
         public ObservableCollection<EntityObject> selectedEmpList { get; set; }
@@ -70,10 +69,9 @@ namespace Abnormal_UI.UI
         {
             try
             {
-                var entityTypes = new List<UniqueEntityType>();
-                entityTypes.Add(UniqueEntityType.User);
+                var entityTypes = new List<UniqueEntityType> {UniqueEntityType.User};
                 var allUsers = _dbClient.GetUniqueEntity(entityTypes);
-                foreach (EntityObject oneEntity in allUsers)
+                foreach (var oneEntity in allUsers)
                 {
                     empList.Add(oneEntity);
                 }
@@ -88,7 +86,7 @@ namespace Abnormal_UI.UI
                 entityTypes.Clear();
                 entityTypes.Add(UniqueEntityType.Computer);
                 var allComputers = _dbClient.GetUniqueEntity(entityTypes);
-                foreach (EntityObject oneEntity in allComputers)
+                foreach (var oneEntity in allComputers)
                 {
                     machinesList.Add(oneEntity);
                 }
