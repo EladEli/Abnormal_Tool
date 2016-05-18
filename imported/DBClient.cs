@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.VisualBasic;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Core;
 using MongoDB.Driver.Builders;
 using NLog;
 
@@ -67,8 +66,7 @@ namespace Abnormal_UI.Imported
 
         public List<EntityObject> GetUniqueEntity(UniqueEntityType entityType, string name = null, bool getDomainController = false)
         {
-            var entityTypes = new List<UniqueEntityType>();
-            entityTypes.Add(entityType);
+            var entityTypes = new List<UniqueEntityType> {entityType};
             return GetUniqueEntity(entityTypes, name, getDomainController);
         }
 
@@ -276,6 +274,19 @@ namespace Abnormal_UI.Imported
             _testDatabase.DropCollection("NetworkActivity");
             _testDatabase.CreateCollection("NetworkActivity");
             _logger.Debug("Cleared Test NA's collection");
+        }
+
+        public void CleaDsaCollection()
+        {
+            _database.DropCollection("DirectoryServicesActivity");
+            _database.CreateCollection("DirectoryServicesActivity");
+            _logger.Debug("Cleared Dsa's collection");
+        }
+
+        public bool CheckDatabaseForDsa(string dsaForCheck)
+        {
+            var dsaCollection = _database.GetCollection<BsonDocument>("DirectoryServicesActivity");
+            return dsaCollection.ToBsonDocument().Any(dsa => dsaForCheck == dsa.ToString());
         }
 
         #endregion

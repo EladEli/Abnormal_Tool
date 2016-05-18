@@ -25,22 +25,19 @@ namespace Abnormal_UI.UI.SimpleBind
                 {
                     return false;
                 }
-                else
+                for (var i = 0; i < 110; i++)
                 {
-                    for (var i = 0; i < 110; i++)
-                    {
-                        networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
-                            selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
-                    }
-                    _dbClient.InsertBatch(networkActivitities);
-                    Logger.Debug("Done inserting Ldap activities");
-                    SvcCtrl.StartService("ATACenter");
-                    return true;
+                    networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
+                        selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
                 }
+                _dbClient.InsertBatch(networkActivitities);
+                Logger.Debug("Done inserting Ldap activities");
+                SvcCtrl.StartService("ATACenter");
+                return true;
             }
-            catch (Exception IntenseExpcetion)
+            catch (Exception intenseExpcetion)
             {
-                Logger.Error(IntenseExpcetion);
+                Logger.Error(intenseExpcetion);
                 return false;
             }
             
@@ -50,26 +47,23 @@ namespace Abnormal_UI.UI.SimpleBind
             try
             {
                 var networkActivitities = new List<BsonDocument>();
-                if (selectedEmpList.Count < 10 || selectedMachinesList.Count < 1)
+                if (selectedEmpList.Count < 11 || selectedMachinesList.Count < 1)
                 {
                     return false;
                 }
-                else
-                {
-                    _dbClient.ClearTestNaCollection();
-                    SvcCtrl.StopService("ATACenter");
-                    _dbClient.SetCenterProfileForReplay();
-                    Logger.Debug("Center profile set for replay");
-                    networkActivitities.AddRange(selectedEmpList.Select(user => DocumentCreator.SimpleBindCreator(user, selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0)));
-                    _dbClient.InsertBatch(networkActivitities);
-                    Logger.Debug("Done inserting Ldap activities");
-                    SvcCtrl.StartService("ATACenter");
-                    return true;
-                }
+                _dbClient.ClearTestNaCollection();
+                SvcCtrl.StopService("ATACenter");
+                _dbClient.SetCenterProfileForReplay();
+                Logger.Debug("Center profile set for replay");
+                networkActivitities.AddRange(selectedEmpList.Select(user => DocumentCreator.SimpleBindCreator(user, selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0)));
+                _dbClient.InsertBatch(networkActivitities);
+                Logger.Debug("Done inserting Ldap activities");
+                SvcCtrl.StartService("ATACenter");
+                return true;
             }
-            catch (Exception DistinctException)
+            catch (Exception distinctException)
             {
-                Logger.Error(DistinctException);
+                Logger.Error(distinctException);
                 return false;
             }
         }
@@ -77,22 +71,20 @@ namespace Abnormal_UI.UI.SimpleBind
         {
             try
             {
+                _dbClient.ClearTestNaCollection();
                 var networkActivitities = new List<BsonDocument>();
                 if (selectedEmpList.Count < 1 || selectedMachinesList[0].name == null)
                 {
                     return false;
                 }
-                else
-                {
-                    networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
-                        selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
-                    _dbClient.InsertBatch(networkActivitities);
-                    return true;
-                }
+                networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
+                    selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
+                _dbClient.InsertBatch(networkActivitities);
+                return true;
             }
-            catch (Exception SingleException)
+            catch (Exception singleException)
             {
-                Logger.Error(SingleException);
+                Logger.Error(singleException);
                 return false;
             }
         }

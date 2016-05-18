@@ -18,12 +18,10 @@ namespace Abnormal_UI.Infra
             if (targetMachine != null) { targetAccount = targetMachine; }
             else { targetAccount = domainController; }
 
-            var targetSPNName = string.Format("krbtgt/{0}", domainName);
+            var targetSPNName = $"krbtgt/{domainName}";
             if (targetSPN != null) { targetSPNName = targetSPN; }
             resourceIdentifier.Add("AccountId", targetAccount.id);
-            var resourceName = new BsonDocument();
-            resourceName.Add("DomainName", domainName);
-            resourceName.Add("Name", targetSPNName);
+            var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSPNName}};
             resourceIdentifier.Add("ResourceName", resourceName);
 
             var networkActivityDocument = new BsonDocument
@@ -94,132 +92,139 @@ namespace Abnormal_UI.Infra
         }
         public static BsonDocument SimpleBindCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainControllerName, string domainName, ObjectId sourceGateway, int daysToSubtruct = 0)
         {
-            DateTime oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, 0, 0, 0, 0));
-            BsonDocument sourceAccount = new BsonDocument();
-            sourceAccount.Add("DomainName", domainName);
-            sourceAccount.Add("Name", userEntity.name);
+            var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, 0, 0, 0, 0));
+            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
 
-            BsonDocument resourceIdentifier = new BsonDocument();
-            resourceIdentifier.Add("AccountId", domainControllerName.id);
-            string targetSPNName = string.Format("krbtgt/{0}", domainName);
+            var resourceIdentifier = new BsonDocument {{"AccountId", domainControllerName.id}};
+            var targetSPNName = $"krbtgt/{domainName}";
 
-            BsonDocument resourceName = new BsonDocument();
-            resourceName.Add("DomainName", domainName);
-            resourceName.Add("Name", targetSPNName);
+            var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSPNName}};
             resourceIdentifier.Add("ResourceName", resourceName);
 
-            BsonDocument networkActivityDocument = new BsonDocument();
+            var networkActivityDocument = new BsonDocument
+            {
+                {"_id", new ObjectId()},
+                {"_t", new BsonArray(new string[5] {"Entity", "Activity", "NetworkActivity", "Ldap", "LdapBind"})},
+                {"StartTime", oldTime},
+                {"EndTime", oldTime},
+                {"HorizontalParentId", new ObjectId()},
+                {"SourceIpAddress", "[daf::daf]"},
+                {"SourcePort", 6666},
+                {"SourceComputerId", computerEntity.id},
+                {"SourceComputerSiteId", BsonValue.Create(null)},
+                {"SourceComputerCertainty", "High"},
+                {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"DestinationIpAddress", "[daf::daf]"},
+                {"DestinationPort", 389},
+                {"DestinationComputerId", domainControllerName.id},
+                {"DestinationComputerSiteId", BsonValue.Create(null)},
+                {"DestinationComputerCertainty", "High"},
+                {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"TransportProtocol", "Tcp"},
+                {"AuthenticationType", "Simple"},
+                {"SourceAccountName", sourceAccount},
+                {"SourceAccountId", userEntity.id},
+                {
+                    "SourceAccountPasswordHash",
+                    "9apJEBIqcse0SNKVm4WzIxaHoLkUareMCDlAzhADI72CLmxOMmA8WzicPPI84xxlewEEIqZZOJJ1VqpE5VJT4g=="
+                },
+                {"ResultCode", "Success"},
+                {"IsSuccess", BsonValue.Create(true)},
+                {"SourceGatewaySystemProfileId", sourceGateway},
+                {"ResourceIdentifier", resourceIdentifier}
+            };
 
-            networkActivityDocument.Add("_id", new ObjectId());
-            networkActivityDocument.Add("_t", new BsonArray(new string[5] { "Entity", "Activity", "NetworkActivity", "Ldap", "LdapBind" }));
-            networkActivityDocument.Add("StartTime", oldTime);
-            networkActivityDocument.Add("EndTime", oldTime);
-            networkActivityDocument.Add("ProcessingTime", oldTime);
-            networkActivityDocument.Add("HorizontalParentId", new ObjectId());
-            networkActivityDocument.Add("SourceIpAddress", "[daf::daf]");
-            networkActivityDocument.Add("SourcePort", 6666);
-            networkActivityDocument.Add("SourceComputerId", computerEntity.id);
-            networkActivityDocument.Add("SourceComputerSiteId", BsonValue.Create(null));
-            networkActivityDocument.Add("SourceComputerCertainty", "High");
-            networkActivityDocument.Add("SourceComputerResolutionMethod", new BsonArray(new string[1] { "RpcNtlm" }));
-            networkActivityDocument.Add("DestinationIpAddress", "[daf::daf]");
-            networkActivityDocument.Add("DestinationPort", 389);
-            networkActivityDocument.Add("DestinationComputerId", domainControllerName.id);
-            networkActivityDocument.Add("DestinationComputerSiteId", BsonValue.Create(null));
-            networkActivityDocument.Add("DestinationComputerCertainty", "High");
-            networkActivityDocument.Add("DestinationComputerResolutionMethod", new BsonArray(new string[1] { "RpcNtlm" }));
-            networkActivityDocument.Add("TransportProtocol", "Tcp");
-            networkActivityDocument.Add("AuthenticationType", "Simple");
-            networkActivityDocument.Add("SourceAccountName", sourceAccount);
-            networkActivityDocument.Add("SourceAccountId", userEntity.id);
-            networkActivityDocument.Add("SourceAccountPasswordHash", "9apJEBIqcse0SNKVm4WzIxaHoLkUareMCDlAzhADI72CLmxOMmA8WzicPPI84xxlewEEIqZZOJJ1VqpE5VJT4g==");
-            networkActivityDocument.Add("ResultCode", "Success");
-            networkActivityDocument.Add("IsSuccess", BsonValue.Create(true));
-            networkActivityDocument.Add("SourceGatewaySystemProfileId", sourceGateway);
-            networkActivityDocument.Add("ResourceIdentifier", resourceIdentifier);
 
 
             return networkActivityDocument;
         }
         public static BsonDocument SAFillerSEAC(List<EntityObject> userEntity, List<EntityObject> computerEntity, Random rnd)
         {
-           
-
-            //Random rnd = new Random();
-            BsonDocument detailRecord = new BsonDocument();
-            detailRecord.Add("StartTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0)));
-            detailRecord.Add("EndTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0)));
-            detailRecord.Add("SourceComputerId", computerEntity[rnd.Next(0, computerEntity.Count)].id);
-            detailRecord.Add("SourceAccountIds", new BsonArray(new string[20]
+            var detailRecord = new BsonDocument
             {
-                userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id
-            }));
-            detailRecord.Add("DestinationComputerIds", new BsonArray(new string[1]
+                {"StartTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
+                {"EndTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
+                {"SourceComputerId", computerEntity[rnd.Next(0, computerEntity.Count)].id},
                 {
-                    computerEntity[rnd.Next(0, computerEntity.Count)].id
-                }));
+                    "SourceAccountIds", new BsonArray(new string[20]
+                    {
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id
+                    })
+                },
+                {
+                    "DestinationComputerIds", new BsonArray(new string[1]
+                    {
+                        computerEntity[rnd.Next(0, computerEntity.Count)].id
+                    })
+                }
+            };
             var a = userEntity[rnd.Next(0, userEntity.Count)].id;
             var b = userEntity[rnd.Next(0, userEntity.Count)].id;
 
-            BsonDocument suspicousActivityDocument = new BsonDocument();
-            suspicousActivityDocument.Add("_id", new ObjectId());
-            suspicousActivityDocument.Add("_t",
-                new BsonArray(new string[5]
+            var suspicousActivityDocument = new BsonDocument
+            {
+                {"_id", new ObjectId()},
                 {
-                    "Entity", "Alert", "SuspiciousActivity", "SuspiciousActivity`1",
-                    "LdapSimpleBindCleartextPasswordSuspiciousActivity"
-                }));
-            suspicousActivityDocument.Add("StartTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0)));
-            suspicousActivityDocument.Add("EndTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0)));
-            suspicousActivityDocument.Add("IsVisible", BsonValue.Create(true));
-            suspicousActivityDocument.Add("Severity", "Low");
-            suspicousActivityDocument.Add("Status", "Open");
-            suspicousActivityDocument.Add("TitleKey", "LdapSimpleBindCleartextPasswordSuspiciousActivityTitleService");
-            suspicousActivityDocument.Add("TitleDetailKeys", new BsonArray(new string[0] {}));
-            suspicousActivityDocument.Add("DescriptionFormatKey",
-                "LdapSimpleBindCleartextPasswordSuspiciousActivityDescriptionServiceSourceAccounts");
-            suspicousActivityDocument.Add("DescriptionDetailFormatKeys", new BsonArray(new string[0] {}));
-            suspicousActivityDocument.Add("SystemUpdateTime", DateTime.UtcNow);
-            suspicousActivityDocument.Add("HasDetails", BsonValue.Create(true));
-            suspicousActivityDocument.Add("HasInput", BsonValue.Create(false));
-            suspicousActivityDocument.Add("InputTitleKey", "LdapSimpleBindCleartextPasswordSuspiciousActivityInputTitle");
-            suspicousActivityDocument.Add("IsInputProvided", BsonValue.Create(false));
-            suspicousActivityDocument.Add("Note", BsonValue.Create(null));
-            suspicousActivityDocument.Add("RelatedActivityCount", 127);
-            suspicousActivityDocument.Add("RelatedUniqueEntityIds",
-                new BsonArray(new string[20]
+                    "_t", new BsonArray(new string[5]
+                    {
+                        "Entity", "Alert", "SuspiciousActivity", "SuspiciousActivity`1",
+                        "LdapSimpleBindCleartextPasswordSuspiciousActivity"
+                    })
+                },
+                {"StartTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
+                {"EndTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
+                {"IsVisible", BsonValue.Create(true)},
+                {"Severity", "Low"},
+                {"Status", "Open"},
+                {"TitleKey", "LdapSimpleBindCleartextPasswordSuspiciousActivityTitleService"},
+                {"TitleDetailKeys", new BsonArray(new string[0] {})},
                 {
-                    userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                    userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                    userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                    userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                    userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                    userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                    userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                    userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                    userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                    userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id
-                }));
-            suspicousActivityDocument.Add("DetailsRecords",
-                new BsonArray(new BsonDocument[1] {detailRecord}));
-            suspicousActivityDocument.Add("Scope", "Service");
+                    "DescriptionFormatKey",
+                    "LdapSimpleBindCleartextPasswordSuspiciousActivityDescriptionServiceSourceAccounts"
+                },
+                {"DescriptionDetailFormatKeys", new BsonArray(new string[0] {})},
+                {"SystemUpdateTime", DateTime.UtcNow},
+                {"HasDetails", BsonValue.Create(true)},
+                {"HasInput", BsonValue.Create(false)},
+                {"InputTitleKey", "LdapSimpleBindCleartextPasswordSuspiciousActivityInputTitle"},
+                {"IsInputProvided", BsonValue.Create(false)},
+                {"Note", BsonValue.Create(null)},
+                {"RelatedActivityCount", 127},
+                {
+                    "RelatedUniqueEntityIds", new BsonArray(new string[20]
+                    {
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
+                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id
+                    })
+                },
+                {"DetailsRecords", new BsonArray(new BsonDocument[1] {detailRecord})},
+                {"Scope", "Service"}
+            };
             return suspicousActivityDocument;
         }
         public static BsonDocument SAFillerAE(List<EntityObject> userEntity, List<EntityObject> computerEntity,EntityObject domainController, string domainName)
         {
             var records = new List<BsonDocument>();
-            BsonDocument detailRecord = new BsonDocument();
+            var detailRecord = new BsonDocument();
             
-            for (int i =0; i < 100000; i++)
+            for (var i =0; i < 100000; i++)
             {
                 detailRecord.Add("DomainName", domainName);
                 detailRecord.Add("Name", "ABCDEFGHIJKLMNOP" + i);
@@ -228,149 +233,164 @@ namespace Abnormal_UI.Infra
             }
             var failedSourceAccountNames = new BsonArray(records);
 
-            BsonDocument suspicousActivityDocument = new BsonDocument();
-            suspicousActivityDocument.Add("_id", new ObjectId());
-            suspicousActivityDocument.Add("_t",
-                new BsonArray(new string[4]
-                {
-                    "Entity", "Alert", "SuspiciousActivity", "AccountEnumerationSuspiciousActivity"
-                }));
-            suspicousActivityDocument.Add("StartTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0)));
-            suspicousActivityDocument.Add("EndTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0)));
-            suspicousActivityDocument.Add("IsVisible", BsonValue.Create(true));
-            suspicousActivityDocument.Add("Severity", "Medium");
-            suspicousActivityDocument.Add("Status", "Open");
-            suspicousActivityDocument.Add("TitleKey", "AccountEnumerationSuspiciousActivityTitle");
-            suspicousActivityDocument.Add("TitleDetailKeys", new BsonArray(new string[0] { }));
-            suspicousActivityDocument.Add("DescriptionFormatKey",
-                "AccountEnumerationSuspiciousActivityDescription");
-            suspicousActivityDocument.Add("DescriptionDetailFormatKeys", new BsonArray(new string[0] { }));
-            suspicousActivityDocument.Add("SystemUpdateTime", DateTime.UtcNow);
-            suspicousActivityDocument.Add("HasDetails", BsonValue.Create(false));
-            suspicousActivityDocument.Add("HasInput", BsonValue.Create(false));
-            suspicousActivityDocument.Add("InputTitleKey", "AccountEnumerationSuspiciousActivityInputTitle");
-            suspicousActivityDocument.Add("IsInputProvided", BsonValue.Create(false));
-            suspicousActivityDocument.Add("Note", BsonValue.Create(null));
-            suspicousActivityDocument.Add("RelatedActivityCount", 127);
-            suspicousActivityDocument.Add("RelatedUniqueEntityIds", new BsonArray(new string[9]
+            var suspicousActivityDocument = new BsonDocument
             {
-                computerEntity[2].id, domainController.id, userEntity[0].id, userEntity[1].id, userEntity[2].id,
-                userEntity[3].id, userEntity[4].id,
-                userEntity[5].id, userEntity[6].id
-            }));
-            suspicousActivityDocument.Add("SourceComputerId", computerEntity[2].id);
-            suspicousActivityDocument.Add("DestinationComputerIds", new BsonArray(new string[1] { domainController.id }));
-            suspicousActivityDocument.Add("FailedSourceAccountNames", failedSourceAccountNames);
-            suspicousActivityDocument.Add("SuccessSourceAccountIds",
-                new BsonArray(new string[7]
+                {"_id", new ObjectId()},
                 {
-                    userEntity[0].id, userEntity[1].id, userEntity[2].id, userEntity[3].id, userEntity[4].id,
-                    userEntity[5].id, userEntity[6].id
-                }));
+                    "_t", new BsonArray(new string[4]
+                    {
+                        "Entity", "Alert", "SuspiciousActivity", "AccountEnumerationSuspiciousActivity"
+                    })
+                },
+                {"StartTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
+                {"EndTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
+                {"IsVisible", BsonValue.Create(true)},
+                {"Severity", "Medium"},
+                {"Status", "Open"},
+                {"TitleKey", "AccountEnumerationSuspiciousActivityTitle"},
+                {"TitleDetailKeys", new BsonArray(new string[0] {})},
+                {"DescriptionFormatKey", "AccountEnumerationSuspiciousActivityDescription"},
+                {"DescriptionDetailFormatKeys", new BsonArray(new string[0] {})},
+                {"SystemUpdateTime", DateTime.UtcNow},
+                {"HasDetails", BsonValue.Create(false)},
+                {"HasInput", BsonValue.Create(false)},
+                {"InputTitleKey", "AccountEnumerationSuspiciousActivityInputTitle"},
+                {"IsInputProvided", BsonValue.Create(false)},
+                {"Note", BsonValue.Create(null)},
+                {"RelatedActivityCount", 127},
+                {
+                    "RelatedUniqueEntityIds", new BsonArray(new string[9]
+                    {
+                        computerEntity[2].id, domainController.id, userEntity[0].id, userEntity[1].id, userEntity[2].id,
+                        userEntity[3].id, userEntity[4].id,
+                        userEntity[5].id, userEntity[6].id
+                    })
+                },
+                {"SourceComputerId", computerEntity[2].id},
+                {"DestinationComputerIds", new BsonArray(new string[1] {domainController.id})},
+                {"FailedSourceAccountNames", failedSourceAccountNames},
+                {
+                    "SuccessSourceAccountIds", new BsonArray(new string[7]
+                    {
+                        userEntity[0].id, userEntity[1].id, userEntity[2].id, userEntity[3].id, userEntity[4].id,
+                        userEntity[5].id, userEntity[6].id
+                    })
+                }
+            };
             return suspicousActivityDocument;
         }
         public static BsonDocument NotificationCreator(ObjectId alertId)
         {
-            BsonDocument notificationDocument = new BsonDocument();
-            notificationDocument.Add("_id", new ObjectId());
-            notificationDocument.Add("_t",
-                new BsonArray(new string[4]
+            var notificationDocument = new BsonDocument
+            {
+                {"_id", new ObjectId()},
                 {
-                    "Entity", "Notification", "AlertNotification", "SuspiciousActivityNotification",
-                }));
-            notificationDocument.Add("Level", "Notice");
-            notificationDocument.Add("CreationTime", DateTime.UtcNow);
-            notificationDocument.Add("ExpirationTime", DateTime.UtcNow.AddDays(100));
-            notificationDocument.Add("CategoryKey", "SuspiciousActivityNotificationCategory");
-            notificationDocument.Add("AlertId", alertId);
-            notificationDocument.Add("AlertTitleKey", "LdapSimpleBindCleartextPasswordSuspiciousActivityTitleService");
+                    "_t", new BsonArray(new string[4]
+                    {
+                        "Entity", "Notification", "AlertNotification", "SuspiciousActivityNotification",
+                    })
+                },
+                {"Level", "Notice"},
+                {"CreationTime", DateTime.UtcNow},
+                {"ExpirationTime", DateTime.UtcNow.AddDays(100)},
+                {"CategoryKey", "SuspiciousActivityNotificationCategory"},
+                {"AlertId", alertId},
+                {"AlertTitleKey", "LdapSimpleBindCleartextPasswordSuspiciousActivityTitleService"}
+            };
             return notificationDocument;
         }
         public static BsonDocument EventCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainControllerName, string domainName,ObjectId sourceGateway, int daysToSubtruct = 0)
         {
 
-            BsonDocument sourceComputer = new BsonDocument();
-            sourceComputer.Add("DomainName", BsonValue.Create(null));
-            sourceComputer.Add("Name", computerEntity.name);
+            var sourceComputer = new BsonDocument
+            {
+                {"DomainName", BsonValue.Create(null)},
+                {"Name", computerEntity.name}
+            };
 
-            BsonDocument destinationComputer = new BsonDocument();
-            destinationComputer.Add("DomainName", BsonValue.Create(null));
-            destinationComputer.Add("Name", domainControllerName.name);
+            var destinationComputer = new BsonDocument
+            {
+                {"DomainName", BsonValue.Create(null)},
+                {"Name", domainControllerName.name}
+            };
 
-            BsonDocument eventActivityDocument = new BsonDocument();
+            var eventActivityDocument = new BsonDocument
+            {
+                {"_id", new ObjectId()},
+                {
+                    "_t",
+                    new BsonArray(new string[5] {"Entity", "Activity", "EventActivity", "WindowsEvent", "NtlmEvent"})
+                },
+                {"SourceGatewaySystemProfileId", sourceGateway},
+                {"SourceComputerId", computerEntity.id},
+                {"DestinationComputerId", domainControllerName.id},
+                {"Time", DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, 4, 0, 0, 0))},
+                {"SourceComputerName", sourceComputer},
+                {"DestinationComputerName", destinationComputer},
+                {"IsTimeMillisecondsAccurate", BsonValue.Create(true)},
+                {"CategoryName", "Security"},
+                {"ProviderName", "Microsoft-Windows-Security-Auditing"},
+                {"SourceAccountName", userEntity.name},
+                {"SourceAccountId", userEntity.id},
+                {"ErrorCode", "Success"},
+                {"IsSuccess", BsonValue.Create(true)}
+            };
 
-            eventActivityDocument.Add("_id", new ObjectId());
-            eventActivityDocument.Add("_t", new BsonArray(new string[5] { "Entity", "Activity", "EventActivity", "WindowsEvent", "NtlmEvent" }));
-            eventActivityDocument.Add("SourceGatewaySystemProfileId", sourceGateway);
-            eventActivityDocument.Add("SourceComputerId", computerEntity.id);
-            eventActivityDocument.Add("DestinationComputerId", domainControllerName.id);
-            eventActivityDocument.Add("Time", DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, 4, 0, 0, 0)));
-            eventActivityDocument.Add("SourceComputerName", sourceComputer);
-            eventActivityDocument.Add("DestinationComputerName", destinationComputer);
-            eventActivityDocument.Add("IsTimeMillisecondsAccurate", BsonValue.Create(true));
-            eventActivityDocument.Add("CategoryName", "Security");
-            eventActivityDocument.Add("ProviderName", "Microsoft-Windows-Security-Auditing");
-            eventActivityDocument.Add("SourceAccountName", userEntity.name);
-            eventActivityDocument.Add("SourceAccountId", userEntity.id);
-            eventActivityDocument.Add("ErrorCode", "Success");
-            eventActivityDocument.Add("IsSuccess", BsonValue.Create(true));
 
             return eventActivityDocument;
         }
 
         public static BsonDocument NtlmCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0)
         {
-            DateTime oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
-            BsonDocument sourceAccount = new BsonDocument();
-            sourceAccount.Add("DomainName", domainName);
-            sourceAccount.Add("Name", userEntity.name);
+            var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
+            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
 
-            BsonDocument resourceIdentifier = new BsonDocument();
+            var resourceIdentifier = new BsonDocument();
             EntityObject targetAccount = null;
             if (targetMachine != null) { targetAccount = targetMachine; }
             else { targetAccount = domainController; }
-            string targetSPNName = string.Format("krbtgt/{0}", domainName);
+            var targetSPNName = $"krbtgt/{domainName}";
             if (targetSPN != null) { targetSPNName = targetSPN; }
             resourceIdentifier.Add("AccountId", targetAccount.id);
 
-            BsonDocument resourceName = new BsonDocument();
-            resourceName.Add("DomainName", domainName);
-            resourceName.Add("Name", targetSPNName);
+            var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSPNName}};
             resourceIdentifier.Add("ResourceName", resourceName);
 
-            BsonDocument networkActivityDocument = new BsonDocument();
+            var networkActivityDocument = new BsonDocument
+            {
+                {"_id", new ObjectId()},
+                {"_t", new BsonArray(new string[4] {"Entity", "Activity", "NetworkActivity", "Ntlm"})},
+                {"SourceGatewaySystemProfileId", sourceGateway},
+                {"SourceComputerId", computerEntity.id},
+                {"DestinationComputerId", targetAccount.id},
+                {"HorizontalParentId", new ObjectId()},
+                {"StartTime", oldTime},
+                {"EndTime", oldTime},
+                {"ProcessingTime", oldTime},
+                {"SourceIpAddress", "[daf::daf]"},
+                {"SourcePort", 51510},
+                {"SourceComputerSiteId", BsonValue.Create(null)},
+                {"SourceComputerCertainty", "High"},
+                {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"DestinationIpAddress", "[daf::daf]"},
+                {"DestinationPort", 88},
+                {"DestinationComputerSiteId", BsonValue.Create(null)},
+                {"DestinationComputerCertainty", "High"},
+                {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"TransportProtocol", "Tcp"},
+                {"Version", 2},
+                {"SourceComputerNetbiosName", computerEntity.name},
+                {"SourceAccountName", sourceAccount},
+                {"SourceAccountId", userEntity.id},
+                {"ResourceIdentifier", resourceIdentifier},
+                {"DceRpcStatus", BsonValue.Create(null)},
+                {"LdapResultCode", BsonValue.Create(null)},
+                {"SmbStatus", "Success"},
+                {"Smb1Status", BsonValue.Create(null)},
+                {"IsSuccess", BsonValue.Create(true)}
+            };
 
-            networkActivityDocument.Add("_id", new ObjectId());
-            networkActivityDocument.Add("_t", new BsonArray(new string[4] { "Entity", "Activity", "NetworkActivity", "Ntlm" }));
-            networkActivityDocument.Add("SourceGatewaySystemProfileId", sourceGateway);
-            networkActivityDocument.Add("SourceComputerId", computerEntity.id);
-            networkActivityDocument.Add("DestinationComputerId", targetAccount.id);
-            networkActivityDocument.Add("HorizontalParentId", new ObjectId());
-            networkActivityDocument.Add("StartTime", oldTime);
-            networkActivityDocument.Add("EndTime", oldTime);
-            networkActivityDocument.Add("ProcessingTime", oldTime);
-            networkActivityDocument.Add("SourceIpAddress", "[daf::daf]");
-            networkActivityDocument.Add("SourcePort", 51510);
-            networkActivityDocument.Add("SourceComputerSiteId", BsonValue.Create(null));
-            networkActivityDocument.Add("SourceComputerCertainty", "High");
-            networkActivityDocument.Add("SourceComputerResolutionMethod", new BsonArray(new string[1] { "RpcNtlm" }));
-            networkActivityDocument.Add("DestinationIpAddress", "[daf::daf]");
-            networkActivityDocument.Add("DestinationPort", 88);
-            networkActivityDocument.Add("DestinationComputerSiteId", BsonValue.Create(null));
-            networkActivityDocument.Add("DestinationComputerCertainty", "High");
-            networkActivityDocument.Add("DestinationComputerResolutionMethod", new BsonArray(new string[1] { "RpcNtlm" }));
-            networkActivityDocument.Add("TransportProtocol", "Tcp");
-            networkActivityDocument.Add("Version", 2);
-            networkActivityDocument.Add("SourceComputerNetbiosName", computerEntity.name);
-            networkActivityDocument.Add("SourceAccountName", sourceAccount);
-            networkActivityDocument.Add("SourceAccountId", userEntity.id);
-            networkActivityDocument.Add("ResourceIdentifier", resourceIdentifier);
-            networkActivityDocument.Add("DceRpcStatus", BsonValue.Create(null));
-            networkActivityDocument.Add("LdapResultCode", BsonValue.Create(null));
-            networkActivityDocument.Add("SmbStatus", "Success");
-            networkActivityDocument.Add("Smb1Status", BsonValue.Create(null));
-            networkActivityDocument.Add("IsSuccess", BsonValue.Create(true));
-            
+
             return networkActivityDocument;
         }
     }

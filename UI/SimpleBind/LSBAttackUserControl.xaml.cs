@@ -45,7 +45,7 @@ namespace Abnormal_UI.UI.SimpleBind
             BtnLSBDistinct.IsEnabled = true;
             MessageBox.Show(result
                 ? "User activity insertion ended."
-                : "Please select at least 10 users and at least 1 machine!");
+                : "Please select at least 11 users and at least 1 machine!");
         }
         private async void BtnLSBDintense_OnClickAsync(object sender, RoutedEventArgs e)
         {
@@ -53,7 +53,9 @@ namespace Abnormal_UI.UI.SimpleBind
             BtnLSBIntense.IsEnabled = false;
             var result = await Task.Run(() => _model.LSBIntense());
             BtnLSBIntense.IsEnabled = true;
-            MessageBox.Show(result ? "User activity insertion ended." : "Please select at least 1 user and 1 machine!");
+            MessageBox.Show(result
+                ? "User activity insertion ended." 
+                : "Please select at least 1 user and 1 machine!");
         }
         private async void BtnLSBSpecific_OnClickAsync(object sender, RoutedEventArgs e)
         {

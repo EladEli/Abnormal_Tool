@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Abnormal_UI.Infra;
+using System.Management.Automation;
+using System.Windows;
+
 
 namespace Abnormal_UI.UI.Dsa
 {
@@ -27,7 +26,7 @@ namespace Abnormal_UI.UI.Dsa
             {
                 {"SecurityPrincipalCreated", "command"},
                 {"AccountDelegationChanged", "command"},
-                {"AccountConstrainedDelegationStateChanged", "command"},
+                {"AccountConstrainedDelegationStateChanged", "death"},
                 {"AccountConstrainedDelegationSpnsChanged", "command"},
                 {"ComputerOperatingSystemChanged", "command"},
                 {"AccountPasswordChanged", "command"},
@@ -55,14 +54,16 @@ namespace Abnormal_UI.UI.Dsa
         }
 
         
-        public async void ActivateDsa()
+        public void ActivateDsa()
         {
             try
             {
                 _dbClient.SetGatewayProfileForDsa();
-                foreach (var command in _SelectedActivitiesList.Select(dsa => _DsaDictionary[dsa]))
+                _dbClient.CleaDsaCollection();
+                foreach (var command in _SelectedActivitiesList.Select(selectedActivity => _DsaDictionary[selectedActivity]))
                 {
-                    await Task.Run(() => PowershellExec(command));
+                    MessageBox.Show(command);
+                    PowershellExec(command);
                 }
             }
             catch (Exception dsaEx)
@@ -72,14 +73,16 @@ namespace Abnormal_UI.UI.Dsa
             
         }
 
-        public async void AutoDsa()
+        public void AutoDsa()
         {
             try
             {
                 _dbClient.SetGatewayProfileForDsa();
+                _dbClient.CleaDsaCollection();
                 foreach (var dsa in _DsaDictionary)
                 {
-                    await Task.Run(() => PowershellExec(dsa.Value));
+
+                    PowershellExec(dsa.Value);
                 }
             }
             catch (Exception dsaEx)
@@ -88,9 +91,13 @@ namespace Abnormal_UI.UI.Dsa
             }
         }
 
-        public void PowershellExec(string command)
+        private static void PowershellExec(string command)
         {
-            
+            using (var powerShellInstance = PowerShell.Create())
+            {
+                powerShellInstance.AddScript(command);
+                powerShellInstance.Invoke();
+            }
         }
     }
 }

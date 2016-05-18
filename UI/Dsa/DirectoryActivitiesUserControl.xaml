@@ -59,12 +59,12 @@
                     Content="Activate Directory Services" 
                     Width="200" 
                     Height="30" 
-                    Margin="5" Click="ActivateDsaBtn_Click"/>
+                    Margin="5" Click="ActivateDsaBtn_ClickAsync"/>
             <Button x:Name="AutoDsaBtn" 
                     Content="Auto Directory Services" 
                     Width="200" 
                     Height="30" 
-                    Margin="5" Click="AutoDsaBtn_Click"/>
+                    Margin="5" Click="AutoDsaBtn_ClickAsync"/>
         </StackPanel>
     </DockPanel>
 </UserControl>

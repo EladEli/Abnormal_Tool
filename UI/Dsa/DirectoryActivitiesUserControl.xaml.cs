@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace Abnormal_UI.UI.Dsa
@@ -21,20 +22,28 @@ namespace Abnormal_UI.UI.Dsa
         private void UpdateSelected()
         {
             var selectedActivitiesList = DsaListBox.SelectedItems.Cast<string>().ToList();
-            _model._SelectedActivitiesList = selectedActivitiesList;
+            _model._SelectedActivitiesList = new List<string>(selectedActivitiesList);
             selectedActivitiesList.Clear();
+
+            _model._selectedUser = UserTextBox.Text;
+            _model._selectedComputer = ComputerTextBox.Text;
+            _model._selectedGroup = GroupTextBox.Text;
         }
 
-        private void ActivateDsaBtn_Click(object sender, System.Windows.RoutedEventArgs e)
+        private async void ActivateDsaBtn_ClickAsync(object sender, System.Windows.RoutedEventArgs e)
         {
+            ActivateDsaBtn.IsEnabled = false;
             UpdateSelected();
-            _model.ActivateDsa();
+            await Task.Run(() => _model.ActivateDsa());
+            ActivateDsaBtn.IsEnabled = true;
         }
 
-        private void AutoDsaBtn_Click(object sender, System.Windows.RoutedEventArgs e)
+        private async void AutoDsaBtn_ClickAsync(object sender, System.Windows.RoutedEventArgs e)
         {
+            AutoDsaBtn.IsEnabled = false;
             UpdateSelected();
-            _model.AutoDsa();
+            await Task.Run(() => _model.AutoDsa());
+            AutoDsaBtn.IsEnabled = true;
         }
     }
 }
