@@ -86,7 +86,7 @@ namespace Abnormal_UI.UI.Abnormal
                         maxUsedMachines = Math.Max(pcsUsedTodayCounter, rcsUsedTodayCounter);
                         if (includeAs)
                         {
-                            for (int i = 0; i <= (pcsUsedTodayCounter - 1); i++)
+                            for (var i = 0; i <= (pcsUsedTodayCounter - 1); i++)
                             {
                                 if ((currentMachineCounter + pcsUsedTodayCounter) >= selectedMachinesList.Count - 1)
                                 {
@@ -94,7 +94,7 @@ namespace Abnormal_UI.UI.Abnormal
                                     machinesUsed = machinesUsed + selectedMachinesList.Count;
 
                                 }
-                                EntityObject currentSelectedMachine =
+                                var currentSelectedMachine =
                                     selectedMachinesList[currentMachineCounter + i];
                                 var activity = DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine, selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, null, null, "As", daysToGenerate);
                                 kerberosAss.Add(activity);

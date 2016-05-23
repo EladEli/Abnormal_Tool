@@ -22,7 +22,7 @@ namespace Abnormal_UI.UI.Dsa
         private void UpdateSelected()
         {
             var selectedActivitiesList = DsaListBox.SelectedItems.Cast<string>().ToList();
-            _model._SelectedActivitiesList = new List<string>(selectedActivitiesList);
+            _model._selectedActivitiesList = new List<string>(selectedActivitiesList);
             selectedActivitiesList.Clear();
 
             _model._selectedUser = UserTextBox.Text;

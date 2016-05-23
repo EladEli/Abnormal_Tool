@@ -9,8 +9,8 @@ namespace Abnormal_UI.UI.Dsa
 {
     public class DirectoryActivitiesViewModel : AttackViewModel
     {
-        public Dictionary<string, string> _DsaDictionary { get; set; }
-        public List<string> _SelectedActivitiesList { get; set; }
+        public Dictionary<string, string> _dsaDictionary { get; set; }
+        public List<string> _selectedActivitiesList { get; set; }
         public string _selectedUser { get; set; }
         public string _selectedComputer { get; set; }
         public string _selectedGroup { get; set; }
@@ -22,7 +22,7 @@ namespace Abnormal_UI.UI.Dsa
 
         public void PopulateDictionary()
         {
-            _DsaDictionary = new Dictionary<string, string>()
+            _dsaDictionary = new Dictionary<string, string>()
             {
                 {"SecurityPrincipalCreated", "command"},
                 {"AccountDelegationChanged", "command"},
@@ -60,7 +60,7 @@ namespace Abnormal_UI.UI.Dsa
             {
                 _dbClient.SetGatewayProfileForDsa();
                 _dbClient.CleaDsaCollection();
-                foreach (var command in _SelectedActivitiesList.Select(selectedActivity => _DsaDictionary[selectedActivity]))
+                foreach (var command in _selectedActivitiesList.Select(selectedActivity => _dsaDictionary[selectedActivity]))
                 {
                     MessageBox.Show(command);
                     PowershellExec(command);
@@ -79,7 +79,7 @@ namespace Abnormal_UI.UI.Dsa
             {
                 _dbClient.SetGatewayProfileForDsa();
                 _dbClient.CleaDsaCollection();
-                foreach (var dsa in _DsaDictionary)
+                foreach (var dsa in _dsaDictionary)
                 {
 
                     PowershellExec(dsa.Value);

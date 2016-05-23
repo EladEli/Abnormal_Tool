@@ -11,7 +11,7 @@
                      Height="Auto" 
                      Margin="20,32,20,8"
                      x:Name="DsaListBox" 
-                     ItemsSource="{Binding _DsaDictionary.Keys}"
+                     ItemsSource="{Binding _dsaDictionary.Keys}"
                      SelectionMode="Extended" 
                      SelectedIndex="0">
             </ListBox>
@@ -28,13 +28,6 @@
                      x:Name="CompletedListBox" 
                      SelectionMode="Extended"
                      SelectedIndex="0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding _ToComplete}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
             </ListBox>
         </StackPanel>
         <StackPanel DockPanel.Dock="Right" >
