@@ -8,12 +8,12 @@ namespace Abnormal_UI.Infra
 {
     public static class DocumentCreator
     {
-        public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0)
+        public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0, ObjectId parentId = new ObjectId())
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
 
-            BsonDocument resourceIdentifier = new BsonDocument();
+            var resourceIdentifier = new BsonDocument();
             EntityObject targetAccount = null;
             if (targetMachine != null) { targetAccount = targetMachine; }
             else { targetAccount = domainController; }
@@ -23,6 +23,16 @@ namespace Abnormal_UI.Infra
             resourceIdentifier.Add("AccountId", targetAccount.id);
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSPNName}};
             resourceIdentifier.Add("ResourceName", resourceName);
+
+            var responseTicket = new BsonDocument
+            {
+                {"EncryptionType", "Aes256CtsHmacSha196"},
+                {"IsReferral", false},
+                {"Realm", BsonValue.Create(null)},
+                {"ResourceIdentifier", resourceIdentifier},
+                {"Size", 1084},
+                {"Hash", new byte[16]}
+            };
 
             var networkActivityDocument = new BsonDocument
             {
@@ -52,21 +62,19 @@ namespace Abnormal_UI.Infra
                 {"SourceAccountId", userEntity.id},
                 {"SourceComputerSupportedEncryptionTypes", new BsonArray(new string[1] {"Rc4Hmac"})},
                 {"ResourceIdentifier", resourceIdentifier},
-                {"RequestTicketHash", new byte[16]},
-                {"RequestTicketKerberosId", new ObjectId()},
+                
                 {"Error", "Success"},
                 {"NtStatus", BsonValue.Create(null)},
-                {"ResponseTicketEncryptionType", "Aes256CtsHmacSha196"},
-                {"ResponseTicketHash", new byte[16]},
                 {"IsSuccess", BsonValue.Create(false)},
                 {"Options", new BsonArray(new string[4] {"RenewableOk", "Canonicalize", "Renewable", "Forwardable"})},
                 {"RequestedTicketExpiration", DateTime.UtcNow},
-                {"SourceGatewaySystemProfileId", sourceGateway}
-            };
+                {"SourceGatewaySystemProfileId", sourceGateway},
+        };
 
 
             if (actionType == "As")
             {
+                networkActivityDocument.Add("RequestTicketKerberosId", parentId);
                 networkActivityDocument.Add("IsOldPassword", BsonValue.Create(null));
                 networkActivityDocument.Add("IsIncludePac", BsonValue.Create(true));
                 networkActivityDocument.Add("SourceAccountSupportedEncryptionTypes", new BsonArray(new string[0]));
@@ -74,18 +82,21 @@ namespace Abnormal_UI.Infra
                 networkActivityDocument.Add("SourceComputerNetbiosName", computerEntity.name);
                 networkActivityDocument.Add("EncryptedTimestampEncryptionType", BsonValue.Create(null));
                 networkActivityDocument.Add("EncryptedTimestamp", BsonValue.Create(null));
-                networkActivityDocument.Add("ResponseTicketSize", 0);
+                networkActivityDocument.Add("RequestTicket", BsonValue.Create(null));
+                networkActivityDocument.Add("ResponseTicket", responseTicket);
+
+
             }
             else
             {
-                networkActivityDocument.Add("IsReferralRequestTicket", BsonValue.Create(false));
-                networkActivityDocument.Add("IsReferralResponseTicket", BsonValue.Create(false));
+                networkActivityDocument.Add("RequestTicketKerberosId", parentId);
                 networkActivityDocument.Add("IsServiceForUserToSelf", BsonValue.Create(false));
-                networkActivityDocument.Add("RequestTicketEncryptionType", "Aes256CtsHmacSha196");
                 networkActivityDocument.Add("AuthorizationDataSize", BsonValue.Create(null));
                 networkActivityDocument.Add("AuthorizationDataEncryptionType", BsonValue.Create(null));
-                networkActivityDocument.Add("RequestTicketSize", 0);
                 networkActivityDocument.Add("ParentsOptions", "None");
+                networkActivityDocument.Add("AdditionalTickets", new BsonArray(new string[0]));
+                networkActivityDocument.Add("RequestTicket", responseTicket);
+                networkActivityDocument.Add("ResponseTicket", responseTicket);
             }
             return networkActivityDocument;
         }
@@ -339,7 +350,7 @@ namespace Abnormal_UI.Infra
             return eventActivityDocument;
         }
 
-        public static BsonDocument NtlmCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0)
+        public static BsonDocument NtlmCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, int daysToSubtruct = 0, int hoursToSubtract = 0)
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
@@ -358,7 +369,7 @@ namespace Abnormal_UI.Infra
             var networkActivityDocument = new BsonDocument
             {
                 {"_id", new ObjectId()},
-                {"_t", new BsonArray(new string[4] {"Entity", "Activity", "NetworkActivity", "Ntlm"})},
+                {"_t", new BsonArray(new string[3] {"Entity", "NetworkActivity", "Ntlm"})},
                 {"SourceGatewaySystemProfileId", sourceGateway},
                 {"SourceComputerId", computerEntity.id},
                 {"DestinationComputerId", targetAccount.id},

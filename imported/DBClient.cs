@@ -22,6 +22,7 @@ namespace Abnormal_UI.Imported
         IMongoCollection<BsonDocument> _systemProfilesCollection;
         List<ObjectId> _gatewayIdsCollection;
         List<string> _kerberosCollections;
+        List<string> _ntlmCollections;
         List<string> _ntlmEventsCollections;
         private Logger _logger;
 
@@ -240,7 +241,7 @@ namespace Abnormal_UI.Imported
             _ntlmEventsCollections = 
                 _database.ListCollections()
                     .ToList()
-                    .Select(_ => _["name"].AsString).Where(_ => _.StartsWith("Ntlm")).ToList()
+                    .Select(_ => _["name"].AsString).Where(_ => _.StartsWith("NtlmE")).ToList()
                     ;
             try
             {
@@ -252,9 +253,33 @@ namespace Abnormal_UI.Imported
             }
             catch (Exception)
             {
-                _logger.Debug("Ntlm collection alraedy renamed");
+                _logger.Debug("Ntlm events collection alraedy renamed");
             }
             
+        }
+
+        public void RenameNtlmCollections()
+        {
+            var monthAgo = DateTime.UtcNow.Subtract(new TimeSpan(27, 0, 0, 0))
+                .ToString("yyyyMMddhhmmss", CultureInfo.InvariantCulture);
+            _ntlmCollections =
+                _database.ListCollections()
+                    .ToList()
+                    .Select(_ => _["name"].AsString).Where(_ => _.StartsWith("Ntlm_")).ToList()
+                    ;
+            try
+            {
+                foreach (var collection in _ntlmCollections)
+                {
+                    _database.RenameCollection(collection, "Ntlm_" + monthAgo);
+                    _logger.Debug("Renamed NTLM collection");
+                }
+            }
+            catch (Exception)
+            {
+                _logger.Debug("Ntlm collection alraedy renamed");
+            }
+
         }
 
         public void CreateActivityCollectionsOnTestDB()

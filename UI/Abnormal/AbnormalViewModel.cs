@@ -11,9 +11,9 @@ namespace Abnormal_UI.UI.Abnormal
 {
     public class AbnormalViewModel : AttackViewModel
     {
-        public Boolean includeAs { get; set; }
-        public Boolean includeTgs { get; set; }
-        public Boolean includeEvent { get; set; }
+        public bool includeKerberos { get; set; }
+        public bool includeNTLM { get; set; }
+        public bool includeEvent { get; set; }
         private int minMachines;
         public int MinMachines
         {
@@ -40,8 +40,8 @@ namespace Abnormal_UI.UI.Abnormal
         {
             minMachines = 1;
             maxMachines = 4;
-            includeAs = true;
-            includeTgs = false;
+            includeKerberos = true;
+            includeNTLM = false;
             includeEvent = false;
             Spns = new []
             {
@@ -57,14 +57,20 @@ namespace Abnormal_UI.UI.Abnormal
         {
             try
             {
+                var includes = new List<bool>() {includeKerberos, includeEvent, includeNTLM};
+                var boolCounter = includes.Count(include => include);
+                if (boolCounter == 0)
+                {
+                    boolCounter++;}
                 _dbClient.RenameKerbCollections();
+                _dbClient.RenameNtlmCollections();
                 _dbClient.RenameNtlmEventsCollections();
                 _dbClient.ClearTestNaCollection();
                 SvcCtrl.StopService("ATACenter");
                 _dbClient.SetCenterProfileForReplay();
                 Logger.Debug("Center profile set for replay");
-                var kerberosAss = new List<BsonDocument>();
-                var kerberosTgss = new List<BsonDocument>();
+                var kerbeross = new List<BsonDocument>();
+                var Ntlms = new List<BsonDocument>();
                 var NtlmEvents = new List<BsonDocument>();
                 if (selectedMachinesList.Count / selectedEmpList.Count < 2)
                 {
@@ -73,6 +79,7 @@ namespace Abnormal_UI.UI.Abnormal
 
                 var currentMachineCounter = 0;
                 var rnd = new Random();
+                var rnd2 = new Random();
                 var machinesUsed = 0;
                 var maxUsedMachines = 0;
 
@@ -84,60 +91,57 @@ namespace Abnormal_UI.UI.Abnormal
                         var pcsUsedTodayCounter = rnd.Next(minMachines, maxMachines + 1);
                         var rcsUsedTodayCounter = rnd.Next(minMachines, maxMachines + 1);
                         maxUsedMachines = Math.Max(pcsUsedTodayCounter, rcsUsedTodayCounter);
-                        if (includeAs)
+                        for (var i = 0; i <= (pcsUsedTodayCounter - 1); i++)
                         {
-                            for (var i = 0; i <= (pcsUsedTodayCounter - 1); i++)
+                            
+                            if ((currentMachineCounter + pcsUsedTodayCounter) >= selectedMachinesList.Count - 1)
                             {
-                                if ((currentMachineCounter + pcsUsedTodayCounter) >= selectedMachinesList.Count - 1)
-                                {
-                                    currentMachineCounter = 0;
-                                    machinesUsed = machinesUsed + selectedMachinesList.Count;
-
-                                }
-                                var currentSelectedMachine =
-                                    selectedMachinesList[currentMachineCounter + i];
-                                var activity = DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine, selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, null, null, "As", daysToGenerate);
-                                kerberosAss.Add(activity);
+                                currentMachineCounter = 0;
+                                machinesUsed = machinesUsed + selectedMachinesList.Count;
                             }
-                            _dbClient.InsertBatch(kerberosAss);
-
-                            Logger.Trace("Inserted {2} Kerberos AS activities for {1} on {0}", DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), selectedUser.name, kerberosAss.Count);
-
-                            kerberosAss = new List<BsonDocument>();
-                        }
-
-                        if (includeTgs)
-                        {
-                            for (var i = 0; i <= (rcsUsedTodayCounter - 1); i++)
+                            var currentSelectedMachine = selectedMachinesList[currentMachineCounter + i];
+                            switch (rnd2.Next(1, (boolCounter+1)))
                             {
-                                if ((currentMachineCounter + rcsUsedTodayCounter) >= selectedMachinesList.Count - 1) { currentMachineCounter = 0; }
-                                var currentSelectedMachine = selectedMachinesList[currentMachineCounter + i];
-                                var defaultMachine = selectedMachinesList[currentMachineCounter];
-                                var activity = DocumentCreator.KerberosCreator(selectedUser, defaultMachine, selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, string.Format("{0}/{1}", Spns[rnd.Next(0, 5)], currentSelectedMachine.name), currentSelectedMachine, "Tgs", daysToGenerate);
-                                kerberosTgss.Add(activity);
-                            }
-                            _dbClient.InsertBatch(kerberosTgss);
-                            Logger.Trace("Inserted {2} Kerberos Tgs activities for {1} on {0}", DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), selectedUser.name, kerberosTgss.Count);
+                                case 1:
+                                    var defaultMachine = selectedMachinesList[currentMachineCounter];
+                                    var asActivity = DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine,
+                                        selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, null, null, "As",
+                                        daysToGenerate);
+                                    kerbeross.Add(asActivity);
+                                    var tgsActivity = DocumentCreator.KerberosCreator(selectedUser, defaultMachine,
+                                        selectedDcsList.FirstOrDefault(), DomainName, sourceGateway,
+                                        $"{Spns[rnd.Next(0, 5)]}/{currentSelectedMachine.name}",
+                                        currentSelectedMachine, "Tgs", daysToGenerate,0, asActivity["_id"].AsObjectId);
+                                    kerbeross.Add(tgsActivity);
+                                    _dbClient.InsertBatch(kerbeross);
 
-                            kerberosTgss = new List<BsonDocument>();
-                        }
-                        if (includeEvent)
-                        {
-                            for (var i = 0; i <= (pcsUsedTodayCounter - 1); i++)
-                            {
-                                if ((currentMachineCounter + pcsUsedTodayCounter) >= selectedMachinesList.Count - 1)
-                                {
-                                    currentMachineCounter = 0;
-                                    machinesUsed = machinesUsed + selectedMachinesList.Count;
-                                }
-                                var currentSelectedMachine = selectedMachinesList[currentMachineCounter + i];
-                                var activity = DocumentCreator.EventCreator(selectedUser, currentSelectedMachine,
-                                    selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, daysToGenerate);
-                                NtlmEvents.Add(activity);
+                                    Logger.Trace("Inserted {2} Kerberos activities for {1} on {0}",
+                                        DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), selectedUser.name,
+                                        kerbeross.Count);
+
+                                    kerbeross = new List<BsonDocument>();
+                                    break;
+                                case 2:
+                                    var eventActivity = DocumentCreator.EventCreator(selectedUser, currentSelectedMachine,
+                                        selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, daysToGenerate);
+                                    NtlmEvents.Add(eventActivity);
+                                    _dbClient.InsertBatch(NtlmEvents, false, false, true);
+                                    Logger.Trace("Inserted {2} Ntlm event activities for {1} on {0}",
+                                        DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), selectedUser.name,
+                                        kerbeross.Count);
+                                    NtlmEvents = new List<BsonDocument>();
+                                    break;
+                                case 3:
+                                    var ntlmActivity = DocumentCreator.NtlmCreator(selectedUser, currentSelectedMachine,
+                                        selectedDcsList.FirstOrDefault(), DomainName, sourceGateway);
+                                    Ntlms.Add(ntlmActivity);
+                                    _dbClient.InsertBatch(Ntlms);
+                                    Logger.Trace("Inserted {2} Ntlm activities for {1} on {0}",
+                                        DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), selectedUser.name,
+                                        kerbeross.Count);
+                                    Ntlms = new List<BsonDocument>();
+                                    break;
                             }
-                            _dbClient.InsertBatch(NtlmEvents, false, false, true);
-                            Logger.Trace("Inserted {2} Kerberos AS activities for {1} on {0}", DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)), selectedUser.name, kerberosAss.Count);
-                            NtlmEvents = new List<BsonDocument>();
                         }
                     }
                     currentMachineCounter = currentMachineCounter + maxUsedMachines;
@@ -191,7 +195,7 @@ namespace Abnormal_UI.UI.Abnormal
                         {
                             hoursCounter++;
                             var currentSelectedMachine = selectedComputer;
-                            if (includeAs)
+                            if (includeKerberos)
                             {
                                 var Activity = DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine, selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, null, null, "As", 0, hoursCounter);
                                 networkActivitities.Add(Activity);
@@ -199,9 +203,9 @@ namespace Abnormal_UI.UI.Abnormal
                             }
                             Logger.Trace("Inserted {2} Kerberos As abnormal activities for {0} on {1}", selectedUser.name, DateTime.UtcNow, selectedMachinesList.Count);
 
-                            if (includeTgs)
+                            if (includeNTLM)
                             {
-                                var Activity = DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine, selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, string.Format("{0}/{1}", Spns[rnd.Next(0, 5)], currentSelectedMachine.name), currentSelectedMachine, "Tgs", 0, hoursCounter);
+                                var Activity = DocumentCreator.NtlmCreator(selectedUser, currentSelectedMachine, selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, string.Format("{0}/{1}", Spns[rnd.Next(0, 5)], currentSelectedMachine.name), currentSelectedMachine, 0, hoursCounter);
                                 networkActivitities.Add(Activity);
                             }
                             if (includeEvent)

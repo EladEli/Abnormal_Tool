@@ -85,13 +85,13 @@
                          />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0 20 0 0">
-                    <CheckBox IsChecked="{Binding includeAs}" 
+                    <CheckBox IsChecked="{Binding includeKerberos}" 
                           x:Name="CheckBxAs" >
-                        <Label Content="As"/>
+                        <Label Content="Kerberos"/>
                     </CheckBox>
-                    <CheckBox IsChecked="{Binding includeTgs}" 
+                    <CheckBox IsChecked="{Binding includeNTLM}" 
                           x:Name="CheckBxTgs">
-                        <Label Content="Tgs"/>
+                        <Label Content="NTLM"/>
                     </CheckBox>
                     <CheckBox IsChecked="{Binding includeEvent}" 
                           x:Name="CheckBxEvent">
