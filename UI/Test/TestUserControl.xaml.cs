@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using Abnormal_UI.Imported;
 
@@ -37,7 +37,7 @@ namespace Abnormal_UI.UI.Test
             selectedEntityObjects.Clear();
         }
 
-        private async void Btn1_OnClickAsync(object sender, System.Windows.RoutedEventArgs e)
+        private async void Btn1_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
             Btn1.IsEnabled = false;
@@ -45,10 +45,26 @@ namespace Abnormal_UI.UI.Test
             Btn1.IsEnabled = true;
         }
 
-        private async void Btn2_OnClickAsync(object sender, System.Windows.RoutedEventArgs e)
+        private async void Btn2_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
             await Task.Run(() => _model.InsertAe());
+        }
+
+        private async void Btn4_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            UpdateSelected();
+            var result = false;
+            Btn4.IsEnabled = false;
+            if (_model.SaAmount != 0)
+            {
+                await Task.Run(() => _model.AddGateway());
+                result = true;
+            }
+            Btn4.IsEnabled = true;
+            MessageBox.Show(result
+                ? "Gateway Creation ended."
+                : "Please enter Gateways amount");
         }
     }
 }

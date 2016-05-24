@@ -30,10 +30,8 @@ namespace Abnormal_UI.UI.Test
         {
             try
             {
-                var entityTypes = new List<UniqueEntityType>();
-                entityTypes.Add(UniqueEntityType.User);
-                var entityTypes2 = new List<UniqueEntityType>();
-                entityTypes2.Add(UniqueEntityType.Computer);
+                var entityTypes = new List<UniqueEntityType> {UniqueEntityType.User};
+                var entityTypes2 = new List<UniqueEntityType> {UniqueEntityType.Computer};
                 var userEntity = _dbClient.GetUniqueEntity(entityTypes);
                 var computerEntity = _dbClient.GetUniqueEntity(entityTypes2);
                 var suspicousActivitities = new List<BsonDocument>();
@@ -73,6 +71,11 @@ namespace Abnormal_UI.UI.Test
                 Logger.Error(AeException);
                 return false;
             }
+        }
+
+        public void AddGateway()
+        {
+            _dbClient.SetNewGateway(_saAmount);
         }
 
         public bool StopService(string serviceName)

@@ -72,7 +72,7 @@
             </ListBox>
             <StackPanel
                 HorizontalAlignment="Left" Margin="20">
-                <Label Content="SA's amount" />
+                <Label Content="SA'/GW's amount" />
                 <StackPanel Orientation="Horizontal" >
                     <TextBox Height="20" 
                          Width="40"
@@ -93,24 +93,29 @@
                 </StackPanel>-->
 
             </StackPanel>
-            <StackPanel HorizontalAlignment="Left" Margin="20">
+            <StackPanel HorizontalAlignment="Left" Margin="20" Height="167">
                 <Button Width="200" 
-                    Height="30" 
-                    Margin="5"
-                    Content="SAEC"
-                    x:Name="Btn1" 
-                    Click="Btn1_OnClickAsync"/>
-               <Button Width="200" 
-                    Height="30" 
-                    Margin="5"
-                    Content="AE"
-                    x:Name="Btn2" 
-                    Click="Btn2_OnClickAsync"/>
+            		Height="30" 
+            		Margin="5"
+            		Content="SAEC"
+            		x:Name="Btn1" 
+            		Click="Btn1_OnClickAsync"/>
                 <Button Width="200" 
-                    Height="30" 
-                    Margin="5"
-                    Content="Test service control"
-                    x:Name="Btn3"/>
+            		Height="30" 
+            		Margin="5"
+            		Content="AE"
+            		x:Name="Btn2" 
+            		Click="Btn2_OnClickAsync"/>
+                <Button Width="200" 
+            		Height="30" 
+            		Margin="5"
+            		Content="Test service control"
+            		x:Name="Btn3"/>
+                <Button Width="200" 
+            		Height="30" 
+            		Margin="5"
+            		Content="Create Gateways"
+            		x:Name="Btn4" Click="Btn4_ClickAsync"/>
             </StackPanel>
         </StackPanel>
     </DockPanel>

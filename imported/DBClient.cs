@@ -314,6 +314,27 @@ namespace Abnormal_UI.Imported
             return dsaCollection.ToBsonDocument().Any(dsa => dsaForCheck == dsa.ToString());
         }
 
+        public void SetNewGateway(int amount)
+        {
+            try
+            {
+                var gatewaySystemProfile = _systemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument()).ToEnumerable().First();
+                var gatewayName = gatewaySystemProfile["NetbiosName"].AsString;
+                for (var i = 0; i < amount; i++)
+                {
+                    gatewaySystemProfile["NetbiosName"] = gatewayName + " " + i;
+                    gatewaySystemProfile["_id"] = new ObjectId();
+                    _systemProfilesCollection.InsertOne(gatewaySystemProfile);
+                }
+            }
+            catch (Exception ex)
+            {
+                
+                _logger.Error(ex);
+            }
+            
+        }
+
         #endregion
     }
 }
