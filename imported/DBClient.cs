@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.Linq;
 using Microsoft.VisualBasic;
@@ -140,18 +141,18 @@ namespace Abnormal_UI.Imported
             _systemProfilesCollection.DeleteMany(mongoQuery.ToBsonDocument());
         }
 
-        public void InsertBatch(List<BsonDocument> documents, bool isSa = false, bool isPhoto = false, bool isEvent = false)
+        public void InsertBatch(List<BsonDocument> documents)
         {
-            string collectionName;
-            if (isSa)
-                collectionName = "SuspiciousActivity";
-            else if (isPhoto)
-                collectionName = "UserPhoto";
-            else if (isEvent)
-                collectionName = "EventActivity";
-            else
-                collectionName = "NetworkActivity";
-            _testDatabase.GetCollection<BsonDocument>(collectionName).InsertMany(documents);
+            var events = documents.Where(_ => _["_t"].ToString().Contains("NtlmEvent")).ToList();
+            var networkActivities = documents.Where(_ => _["_t"].ToString().Contains("NetworkActivity")).ToList();
+            if (events.Any())
+            {
+                _testDatabase.GetCollection<BsonDocument>("EventActivity").InsertMany(events);
+            }
+            if (networkActivities.Any())
+            {
+                _testDatabase.GetCollection<BsonDocument>("NetworkActivity").InsertMany(networkActivities);
+            }
         }
 
         public void InsertBatchTest(List<BsonDocument> documents, bool isSa = false, bool isPhoto = false, bool isEvent = false)
@@ -286,8 +287,8 @@ namespace Abnormal_UI.Imported
         {
             try
             {
-                _testDatabase.CreateCollection("NetworkActivity");
-                _testDatabase.CreateCollection("EventActivity");
+                _testDatabase.GetCollection<BsonDocument>("EventActivity");
+                _testDatabase.GetCollection<BsonDocument>("NetworkActivity");
             }
             catch(Exception ex)
             {
@@ -298,7 +299,9 @@ namespace Abnormal_UI.Imported
         {
             _testDatabase.DropCollection("NetworkActivity");
             _testDatabase.CreateCollection("NetworkActivity");
-            _logger.Debug("Cleared Test NA's collection");
+            _testDatabase.DropCollection("EventActivity");
+            _testDatabase.CreateCollection("EventActivity");
+            _logger.Debug("Cleared Test collections");
         }
 
         public void CleaDsaCollection()

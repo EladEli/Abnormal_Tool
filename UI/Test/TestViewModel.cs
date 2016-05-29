@@ -61,7 +61,7 @@ namespace Abnormal_UI.UI.Test
                 var suspicousActivitities = new List<BsonDocument>();
                 for (var i = 0; i < _saAmount; i++)
                 {
-                    suspicousActivitities.Add(DocumentCreator.SAFillerAE(userEntity, computerEntity, selectedDcsList.FirstOrDefault(), DomainName));
+                    suspicousActivitities.Add(DocumentCreator.SAFillerAE(userEntity, computerEntity, SelectedDomainControllers.FirstOrDefault(), DomainName));
                 }
                 _dbClient.InsertBatchTest(suspicousActivitities, true);
                 return true;

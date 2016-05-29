@@ -25,15 +25,15 @@ namespace Abnormal_UI.UI.Test
         private void UpdateSelected()
         {
             var selectedEntityObjects = BoxUsers.SelectedItems.Cast<EntityObject>().ToList();
-            _model.selectedEmpList = new ObservableCollection<EntityObject>(selectedEntityObjects);
+            _model.SelectedEmployees = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
 
             selectedEntityObjects.AddRange(BoxMachines.SelectedItems.Cast<EntityObject>());
-            _model.selectedMachinesList = new ObservableCollection<EntityObject>(selectedEntityObjects);
+            _model.SelectedMachines = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
 
             selectedEntityObjects.AddRange(BoxDCs.SelectedItems.Cast<EntityObject>());
-            _model.selectedDcsList = new ObservableCollection<EntityObject>(selectedEntityObjects);
+            _model.SelectedDomainControllers = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
         }
 

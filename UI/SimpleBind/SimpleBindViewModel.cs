@@ -21,14 +21,14 @@ namespace Abnormal_UI.UI.SimpleBind
                 _dbClient.SetCenterProfileForReplay();
                 Logger.Debug("Center profile set for replay");
                 var networkActivitities = new List<BsonDocument>();
-                if (selectedEmpList.Count < 1 || selectedMachinesList.Count < 1)
+                if (SelectedEmployees.Count < 1 || SelectedMachines.Count < 1)
                 {
                     return false;
                 }
                 for (var i = 0; i < 110; i++)
                 {
-                    networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
-                        selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
+                    networkActivitities.Add(DocumentCreator.SimpleBindCreator(SelectedEmployees.FirstOrDefault(),
+                        SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway, 0));
                 }
                 _dbClient.InsertBatch(networkActivitities);
                 Logger.Debug("Done inserting Ldap activities");
@@ -47,7 +47,7 @@ namespace Abnormal_UI.UI.SimpleBind
             try
             {
                 var networkActivitities = new List<BsonDocument>();
-                if (selectedEmpList.Count < 11 || selectedMachinesList.Count < 1)
+                if (SelectedEmployees.Count < 11 || SelectedMachines.Count < 1)
                 {
                     return false;
                 }
@@ -55,7 +55,7 @@ namespace Abnormal_UI.UI.SimpleBind
                 SvcCtrl.StopService("ATACenter");
                 _dbClient.SetCenterProfileForReplay();
                 Logger.Debug("Center profile set for replay");
-                networkActivitities.AddRange(selectedEmpList.Select(user => DocumentCreator.SimpleBindCreator(user, selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0)));
+                networkActivitities.AddRange(SelectedEmployees.Select(user => DocumentCreator.SimpleBindCreator(user, SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway, 0)));
                 _dbClient.InsertBatch(networkActivitities);
                 Logger.Debug("Done inserting Ldap activities");
                 SvcCtrl.StartService("ATACenter");
@@ -73,12 +73,12 @@ namespace Abnormal_UI.UI.SimpleBind
             {
                 _dbClient.ClearTestNaCollection();
                 var networkActivitities = new List<BsonDocument>();
-                if (selectedEmpList.Count < 1 || selectedMachinesList[0].name == null)
+                if (SelectedEmployees.Count < 1 || SelectedMachines[0].name == null)
                 {
                     return false;
                 }
-                networkActivitities.Add(DocumentCreator.SimpleBindCreator(selectedEmpList.FirstOrDefault(),
-                    selectedMachinesList[0], selectedDcsList.FirstOrDefault(), DomainName, sourceGateway, 0));
+                networkActivitities.Add(DocumentCreator.SimpleBindCreator(SelectedEmployees.FirstOrDefault(),
+                    SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway, 0));
                 _dbClient.InsertBatch(networkActivitities);
                 return true;
             }

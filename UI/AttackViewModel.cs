@@ -27,19 +27,19 @@ namespace Abnormal_UI.UI
             }
         }
 
-        public ObjectId sourceGateway;
+        public ObjectId SourceGateway;
 
-        public ObservableCollection<EntityObject> empList { get; set; }
+        public ObservableCollection<EntityObject> Employees { get; set; }
 
-        public ObservableCollection<EntityObject> selectedEmpList { get; set; }
+        public ObservableCollection<EntityObject> SelectedEmployees { get; set; }
 
-        public ObservableCollection<EntityObject> machinesList { get; set; }
+        public ObservableCollection<EntityObject> Machines { get; set; }
 
-        public ObservableCollection<EntityObject> selectedMachinesList { get; set; }
+        public ObservableCollection<EntityObject> SelectedMachines { get; set; }
 
-        public ObservableCollection<EntityObject> dcsList { get; set; }
+        public ObservableCollection<EntityObject> DomainControllers { get; set; }
 
-        public ObservableCollection<EntityObject> selectedDcsList { get; set; }
+        public ObservableCollection<EntityObject> SelectedDomainControllers { get; set; }
 
         public Logger Logger;
 
@@ -50,14 +50,14 @@ namespace Abnormal_UI.UI
         public AttackViewModel()
         {
             _dbClient = DBClient.getDBClient();
-            empList = new ObservableCollection<EntityObject>();
-            selectedEmpList = new ObservableCollection<EntityObject>();
-            machinesList = new ObservableCollection<EntityObject>();
-            selectedMachinesList = new ObservableCollection<EntityObject>();
-            dcsList = new ObservableCollection<EntityObject>();
-            selectedDcsList = new ObservableCollection<EntityObject>();
+            Employees = new ObservableCollection<EntityObject>();
+            SelectedEmployees = new ObservableCollection<EntityObject>();
+            Machines = new ObservableCollection<EntityObject>();
+            SelectedMachines = new ObservableCollection<EntityObject>();
+            DomainControllers = new ObservableCollection<EntityObject>();
+            SelectedDomainControllers = new ObservableCollection<EntityObject>();
             DomainName = string.Empty;
-            sourceGateway = _dbClient.GetGwOids().FirstOrDefault();
+            SourceGateway = _dbClient.GetGwOids().FirstOrDefault();
             Logger = LogManager.GetLogger("TestToolboxLog");
         }
 
@@ -73,14 +73,14 @@ namespace Abnormal_UI.UI
                 var allUsers = _dbClient.GetUniqueEntity(entityTypes);
                 foreach (var oneEntity in allUsers)
                 {
-                    empList.Add(oneEntity);
+                    Employees.Add(oneEntity);
                 }
-                empList.OrderByDescending(EntityObject => EntityObject.DnsName);
+                Employees.OrderByDescending(EntityObject => EntityObject.DnsName);
 
                 var domainControllers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer, null, true);
                 foreach (var oneDC in domainControllers)
                 {
-                    dcsList.Add(oneDC);
+                    DomainControllers.Add(oneDC);
                 }
 
                 entityTypes.Clear();
@@ -88,9 +88,9 @@ namespace Abnormal_UI.UI
                 var allComputers = _dbClient.GetUniqueEntity(entityTypes);
                 foreach (var oneEntity in allComputers)
                 {
-                    machinesList.Add(oneEntity);
+                    Machines.Add(oneEntity);
                 }
-                machinesList.OrderByDescending(EntityObject => EntityObject.DnsName);
+                Machines.OrderByDescending(EntityObject => EntityObject.DnsName);
 
                 var domain = _dbClient.GetUniqueEntity(UniqueEntityType.Domain);
                 DomainName = domain.FirstOrDefault().name;
