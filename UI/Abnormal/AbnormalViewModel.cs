@@ -61,7 +61,7 @@ namespace Abnormal_UI.UI.Abnormal
         {
             try
             {
-                if (SelectedMachines.Count / SelectedEmployees.Count < 2)
+                if (SelectedMachines.Count / SelectedUsers.Count < 2)
                 {
                     Logger.Debug("Not enough users");
                     return false;
@@ -109,9 +109,9 @@ namespace Abnormal_UI.UI.Abnormal
             var currentMachinesCounter = 0;
             machinesUsed = 0;
             var computersUsedTodayCounter = 0;
-            foreach (var selectedEmployee in SelectedEmployees)
+            foreach (var selectedUser in SelectedUsers)
             {
-                Logger.Debug("inserting normal activity for {0}", selectedEmployee.name);
+                Logger.Debug("inserting normal activity for {0}", selectedUser.name);
                 for (var daysToGenerate = 1; daysToGenerate <= 23; daysToGenerate++)
                 {
                     computersUsedTodayCounter = _random.Next(minMachines, maxMachines + 1);
@@ -127,18 +127,18 @@ namespace Abnormal_UI.UI.Abnormal
                         switch (selectedActivityType)
                         {
                             case ActivityType.Kerberos:
-                                networkActivities.AddRange(AddKerberos(currentMachinesCounter, selectedEmployee, currentSelectedMachine, daysToGenerate));
+                                networkActivities.AddRange(AddKerberos(currentMachinesCounter, selectedUser, currentSelectedMachine, daysToGenerate));
                                 break;
                             case ActivityType.Event:
                                 networkActivities.Add(
-                                    DocumentCreator.EventCreator(selectedEmployee,
+                                    DocumentCreator.EventCreator(selectedUser,
                                         currentSelectedMachine,
                                         SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway,
                                         daysToGenerate));
                                 break;
                             case ActivityType.Ntlm:
                                 networkActivities.Add(
-                                    DocumentCreator.NtlmCreator(selectedEmployee,
+                                    DocumentCreator.NtlmCreator(selectedUser,
                                         currentSelectedMachine,
                                         SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway));
                                 break;
@@ -147,7 +147,7 @@ namespace Abnormal_UI.UI.Abnormal
                         }
                         Logger.Trace("Inserted {2} activity for {1} on {0}",
                                         DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)),
-                                        selectedEmployee.name, selectedActivityType);
+                                        selectedUser.name, selectedActivityType);
                     }
                 }
                 currentMachinesCounter += computersUsedTodayCounter;
@@ -210,7 +210,7 @@ namespace Abnormal_UI.UI.Abnormal
                 Logger.Debug("Woke up!");
                 SvcCtrl.StopService("ATACenter");
                 var hoursCounter = 4;
-                if (SelectedEmployees.Count == 0 && specificUser == null)
+                if (SelectedUsers.Count == 0 && specificUser == null)
                 {
                     return false;
                 }
@@ -218,11 +218,11 @@ namespace Abnormal_UI.UI.Abnormal
                 {
                     if (specificUser != null)
                     {
-                        SelectedEmployees = specificUser;
+                        SelectedUsers = specificUser;
                     }
-                    foreach (var selectedEmployee in SelectedEmployees)
+                    foreach (var selectedUser in SelectedUsers)
                     {
-                        Logger.Debug("inserting abnormal activity for {0}", selectedEmployee.name);
+                        Logger.Debug("inserting abnormal activity for {0}", selectedUser.name);
                         foreach (var selectedComputer in SelectedMachines)
                         {
                             hoursCounter++;
@@ -232,21 +232,21 @@ namespace Abnormal_UI.UI.Abnormal
                             switch (selectedActivityType)
                             {
                                 case ActivityType.Kerberos:
-                                    activities.Add(DocumentCreator.KerberosCreator(selectedEmployee, currentSelectedMachine,
+                                    activities.Add(DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine,
                                         SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway, null,
                                         null, "As", 0, hoursCounter));
-                                    activities.Add(DocumentCreator.KerberosCreator(selectedEmployee, currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway,
+                                    activities.Add(DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway,
                                         $"{Spns[_random.Next(0, 5)]}/{currentSelectedMachine.name}", currentSelectedMachine,"Tgs", 0, hoursCounter));
                                     break;
                                 case ActivityType.Event:
                                     activities.Add(
-                                        DocumentCreator.EventCreator(selectedEmployee,
+                                        DocumentCreator.EventCreator(selectedUser,
                                             currentSelectedMachine,
                                             SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway));
                                     break;
                                 case ActivityType.Ntlm:
                                     activities.Add(
-                                        DocumentCreator.NtlmCreator(selectedEmployee,
+                                        DocumentCreator.NtlmCreator(selectedUser,
                                             currentSelectedMachine,
                                             SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway));
                                     break;
@@ -254,7 +254,7 @@ namespace Abnormal_UI.UI.Abnormal
                                     throw new ArgumentOutOfRangeException();
                             }
                         }
-                        Logger.Debug("Expect abnormal activity on {0}", selectedEmployee.name);
+                        Logger.Debug("Expect abnormal activity on {0}", selectedUser.name);
                     }
                     _dbClient.InsertBatch(activities);
                     Logger.Debug("Done inserting abnormal activity");
@@ -273,13 +273,13 @@ namespace Abnormal_UI.UI.Abnormal
         {
             try
             {
-                SelectedEmployees = new ObservableCollection<EntityObject> {};
+                SelectedUsers = new ObservableCollection<EntityObject> {};
                 SelectedMachines = new ObservableCollection<EntityObject> {};
                 SelectedDomainControllers = new ObservableCollection<EntityObject> {};
 
                 for (var i = 0; i < 70; i++)
                 {
-                    SelectedEmployees.Add(Employees[i]);
+                    SelectedUsers.Add(Users[i]);
                 }
                 for (var i = 0; i < 250; i++)
                 {
@@ -295,9 +295,9 @@ namespace Abnormal_UI.UI.Abnormal
                     SelectedMachines.Add(Machines[250 + i]);
                 }
 
-                AbnormalActivity(new ObservableCollection<EntityObject> {SelectedEmployees[_random.Next(1, 60)]});
+                AbnormalActivity(new ObservableCollection<EntityObject> {SelectedUsers[_random.Next(1, 60)]});
 
-                return SelectedEmployees[0].name;
+                return SelectedUsers[0].name;
             }
             catch (Exception AutoException)
             {

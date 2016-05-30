@@ -53,7 +53,7 @@ namespace Abnormal_UI.Infra
                 {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
                 {"DestinationIpAddress", "[daf::daf]"},
                 {"DestinationPort", 88},
-                {"DestinationComputerId", targetAccount.id},
+                {"DestinationComputerId", domainController.id},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},

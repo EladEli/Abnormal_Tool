@@ -25,7 +25,7 @@ namespace Abnormal_UI.UI.Test
         private void UpdateSelected()
         {
             var selectedEntityObjects = BoxUsers.SelectedItems.Cast<EntityObject>().ToList();
-            _model.SelectedEmployees = new ObservableCollection<EntityObject>(selectedEntityObjects);
+            _model.SelectedUsers = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
 
             selectedEntityObjects.AddRange(BoxMachines.SelectedItems.Cast<EntityObject>());

@@ -29,9 +29,9 @@ namespace Abnormal_UI.UI
 
         public ObjectId SourceGateway;
 
-        public ObservableCollection<EntityObject> Employees { get; set; }
+        public ObservableCollection<EntityObject> Users { get; set; }
 
-        public ObservableCollection<EntityObject> SelectedEmployees { get; set; }
+        public ObservableCollection<EntityObject> SelectedUsers { get; set; }
 
         public ObservableCollection<EntityObject> Machines { get; set; }
 
@@ -50,8 +50,8 @@ namespace Abnormal_UI.UI
         public AttackViewModel()
         {
             _dbClient = DBClient.getDBClient();
-            Employees = new ObservableCollection<EntityObject>();
-            SelectedEmployees = new ObservableCollection<EntityObject>();
+            Users = new ObservableCollection<EntityObject>();
+            SelectedUsers = new ObservableCollection<EntityObject>();
             Machines = new ObservableCollection<EntityObject>();
             SelectedMachines = new ObservableCollection<EntityObject>();
             DomainControllers = new ObservableCollection<EntityObject>();
@@ -73,9 +73,9 @@ namespace Abnormal_UI.UI
                 var allUsers = _dbClient.GetUniqueEntity(entityTypes);
                 foreach (var oneEntity in allUsers)
                 {
-                    Employees.Add(oneEntity);
+                    Users.Add(oneEntity);
                 }
-                Employees.OrderByDescending(EntityObject => EntityObject.DnsName);
+                Users.OrderByDescending(EntityObject => EntityObject.DnsName);
 
                 var domainControllers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer, null, true);
                 foreach (var oneDC in domainControllers)

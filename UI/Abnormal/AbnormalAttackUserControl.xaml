@@ -10,7 +10,7 @@
                      Height="Auto" 
                      Margin="20"
                      x:Name="BoxUsers" 
-                     ItemsSource="{Binding Employees}" 
+                     ItemsSource="{Binding Users}" 
                      SelectionMode="Extended"
                      SelectedIndex="0" >
                 <ListBox.ItemTemplate>
