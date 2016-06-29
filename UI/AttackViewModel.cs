@@ -15,18 +15,7 @@ namespace Abnormal_UI.UI
         #region Data Members
 
         public DBClient _dbClient;
-        private string domainName { get; set; }
-
-        public string DomainName
-        {
-            get { return domainName; }
-            set
-            {
-                domainName = value;
-                OnPropertyChanged();
-            }
-        }
-
+        
         public ObjectId SourceGateway;
 
         public ObservableCollection<EntityObject> Users { get; set; }
@@ -43,6 +32,7 @@ namespace Abnormal_UI.UI
 
         public Logger Logger;
 
+        public string DomainName { get; set; }
         #endregion
 
         #region Ctors
@@ -75,12 +65,12 @@ namespace Abnormal_UI.UI
                 {
                     Users.Add(oneEntity);
                 }
-                Users.OrderByDescending(EntityObject => EntityObject.DnsName);
+                Users.OrderByDescending(entityObject => entityObject.DnsName);
 
                 var domainControllers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer, null, true);
-                foreach (var oneDC in domainControllers)
+                foreach (var oneDc in domainControllers)
                 {
-                    DomainControllers.Add(oneDC);
+                    DomainControllers.Add(oneDc);
                 }
 
                 entityTypes.Clear();
@@ -90,14 +80,14 @@ namespace Abnormal_UI.UI
                 {
                     Machines.Add(oneEntity);
                 }
-                Machines.OrderByDescending(EntityObject => EntityObject.DnsName);
+                Machines.OrderByDescending(entityObject => entityObject.DnsName);
 
                 var domain = _dbClient.GetUniqueEntity(UniqueEntityType.Domain);
                 DomainName = domain.FirstOrDefault().name;
             }
-            catch (Exception PmException)
+            catch (Exception pmException)
             {
-                Logger.Error(PmException);
+                Logger.Error(pmException);
             }
             
         }
@@ -111,11 +101,9 @@ namespace Abnormal_UI.UI
             [CallerMemberName] string caller = "")
 
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged( this, new PropertyChangedEventArgs(caller));
-            }
+            PropertyChanged?.Invoke( this, new PropertyChangedEventArgs(caller));
         }
+
         #endregion
     }
 

@@ -68,11 +68,5 @@ namespace Abnormal_UI.UI.Abnormal
             BtnAutoAbnormal.IsEnabled = true;
             MessageBox.Show("User activity insertion ended, you should expect an SA on " + result);
         }
-
-        private void b_Click(object sender, RoutedEventArgs e)
-        {
-           _model.setCenter();
-           MessageBox.Show("SetCenter");
-        }
     }
 }

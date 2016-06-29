@@ -8,20 +8,17 @@ namespace Abnormal_UI.Infra
 {
     public static class DocumentCreator
     {
-        public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0, ObjectId parentId = new ObjectId())
+        public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSpn = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0, ObjectId parentId = new ObjectId())
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
 
             var resourceIdentifier = new BsonDocument();
-            EntityObject targetAccount = null;
-            if (targetMachine != null) { targetAccount = targetMachine; }
-            else { targetAccount = domainController; }
-
-            var targetSPNName = $"krbtgt/{domainName}";
-            if (targetSPN != null) { targetSPNName = targetSPN; }
+            var targetAccount = targetMachine ?? domainController;
+            var targetSpnName = $"krbtgt/{domainName}";
+            if (targetSpn != null) { targetSpnName = targetSpn; }
             resourceIdentifier.Add("AccountId", targetAccount.id);
-            var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSPNName}};
+            var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
 
             var responseTicket = new BsonDocument
@@ -106,9 +103,8 @@ namespace Abnormal_UI.Infra
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
 
             var resourceIdentifier = new BsonDocument {{"AccountId", domainControllerName.id}};
-            var targetSPNName = $"krbtgt/{domainName}";
-
-            var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSPNName}};
+            var targetSpnName = $"krbtgt/{domainName}";
+            var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
 
             var networkActivityDocument = new BsonDocument
@@ -148,7 +144,7 @@ namespace Abnormal_UI.Infra
 
             return networkActivityDocument;
         }
-        public static BsonDocument SAFillerSEAC(List<EntityObject> userEntity, List<EntityObject> computerEntity, Random rnd)
+        public static BsonDocument SaFillerSeac(List<EntityObject> userEntity, List<EntityObject> computerEntity, Random rnd)
         {
             var detailRecord = new BsonDocument
             {
@@ -229,7 +225,7 @@ namespace Abnormal_UI.Infra
             };
             return suspicousActivityDocument;
         }
-        public static BsonDocument SAFillerAE(List<EntityObject> userEntity, List<EntityObject> computerEntity,EntityObject domainController, string domainName)
+        public static BsonDocument SaFillerAe(List<EntityObject> userEntity, List<EntityObject> computerEntity,EntityObject domainController, string domainName)
         {
             var records = new List<BsonDocument>();
             var detailRecord = new BsonDocument();
@@ -356,14 +352,11 @@ namespace Abnormal_UI.Infra
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
 
             var resourceIdentifier = new BsonDocument();
-            EntityObject targetAccount = null;
-            if (targetMachine != null) { targetAccount = targetMachine; }
-            else { targetAccount = domainController; }
-            var targetSPNName = $"krbtgt/{domainName}";
-            if (targetSPN != null) { targetSPNName = targetSPN; }
+            var targetAccount = targetMachine ?? domainController;
+            var targetSpnName = $"krbtgt/{domainName}";
+            if (targetSPN != null) { targetSpnName = targetSPN; }
             resourceIdentifier.Add("AccountId", targetAccount.id);
-
-            var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSPNName}};
+            var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
 
             var networkActivityDocument = new BsonDocument

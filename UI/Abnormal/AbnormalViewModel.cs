@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Abnormal_UI.Imported;
@@ -9,43 +10,25 @@ using MongoDB.Bson;
 
 namespace Abnormal_UI.UI.Abnormal
 {
+    [SuppressMessage("ReSharper", "TooWideLocalVariableScope")]
     public class AbnormalViewModel : AttackViewModel
     {
         private readonly Random _random = new Random();
-        public bool includeKerberos { get; set; }
-        public bool includeNtlm { get; set; }
-        public bool includeEvent { get; set; }
-        private int minMachines;
+        public bool IncludeKerberos { get; set; }
+        public bool IncludeNtlm { get; set; }
+        public bool IncludeEvent { get; set; }
+        public int MinMachines { get; set; }
+        public int MaxMachines { get; set; }
+        private readonly string[] _spns;
 
-        public int MinMachines
-        {
-            get { return minMachines; }
-            set
-            {
-                minMachines = value;
-                OnPropertyChanged();
-            }
-        }
-        private int maxMachines;
-        public int MaxMachines
-        {
-            get { return maxMachines; }
-            set
-            {
-                maxMachines = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string[] Spns;
         public AbnormalViewModel() : base()
         {
-            minMachines = 1;
-            maxMachines = 4;
-            includeKerberos = true;
-            includeNtlm = false;
-            includeEvent = false;
-            Spns = new []
+            MinMachines = 1;
+            MaxMachines = 4;
+            IncludeKerberos = true;
+            IncludeNtlm = false;
+            IncludeEvent = false;
+            _spns = new []
             {
                 "HOST",
                 "HTTP",
@@ -54,80 +37,81 @@ namespace Abnormal_UI.UI.Abnormal
                 "DNS",
                 "RPC"
             };
-
-            
         }
         public bool ActivateUsers()
         {
             try
             {
-                if (SelectedMachines.Count / SelectedUsers.Count < 2)
+                if (SelectedMachines.Count / SelectedUsers.Count < MaxMachines)
                 {
                     Logger.Debug("Not enough users");
                     return false;
                 }
                 var choosenTypes = new List<ActivityType>();
-                if (includeKerberos)
+                if (IncludeKerberos)
                 {
                     choosenTypes.Add(ActivityType.Kerberos);
                 }
-                if (includeEvent)
+                if (IncludeEvent)
                 {
                     choosenTypes.Add(ActivityType.Event);
                 }
-                if (includeNtlm)
+                if (IncludeNtlm)
                 {
                     choosenTypes.Add(ActivityType.Ntlm);
                 }
 
-                CleanDatabase();
+                PrepareDatabaseForInsertion();
                 SvcCtrl.StopService("ATACenter");
-                Logger.Debug("Center profile set for replay");
-                int machinesUsed;
-                var activities = GenerateRandomActivities(choosenTypes.ToArray(), out machinesUsed);
+                Logger.Debug("Center profile set for insertion");
+                var activities = GenerateRandomActivities(choosenTypes.ToArray());
                 _dbClient.InsertBatch(activities);
                 Logger.Debug("Done inserting normal activity");
-                Logger.Debug("Used {0} machines", machinesUsed);
                 SvcCtrl.StartService("ATACenter");
                 Logger.Debug("Gone to sleep for 3 minutes of user profilling");
                 Thread.Sleep(180000);
                 Logger.Debug("Woke up!");
                 return true;
             }
-            catch (Exception AcException)
+            catch (Exception acException)
             {
-                Logger.Error(AcException);
+                Logger.Error(acException);
                 return false;
             }
-            
         }
 
 
-        private List<BsonDocument> GenerateRandomActivities(ActivityType[] choosenTypes, out int machinesUsed)
+        private List<BsonDocument> GenerateRandomActivities(ActivityType[] choosenTypes)
         {
             var networkActivities = new List<BsonDocument>();
             var currentMachinesCounter = 0;
-            machinesUsed = 0;
+            EntityObject currentSelectedMachine;
+            ActivityType selectedActivityType;
             var computersUsedTodayCounter = 0;
             foreach (var selectedUser in SelectedUsers)
             {
                 Logger.Debug("inserting normal activity for {0}", selectedUser.name);
                 for (var daysToGenerate = 1; daysToGenerate <= 23; daysToGenerate++)
                 {
-                    computersUsedTodayCounter = _random.Next(minMachines, maxMachines + 1);
-                    for (var i = 0; i <= computersUsedTodayCounter - 1; i++)
+                    computersUsedTodayCounter = _random.Next(MinMachines, MaxMachines + 1);
+                    for (var i = 0; i < computersUsedTodayCounter; i++)
                     {
                         if (currentMachinesCounter + computersUsedTodayCounter >= SelectedMachines.Count - 1)
                         {
                             currentMachinesCounter = 0;
-                            machinesUsed += SelectedMachines.Count;
                         }
-                        var currentSelectedMachine = SelectedMachines[currentMachinesCounter + i];
-                        var selectedActivityType = choosenTypes[_random.Next(0, choosenTypes.Length)];
+                        // consider mulitple tgs's per day per machine - random the spn's array
+                        // manual abnormal - no restarts!!!!
+                        currentSelectedMachine = SelectedMachines[currentMachinesCounter + i];
+                        selectedActivityType = choosenTypes[_random.Next(0, choosenTypes.Length)];
                         switch (selectedActivityType)
                         {
                             case ActivityType.Kerberos:
-                                networkActivities.AddRange(AddKerberos(currentMachinesCounter, selectedUser, currentSelectedMachine, daysToGenerate));
+                                networkActivities.Add(DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(),
+                                    DomainName, SourceGateway, null, null, "As", daysToGenerate));
+                                networkActivities.Add(DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(),
+                                    DomainName, SourceGateway, $"{_spns[_random.Next(0, 5)]}/{currentSelectedMachine.name}", currentSelectedMachine, "Tgs",
+                                    daysToGenerate, 0, networkActivities.Last()["_id"].AsObjectId));
                                 break;
                             case ActivityType.Event:
                                 networkActivities.Add(
@@ -152,19 +136,7 @@ namespace Abnormal_UI.UI.Abnormal
                 }
                 currentMachinesCounter += computersUsedTodayCounter;
             }
-
             return networkActivities;
-        }
-
-        private IReadOnlyCollection<BsonDocument> AddKerberos(int currentMachinesCounter, EntityObject selectedEmployee, EntityObject currentSelectedMachine, int daysToGenerate)
-        {
-            var output = new List<BsonDocument>();
-            var defaultMachine = SelectedMachines[currentMachinesCounter];
-            var asActivity = DocumentCreator.KerberosCreator(selectedEmployee, currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway, null, null, "As", daysToGenerate);
-            output.Add(asActivity);
-            var tgsActivity = DocumentCreator.KerberosCreator(selectedEmployee, defaultMachine, SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway, $"{Spns[_random.Next(0, 5)]}/{currentSelectedMachine.name}", currentSelectedMachine, "Tgs", daysToGenerate, 0, asActivity["_id"].AsObjectId);
-            output.Add(tgsActivity);
-            return output;
         }
 
         private enum ActivityType
@@ -174,7 +146,7 @@ namespace Abnormal_UI.UI.Abnormal
             Event,
         }
 
-        private void CleanDatabase()
+        private void PrepareDatabaseForInsertion()
         {
             _dbClient.RenameKerbCollections();
             _dbClient.RenameNtlmCollections();
@@ -189,19 +161,21 @@ namespace Abnormal_UI.UI.Abnormal
             {
                 var activities = new List<BsonDocument>();
                 var choosenTypes = new List<ActivityType>();
-                if (includeKerberos)
+                var hoursCounter = 4;
+                // check if hours counter relevant
+                ActivityType selectedActivityType;
+                if (IncludeKerberos)
                 {
                     choosenTypes.Add(ActivityType.Kerberos);
                 }
-                if (includeEvent)
+                if (IncludeEvent)
                 {
                     choosenTypes.Add(ActivityType.Event);
                 }
-                if (includeNtlm)
+                if (IncludeNtlm)
                 {
                     choosenTypes.Add(ActivityType.Ntlm);
                 }
-
                 var choosenArray = choosenTypes.ToArray();
                 _dbClient.ClearTestNaCollection();
                 SvcCtrl.RestartService("ATACenter");
@@ -209,13 +183,10 @@ namespace Abnormal_UI.UI.Abnormal
                 Thread.Sleep(120000);
                 Logger.Debug("Woke up!");
                 SvcCtrl.StopService("ATACenter");
-                var hoursCounter = 4;
                 if (SelectedUsers.Count == 0 && specificUser == null)
                 {
                     return false;
                 }
-                else
-                {
                     if (specificUser != null)
                     {
                         SelectedUsers = specificUser;
@@ -226,33 +197,36 @@ namespace Abnormal_UI.UI.Abnormal
                         foreach (var selectedComputer in SelectedMachines)
                         {
                             hoursCounter++;
-                            var currentSelectedMachine = selectedComputer;
-
-                            var selectedActivityType = choosenArray[_random.Next(0, choosenArray.Length)];
+                            selectedActivityType = choosenArray[_random.Next(0, choosenArray.Length)];
                             switch (selectedActivityType)
                             {
                                 case ActivityType.Kerberos:
-                                    activities.Add(DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine,
+                                    activities.Add(DocumentCreator.KerberosCreator(selectedUser, selectedComputer,
                                         SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway, null,
                                         null, "As", 0, hoursCounter));
-                                    activities.Add(DocumentCreator.KerberosCreator(selectedUser, currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway,
-                                        $"{Spns[_random.Next(0, 5)]}/{currentSelectedMachine.name}", currentSelectedMachine,"Tgs", 0, hoursCounter));
+                                    activities.Add(DocumentCreator.KerberosCreator(selectedUser, selectedComputer,
+                                        SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway,
+                                        $"{_spns[_random.Next(0, 5)]}/{selectedComputer.name}",
+                                        selectedComputer, "Tgs", 0, hoursCounter, activities.Last()["_id"].AsObjectId));
                                     break;
                                 case ActivityType.Event:
                                     activities.Add(
                                         DocumentCreator.EventCreator(selectedUser,
-                                            currentSelectedMachine,
+                                            selectedComputer,
                                             SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway));
                                     break;
                                 case ActivityType.Ntlm:
                                     activities.Add(
-                                        DocumentCreator.NtlmCreator(selectedUser,
-                                            currentSelectedMachine,
-                                            SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway));
+                                        DocumentCreator.NtlmCreator(selectedUser, selectedComputer,
+                                            SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway,
+                                            $"{_spns[_random.Next(0, 5)]}/{selectedComputer.name}"));
                                     break;
                                 default:
                                     throw new ArgumentOutOfRangeException();
                             }
+                            Logger.Trace("Inserted abnormal {2} activity for {1} on {0}",
+                                DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 0, 0)),
+                                selectedUser.name, selectedActivityType);
                         }
                         Logger.Debug("Expect abnormal activity on {0}", selectedUser.name);
                     }
@@ -260,11 +234,10 @@ namespace Abnormal_UI.UI.Abnormal
                     Logger.Debug("Done inserting abnormal activity");
                     SvcCtrl.StartService("ATACenter");
                     return true;
-                }
             }
-            catch (Exception AaException)
+            catch (Exception aaException)
             {
-                Logger.Error(AaException);
+                Logger.Error(aaException);
                 return false;
             }
         }
@@ -273,9 +246,9 @@ namespace Abnormal_UI.UI.Abnormal
         {
             try
             {
-                SelectedUsers = new ObservableCollection<EntityObject> {};
-                SelectedMachines = new ObservableCollection<EntityObject> {};
-                SelectedDomainControllers = new ObservableCollection<EntityObject> {};
+                SelectedUsers = new ObservableCollection<EntityObject>();
+                SelectedMachines = new ObservableCollection<EntityObject>();
+                SelectedDomainControllers = new ObservableCollection<EntityObject>();
 
                 for (var i = 0; i < 70; i++)
                 {
@@ -289,7 +262,7 @@ namespace Abnormal_UI.UI.Abnormal
 
                 ActivateUsers();
 
-                SelectedMachines = new ObservableCollection<EntityObject> {};
+                SelectedMachines = new ObservableCollection<EntityObject>();
                 for (var i = 0; i < 10; i++)
                 {
                     SelectedMachines.Add(Machines[250 + i]);
@@ -299,9 +272,9 @@ namespace Abnormal_UI.UI.Abnormal
 
                 return SelectedUsers[0].name;
             }
-            catch (Exception AutoException)
+            catch (Exception autoException)
             {
-                Logger.Error(AutoException);
+                Logger.Error(autoException);
                 return "Not Succeded";
             }
         }
@@ -309,11 +282,6 @@ namespace Abnormal_UI.UI.Abnormal
         public void TriggerAbnormalModeling()
         {
             _dbClient.TriggerAbnormalModeling();
-        }
-
-        public void setCenter()
-        {
-            _dbClient.SetCenterProfileForReplay();
         }
     }
 }

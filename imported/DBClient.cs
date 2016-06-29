@@ -16,16 +16,15 @@ namespace Abnormal_UI.Imported
         #region Data Members
 
         private static DBClient _dbClient;
-        MongoClient _client;
-        IMongoDatabase _database;
-        IMongoDatabase _testDatabase;
-        IMongoCollection<BsonDocument> _uniqueEntitiesCollection;
-        IMongoCollection<BsonDocument> _systemProfilesCollection;
-        List<ObjectId> _gatewayIdsCollection;
-        List<string> _kerberosCollections;
-        List<string> _ntlmCollections;
-        List<string> _ntlmEventsCollections;
-        private Logger _logger;
+        private readonly IMongoDatabase _database;
+        public readonly IMongoDatabase _testDatabase;
+        private readonly IMongoCollection<BsonDocument> _uniqueEntitiesCollection;
+        public readonly IMongoCollection<BsonDocument> _systemProfilesCollection;
+        readonly List<ObjectId> _gatewayIdsCollection;
+        public List<string> _kerberosCollections;
+        public List<string> _ntlmCollections;
+        public List<string> _ntlmEventsCollections;
+        private readonly Logger _logger;
 
         #endregion
         
@@ -38,19 +37,18 @@ namespace Abnormal_UI.Imported
                 string connectionString;
                 if ("mongodb://:27017" ==
                     (connectionString =
-                        string.Format("mongodb://{0}:27017",
-                            Interaction.InputBox("Please enter the server Address", "Target Server", "127.0.0.1", -1, -1))))
+                        $"mongodb://{Interaction.InputBox("Please enter the server Address", "Target Server", "127.0.0.1", -1, -1)}:27017"))
                 {
                     connectionString = "mongodb://127.0.0.1:27017";
                 }
-                _client = new MongoClient(connectionString);
-                _database = _client.GetDatabase("ATA");
-                _testDatabase = _client.GetDatabase("ATAActivitySimulator");
+                var client = new MongoClient(connectionString);
+                _database = client.GetDatabase("ATA");
+                _testDatabase = client.GetDatabase("ATAActivitySimulator");
                 _uniqueEntitiesCollection = _database.GetCollection<BsonDocument>("UniqueEntity");
                 _systemProfilesCollection = _database.GetCollection<BsonDocument>("SystemProfile");
                 _gatewayIdsCollection = new List<ObjectId>(0);
-                _gatewayIdsCollection = FilterGWIds();
-                CreateActivityCollectionsOnTestDB();
+                _gatewayIdsCollection = FilterGwIds();
+                CreateActivityCollectionsOnTestDb();
             }
             catch (Exception dbException)
             {
@@ -110,7 +108,7 @@ namespace Abnormal_UI.Imported
                         currentObjectType = UniqueEntityType.Computer;
                     }
 
-                    EntityObject entityObject = null;
+                    EntityObject entityObject;
                     if (objectType[objectType.Count - 1] == Enum.GetName(typeof(UniqueEntityType), UniqueEntityType.Domain))
                     {
                         entityObject = new EntityObject(oneResult.GetValue("Name").AsString, oneResult.GetValue("_id").AsString, oneResult.GetValue("DnsName").AsString, currentObjectType);
@@ -125,9 +123,9 @@ namespace Abnormal_UI.Imported
             return allNames;
         }
 
-        public List<ObjectId> FilterGWIds()
+        public List<ObjectId> FilterGwIds()
         {
-            return _systemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument()).ToEnumerable().Select(GwProfile => GwProfile.GetElement("_id").Value.AsObjectId).ToList();
+            return _systemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument()).ToEnumerable().Select(gwProfile => gwProfile.GetElement("_id").Value.AsObjectId).ToList();
         }
 
         public List<ObjectId> GetGwOids()
@@ -155,18 +153,9 @@ namespace Abnormal_UI.Imported
             }
         }
 
-        public void InsertBatchTest(List<BsonDocument> documents, bool isSa = false, bool isPhoto = false, bool isEvent = false)
+        public void InsertSaBatch(List<BsonDocument> documents)
         {
-            string collectionName;
-            if (isSa)
-                collectionName = "SuspiciousActivity";
-            else if (isPhoto)
-                collectionName = "UserPhoto";
-            else if (isEvent)
-                collectionName = "EventActivity";
-            else
-                collectionName = "NetworkActivity";
-            _database.GetCollection<BsonDocument>(collectionName).InsertMany(documents);
+            _database.GetCollection<BsonDocument>("SuspiciousActivity").InsertMany(documents);
         }
         public void SetCenterProfileForReplay()
         {
@@ -195,7 +184,7 @@ namespace Abnormal_UI.Imported
             {
                 var configurationBson = gatewayProfile["Configuration"];
                 configurationBson["DirectoryServicesResolverConfiguration"]["UpdateDirectoryEntityChangesInterval"] =
-                    "00:00:02";
+                    "00:00:01";
                 gatewayProfile["Configuration"] = configurationBson;
                 _systemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", gatewayProfile["_id"]),
                     gatewayProfile);
@@ -283,7 +272,7 @@ namespace Abnormal_UI.Imported
 
         }
 
-        public void CreateActivityCollectionsOnTestDB()
+        public void CreateActivityCollectionsOnTestDb()
         {
             try
             {

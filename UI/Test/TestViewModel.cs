@@ -38,9 +38,9 @@ namespace Abnormal_UI.UI.Test
                 var rnd = new Random();
                 for (var i = 0; i < _saAmount; i++)
                 {
-                    suspicousActivitities.Add(DocumentCreator.SAFillerSEAC(userEntity, computerEntity, rnd));
+                    suspicousActivitities.Add(DocumentCreator.SaFillerSeac(userEntity, computerEntity, rnd));
                 }
-                _dbClient.InsertBatchTest(suspicousActivitities, true);
+                _dbClient.InsertSaBatch(suspicousActivitities);
                 return true;
             }
             catch (Exception SeacException)
@@ -61,9 +61,9 @@ namespace Abnormal_UI.UI.Test
                 var suspicousActivitities = new List<BsonDocument>();
                 for (var i = 0; i < _saAmount; i++)
                 {
-                    suspicousActivitities.Add(DocumentCreator.SAFillerAE(userEntity, computerEntity, SelectedDomainControllers.FirstOrDefault(), DomainName));
+                    suspicousActivitities.Add(DocumentCreator.SaFillerAe(userEntity, computerEntity, SelectedDomainControllers.FirstOrDefault(), DomainName));
                 }
-                _dbClient.InsertBatchTest(suspicousActivitities, true);
+                _dbClient.InsertSaBatch(suspicousActivitities);
                 return true;
             }
             catch (Exception AeException)

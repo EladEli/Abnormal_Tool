@@ -8,11 +8,15 @@ namespace Abnormal_UI.Infra
     {
         private static readonly Logger _logger = LogManager.GetLogger("TestToolboxLog");
 
-        public static bool StartService(string serviceName, int timeoutSeconds = 30)
+        public static bool StartService(string serviceName, int timeoutSeconds = 50)
         {
             var service = new ServiceController(serviceName);
             try
             {
+                if (service.Status == ServiceControllerStatus.Running)
+                {
+                    return true;
+                }
                 var timeout = TimeSpan.FromSeconds(timeoutSeconds);
                 service.Start();
                 service.WaitForStatus(ServiceControllerStatus.Running, timeout);
@@ -29,6 +33,10 @@ namespace Abnormal_UI.Infra
         public static bool StopService(string serviceName, int timeoutSeconds = 20)
         {
             var service = new ServiceController(serviceName);
+            if (service.Status == ServiceControllerStatus.Stopped)
+            {
+                return true;
+            }
             try
             {
                 var timeout = TimeSpan.FromSeconds(timeoutSeconds);
@@ -65,5 +73,6 @@ namespace Abnormal_UI.Infra
                 return false;
             }
         }
+
     }
 }

@@ -74,26 +74,26 @@
                 <StackPanel Orientation="Horizontal" >
                     <TextBox Height="20" 
                          Width="20"
-                         Text="{Binding MinMachines, Mode=TwoWay}" 
+                         Text="{Binding MinMachines}" 
                          x:Name="TextBoxMin"
                          />
                     <Label Content=" - "/>
                     <TextBox Height="20" 
                          Width="20"
-                         Text="{Binding MaxMachines, Mode=TwoWay}" 
+                         Text="{Binding MaxMachines}" 
                          x:Name="TextBoxMax"
                          />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0 20 0 0">
-                    <CheckBox IsChecked="{Binding includeKerberos}" 
+                    <CheckBox IsChecked="{Binding IncludeKerberos}" 
                           x:Name="CheckBxAs" >
                         <Label Content="Kerberos"/>
                     </CheckBox>
-                    <CheckBox IsChecked="{Binding includeNtlm}" 
+                    <CheckBox IsChecked="{Binding IncludeNtlm}" 
                           x:Name="CheckBxNtlm">
                         <Label Content="NTLM"/>
                     </CheckBox>
-                    <CheckBox IsChecked="{Binding includeEvent}" 
+                    <CheckBox IsChecked="{Binding IncludeEvent}" 
                           x:Name="CheckBxEvent">
                         <Label Content="Events"/>
                     </CheckBox>

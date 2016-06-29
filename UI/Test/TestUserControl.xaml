@@ -12,7 +12,7 @@
                      Height="Auto" 
                      Margin="20"
                      x:Name="BoxUsers" 
-                     ItemsSource="{Binding empList}" 
+                     ItemsSource="{Binding Users}" 
                      SelectionMode="Extended"
                      SelectedIndex="0" >
                 <ListBox.ItemTemplate>
@@ -33,7 +33,7 @@
                      Height="Auto" 
                      Margin="20"
                      x:Name="BoxMachines" 
-                     ItemsSource="{Binding machinesList}" 
+                     ItemsSource="{Binding Machines}" 
                      SelectionMode="Extended"
                      SelectedIndex="0">
                 <ListBox.ItemTemplate>
@@ -58,7 +58,7 @@
                      Height="100" 
                      Margin="20"
                      x:Name="BoxDCs" 
-                     ItemsSource="{Binding dcsList}" 
+                     ItemsSource="{Binding DomainControllers}" 
                      SelectionMode="Extended"
                      SelectedIndex="0"
                      HorizontalAlignment="Left">
