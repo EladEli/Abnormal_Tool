@@ -13,7 +13,7 @@ namespace Abnormal_UI.UI
     public class AttackViewModel : INotifyPropertyChanged
     {
         #region Data Members
-
+        // baclkup
         public DBClient _dbClient;
         
         public ObjectId SourceGateway;
