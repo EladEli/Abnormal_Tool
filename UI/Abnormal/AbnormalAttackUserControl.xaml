@@ -2,27 +2,26 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" >
+    <UserControl.Resources>
+        <xctk:VisibilityToBoolConverter x:Key="BooleanToVisibilityConverter"  Inverted="True" ></xctk:VisibilityToBoolConverter>
+        <xctk:VisibilityToBoolConverter x:Key="InverseBooleanToVisibilityConverter" Not="True" Inverted="True"></xctk:VisibilityToBoolConverter>
+    </UserControl.Resources>
     <DockPanel>
-        <StackPanel Orientation="Horizontal">
-            <ListBox Width="250" 
-                     Height="Auto" 
+        <StackPanel Orientation="Horizontal" Visibility="{Binding IsResultsShown, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+            <ListBox Width="250"
+                     Height="Auto"
                      Margin="20"
-                     x:Name="BoxUsers" 
-                     ItemsSource="{Binding Users}" 
+                     x:Name="BoxUsers"
+                     ItemsSource="{Binding Users}"
+                     DisplayMemberPath="name"
                      SelectionMode="Extended"
-                     SelectedIndex="0" >
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
+                     SelectedIndex="0">
             </ListBox>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxUsers}" 
-                       Name="SelUsersCount"
+                       x:Name="SelUsersCount"
                        Width="20" 
                        Height="20"
                        VerticalAlignment="Bottom"
@@ -31,43 +30,36 @@
                      Height="Auto" 
                      Margin="20"
                      x:Name="BoxMachines" 
-                     ItemsSource="{Binding Machines}" 
+                     ItemsSource="{Binding Machines}"
+                     DisplayMemberPath= "name"
                      SelectionMode="Extended"
-                     SelectedIndex="0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                     SelectedIndex="0"/>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxMachines}" 
-                       Name="SelMachinesCount"
+                       x:Name="SelMachinesCount"
                        Width="35" 
                        Height="20"
                        VerticalAlignment="Bottom"
                        Margin="-10 0 0 20" RenderTransformOrigin="0.319,0.474"/>
         </StackPanel>
+        <StackPanel Visibility="{Binding IsResultsShown, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBox Width="550"
+                         Height="450" 
+                         Margin="20" 
+                         BorderThickness="2"
+                         Name="LogTextBox"
+                         Background="White"
+                         Text="{Binding LogString}" />
+        </StackPanel>
         <StackPanel DockPanel.Dock="Right" >
-
-
             <ListBox Width="200" 
                      Height="100" 
                      Margin="20"
                      x:Name="BoxDCs" 
                      ItemsSource="{Binding DomainControllers}" 
+                     DisplayMemberPath="name"
                      SelectionMode="Extended"
                      SelectedIndex="0"
-                     HorizontalAlignment="Left">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                     HorizontalAlignment="Left"/>
             <StackPanel
                 HorizontalAlignment="Left" Margin="20">
                 <Label Content="Machines/Day Range" />

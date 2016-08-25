@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.Linq;
 using Microsoft.VisualBasic;
@@ -63,64 +62,19 @@ namespace Abnormal_UI.Imported
         }
         #endregion
         #region Methods
-
-        public List<EntityObject> GetUniqueEntity(UniqueEntityType entityType, string name = null, bool getDomainController = false)
+        
+        public List<EntityObject> GetUniqueEntity(UniqueEntityType entityType, bool getDomainController = false)
         {
-            var entityTypes = new List<UniqueEntityType> {entityType};
-            return GetUniqueEntity(entityTypes, name, getDomainController);
-        }
-
-        public List<EntityObject> GetUniqueEntity(List<UniqueEntityType> entityTypes, string name = null, bool getDomainController = false)
-        {
-            var allNames = new List<EntityObject>();
-
-            IMongoQuery mongoQuery;
-
-            var queryElements = entityTypes.Select(oneEntityType => Query.EQ("_t", Enum.GetName(typeof (UniqueEntityType), oneEntityType))).ToList();
-            if (queryElements.Count > 0)
-            {
-                mongoQuery = Query.Or(queryElements);
-            }
-            else
-            {
-                return allNames;
-            }
-
-            if (!string.IsNullOrEmpty(name))
-            {
-                mongoQuery = Query.And(mongoQuery, Query.EQ("Name", name));
-            }
-
-            if (getDomainController)
-            {
-                mongoQuery = Query.And(mongoQuery, Query.EQ("IsDomainController", true));
-            }
-
-            var result = _uniqueEntitiesCollection.Find(mongoQuery.ToBsonDocument());
-            foreach (var oneResult in result.ToEnumerable())
-            {
-                if (oneResult.GetValue("Name").GetType() != typeof(BsonNull))
-                {
-                    var objectType = oneResult.GetValue("_t").AsBsonArray;
-                    var currentObjectType = UniqueEntityType.User;
-                    if (objectType[objectType.Count - 1] == Enum.GetName(typeof(UniqueEntityType), UniqueEntityType.Computer))
-                    {
-                        currentObjectType = UniqueEntityType.Computer;
-                    }
-
-                    EntityObject entityObject;
-                    if (objectType[objectType.Count - 1] == Enum.GetName(typeof(UniqueEntityType), UniqueEntityType.Domain))
-                    {
-                        entityObject = new EntityObject(oneResult.GetValue("Name").AsString, oneResult.GetValue("_id").AsString, oneResult.GetValue("DnsName").AsString, currentObjectType);
-                    }
-                    else
-                    {
-                        entityObject = new EntityObject(oneResult.GetValue("Name").AsString, oneResult.GetValue("_id").AsString, currentObjectType);
-                    }
-                    allNames.Add(entityObject);
-                }
-            }
-            return allNames;
+            return getDomainController
+                ? _uniqueEntitiesCollection.Find(Query.EQ("_t", entityType.ToString()).ToBsonDocument()).
+                    ToList().
+                    Where(_ => _["IsDomainController"].AsBoolean).
+                    Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString, entityType)).
+                    ToList()
+                : _uniqueEntitiesCollection.Find(Query.EQ("_t", entityType.ToString()).ToBsonDocument())
+                    .ToList()
+                    .Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString, entityType))
+                    .ToList();
         }
 
         public List<ObjectId> FilterGwIds()
@@ -325,6 +279,12 @@ namespace Abnormal_UI.Imported
                 _logger.Error(ex);
             }
             
+        }
+
+        public void DisposeDatabae()
+        {
+            _testDatabase.Client.DropDatabase("ATAActivitySimulator");
+
         }
 
         #endregion

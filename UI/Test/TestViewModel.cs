@@ -30,10 +30,8 @@ namespace Abnormal_UI.UI.Test
         {
             try
             {
-                var entityTypes = new List<UniqueEntityType> {UniqueEntityType.User};
-                var entityTypes2 = new List<UniqueEntityType> {UniqueEntityType.Computer};
-                var userEntity = _dbClient.GetUniqueEntity(entityTypes);
-                var computerEntity = _dbClient.GetUniqueEntity(entityTypes2);
+                var userEntity = _dbClient.GetUniqueEntity(UniqueEntityType.User);
+                var computerEntity = _dbClient.GetUniqueEntity(UniqueEntityType.Computer);
                 var suspicousActivitities = new List<BsonDocument>();
                 var rnd = new Random();
                 for (var i = 0; i < _saAmount; i++)
@@ -43,9 +41,9 @@ namespace Abnormal_UI.UI.Test
                 _dbClient.InsertSaBatch(suspicousActivitities);
                 return true;
             }
-            catch (Exception SeacException)
+            catch (Exception seacException)
             {
-                Logger.Error(SeacException);
+                Logger.Error(seacException);
                 return false;
             }
         }
@@ -54,10 +52,8 @@ namespace Abnormal_UI.UI.Test
         {
             try
             {
-                var entityTypes = new List<UniqueEntityType> {UniqueEntityType.User};
-                var entityTypes2 = new List<UniqueEntityType> {UniqueEntityType.Computer};
-                var userEntity = _dbClient.GetUniqueEntity(entityTypes);
-                var computerEntity = _dbClient.GetUniqueEntity(entityTypes2);
+                var userEntity = _dbClient.GetUniqueEntity(UniqueEntityType.User);
+                var computerEntity = _dbClient.GetUniqueEntity(UniqueEntityType.Computer);
                 var suspicousActivitities = new List<BsonDocument>();
                 for (var i = 0; i < _saAmount; i++)
                 {
@@ -66,9 +62,9 @@ namespace Abnormal_UI.UI.Test
                 _dbClient.InsertSaBatch(suspicousActivitities);
                 return true;
             }
-            catch (Exception AeException)
+            catch (Exception aeException)
             {
-                Logger.Error(AeException);
+                Logger.Error(aeException);
                 return false;
             }
         }

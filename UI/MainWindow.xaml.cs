@@ -4,10 +4,10 @@ using Abnormal_UI.UI.Abnormal;
 using Abnormal_UI.UI.Dsa;
 using Abnormal_UI.UI.SimpleBind;
 using Abnormal_UI.UI.Test;
+using Abnormal_UI.UI;
 
 namespace Abnormal_UI.UI
 {
-   
     public partial class MainWindow 
     {
         private AbnormalViewModel _abnormalModel;
@@ -43,17 +43,9 @@ namespace Abnormal_UI.UI
             DataContext = this;
         }
 
-        private void Root_MouseDown(object sender, MouseButtonEventArgs eventArgs)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (eventArgs.ChangedButton == MouseButton.Left)
-            {
-                DragMove();
-            }
+            _abnormalModel._dbClient.DisposeDatabae();
         }
-        private void CloseButton_Click(object sender, RoutedEventArgs eventArgs)
-        {
-            Close();
-        }
-
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Abnormal_UI.Imported;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Abnormal_UI.UI.Abnormal
 {
@@ -38,21 +39,27 @@ namespace Abnormal_UI.UI.Abnormal
         private async void BtnActivateUsers_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
+            _model.IsResultsShown = true;
             BtnActivateUsers.IsEnabled = false;
             var result = await Task.Run(() => _model.ActivateUsers());
             BtnActivateUsers.IsEnabled = true;
             MessageBox.Show(result
-                ? "User activity insertion ended."
-                : "Please make sure that user-computer ratio is at least 1-2");
+                            ? "User activity insertion ended."
+                            : "Please make sure that user-computer ratio is at least 1-2");
+            _model.IsResultsShown = false;
         }
 
         private async void BtnAbnormalActivity_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
+            _model.IsResultsShown = true;
             BtnAbnormalActivity.IsEnabled = false;
             var result = await Task.Run(() => _model.AbnormalActivity());
             BtnAbnormalActivity.IsEnabled = true;
-            MessageBox.Show(result ? "User activity insertion ended." : "Please choose users");
+            MessageBox.Show(result 
+                            ? "User activity insertion ended." 
+                            : "Please choose users");
+            _model.IsResultsShown = false;
         }
 
         private void BtnMakeItRun_OnClick(object sender, RoutedEventArgs e)

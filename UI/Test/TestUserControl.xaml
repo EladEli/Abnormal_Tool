@@ -12,16 +12,10 @@
                      Height="Auto" 
                      Margin="20"
                      x:Name="BoxUsers" 
-                     ItemsSource="{Binding Users}" 
+                     ItemsSource="{Binding Users}"
+                     DisplayMemberPath="name"
                      SelectionMode="Extended"
                      SelectedIndex="0" >
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
             </ListBox>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxUsers}" 
                        Name="SelUsersCount"
@@ -33,16 +27,10 @@
                      Height="Auto" 
                      Margin="20"
                      x:Name="BoxMachines" 
-                     ItemsSource="{Binding Machines}" 
+                     ItemsSource="{Binding Machines}"
+                     DisplayMemberPath="name"
                      SelectionMode="Extended"
                      SelectedIndex="0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
             </ListBox>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxMachines}" 
                        Name="SelMachinesCount"
@@ -52,23 +40,15 @@
                        Margin="-10 0 0 20" RenderTransformOrigin="0.319,0.474"/>
         </StackPanel>
         <StackPanel DockPanel.Dock="Right" >
-
-
             <ListBox Width="200" 
                      Height="100" 
                      Margin="20"
                      x:Name="BoxDCs" 
-                     ItemsSource="{Binding DomainControllers}" 
+                     ItemsSource="{Binding DomainControllers}"
+                     DisplayMemberPath="name"
                      SelectionMode="Extended"
                      SelectedIndex="0"
                      HorizontalAlignment="Left">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
             </ListBox>
             <StackPanel
                 HorizontalAlignment="Left" Margin="20">
@@ -77,21 +57,8 @@
                     <TextBox Height="20" 
                          Width="40"
                          Text="{Binding SaAmount, Mode=TwoWay}" 
-                         x:Name="TextBoxSaAmount"
-                         />
-                    
+                         x:Name="TextBoxSaAmount" />
                 </StackPanel>
-                <!--<StackPanel Orientation="Horizontal" Margin="0 20 0 0">
-                    <CheckBox IsChecked="{Binding includeAs}" 
-                          x:Name="CheckBxAs" >
-                        <Label Content="As"/>
-                    </CheckBox>
-                    <CheckBox IsChecked="{Binding includeTgs}" 
-                          x:Name="CheckBxTgs">
-                        <Label Content="Tgs"/>
-                    </CheckBox>
-                </StackPanel>-->
-
             </StackPanel>
             <StackPanel HorizontalAlignment="Left" Margin="20" Height="167">
                 <Button Width="200" 

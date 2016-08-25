@@ -13,7 +13,6 @@ namespace Abnormal_UI.UI
     public class AttackViewModel : INotifyPropertyChanged
     {
         #region Data Members
-        // baclkup
         public DBClient _dbClient;
         
         public ObjectId SourceGateway;
@@ -59,28 +58,14 @@ namespace Abnormal_UI.UI
         {
             try
             {
-                var entityTypes = new List<UniqueEntityType> {UniqueEntityType.User};
-                var allUsers = _dbClient.GetUniqueEntity(entityTypes);
-                foreach (var oneEntity in allUsers)
-                {
-                    Users.Add(oneEntity);
-                }
-                Users.OrderByDescending(entityObject => entityObject.DnsName);
+                var allUsers = _dbClient.GetUniqueEntity(UniqueEntityType.User);
+                Users = new ObservableCollection<EntityObject>(allUsers.OrderBy(entityObject => entityObject.name).AsEnumerable());
 
-                var domainControllers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer, null, true);
-                foreach (var oneDc in domainControllers)
-                {
-                    DomainControllers.Add(oneDc);
-                }
+                var domainControllers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer,true);
+                DomainControllers = new ObservableCollection<EntityObject>(domainControllers.OrderBy(entityObject => entityObject.name).AsEnumerable());
 
-                entityTypes.Clear();
-                entityTypes.Add(UniqueEntityType.Computer);
-                var allComputers = _dbClient.GetUniqueEntity(entityTypes);
-                foreach (var oneEntity in allComputers)
-                {
-                    Machines.Add(oneEntity);
-                }
-                Machines.OrderByDescending(entityObject => entityObject.DnsName);
+                var allComputers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer);
+                Machines = new ObservableCollection<EntityObject>(allComputers.OrderBy(entityObject => entityObject.name).AsEnumerable());
 
                 var domain = _dbClient.GetUniqueEntity(UniqueEntityType.Domain);
                 DomainName = domain.FirstOrDefault().name;

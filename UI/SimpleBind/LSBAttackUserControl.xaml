@@ -11,15 +11,9 @@
                      Margin="20"
                      x:Name="BoxUsers" 
                      ItemsSource="{Binding Users}" 
+                     DisplayMemberPath="name"
                      SelectionMode="Extended" 
                      SelectedIndex="0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
             </ListBox>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxUsers}" 
                        Name="SelUsersCount"
@@ -32,15 +26,9 @@
                      Margin="20"
                      x:Name="BoxMachines" 
                      ItemsSource="{Binding Machines}" 
+                     DisplayMemberPath="name"
                      SelectionMode="Extended"
                      SelectedIndex="0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
             </ListBox>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxMachines}" 
                        Name="SelMachinesCount"
@@ -54,21 +42,12 @@
                      Height="100" 
                      Margin="20"
                      x:Name="BoxDCs" 
-                     ItemsSource="{Binding DomainControllers}" 
+                     ItemsSource="{Binding DomainControllers}"
+                     DisplayMemberPath="name"
                      SelectionMode="Extended"
-                     SelectedIndex="0" 
+                     SelectedIndex="0"
                      HorizontalAlignment="Left">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
             </ListBox>
-            <TextBlock Text="abc" Name="statusTB">
-                
-            </TextBlock>
             <StackPanel HorizontalAlignment="Left" Margin="20">
             <Button Width="200" 
                     Height="30" 
