@@ -20,7 +20,7 @@ namespace Abnormal_UI.Infra
                 var timeout = TimeSpan.FromSeconds(timeoutSeconds);
                 service.Start();
                 service.WaitForStatus(ServiceControllerStatus.Running, timeout);
-                _logger.Debug("Started service {0}",serviceName);
+                _logger.Debug($"Started service {serviceName}");
                 return true;
             }
             catch (Exception ex)
@@ -42,7 +42,7 @@ namespace Abnormal_UI.Infra
                 var timeout = TimeSpan.FromSeconds(timeoutSeconds);
                 service.Stop();
                 service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
-                _logger.Debug("Stopped service {0}", serviceName);
+                _logger.Debug($"Stopped service {serviceName}");
 
                 return true;
             }
@@ -53,7 +53,7 @@ namespace Abnormal_UI.Infra
             }
         }
 
-        public static bool RestartService(string serviceName, int timeoutSeconds = 30)
+        public static bool RestartService(string serviceName, int timeoutSeconds = 40)
         {
             var service = new ServiceController(serviceName);
             try
@@ -63,7 +63,7 @@ namespace Abnormal_UI.Infra
                 service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
                 service.Start();
                 service.WaitForStatus(ServiceControllerStatus.Running, timeout);
-                _logger.Debug("Restarted service {0}", serviceName);
+                _logger.Debug($"Restarted service {serviceName}");
 
                 return true;
             }

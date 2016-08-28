@@ -56,7 +56,7 @@ namespace Abnormal_UI.Imported
             
             
         }
-        public static DBClient getDBClient()
+        public static DBClient GetDbClient()
         {
             return _dbClient ?? (_dbClient = new DBClient());
         }
@@ -72,14 +72,18 @@ namespace Abnormal_UI.Imported
                     Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString, entityType)).
                     ToList()
                 : _uniqueEntitiesCollection.Find(Query.EQ("_t", entityType.ToString()).ToBsonDocument())
-                    .ToList()
+                    .ToList().Where(_ => _["Name"] != BsonNull.Value)
                     .Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString, entityType))
                     .ToList();
         }
 
         public List<ObjectId> FilterGwIds()
         {
-            return _systemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument()).ToEnumerable().Select(gwProfile => gwProfile.GetElement("_id").Value.AsObjectId).ToList();
+            return
+                _systemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument())
+                    .ToEnumerable()
+                    .Select(gwProfile => gwProfile.GetElement("_id").Value.AsObjectId)
+                    .ToList();
         }
 
         public List<ObjectId> GetGwOids()
@@ -113,8 +117,9 @@ namespace Abnormal_UI.Imported
         }
         public void SetCenterProfileForReplay()
         {
-            
-            var centerSystemProfile = _systemProfilesCollection.Find(Query.EQ("_t", "CenterSystemProfile").ToBsonDocument()).ToEnumerable();
+
+            var centerSystemProfile =
+                _systemProfilesCollection.Find(Query.EQ("_t", "CenterSystemProfile").ToBsonDocument()).ToEnumerable();
             foreach (var centerProfile in centerSystemProfile)
             {
                 var configurationBson = centerProfile["Configuration"];
@@ -125,7 +130,6 @@ namespace Abnormal_UI.Imported
                 centerProfile["Configuration"] = configurationBson;
                 _systemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", centerProfile["_id"]),
                     centerProfile);
-
             }
           
         }
@@ -247,7 +251,7 @@ namespace Abnormal_UI.Imported
             _logger.Debug("Cleared Test collections");
         }
 
-        public void CleaDsaCollection()
+        public void ClearDsaCollection()
         {
             _database.DropCollection("DirectoryServicesActivity");
             _database.CreateCollection("DirectoryServicesActivity");

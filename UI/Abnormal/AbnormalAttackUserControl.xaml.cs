@@ -62,7 +62,7 @@ namespace Abnormal_UI.UI.Abnormal
             _model.IsResultsShown = false;
         }
 
-        private void BtnMakeItRun_OnClick(object sender, RoutedEventArgs e)
+        private void ResetAbnormalProfile_OnClick(object sender, RoutedEventArgs e)
         {
             _model.TriggerAbnormalModeling();
         }

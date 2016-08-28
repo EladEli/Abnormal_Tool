@@ -22,12 +22,12 @@ namespace Abnormal_UI.UI.Dsa
         private void UpdateSelected()
         {
             var selectedActivitiesList = DsaListBox.SelectedItems.Cast<string>().ToList();
-            _model._selectedActivitiesList = new List<string>(selectedActivitiesList);
+            _model.SelectedActivitiesList = new List<string>(selectedActivitiesList);
             selectedActivitiesList.Clear();
 
-            _model._selectedUser = UserTextBox.Text;
-            _model._selectedComputer = ComputerTextBox.Text;
-            _model._selectedGroup = GroupTextBox.Text;
+            _model.SelectedUser = UserTextBox.Text;
+            _model.SelectedComputer = ComputerTextBox.Text;
+            _model.SelectedGroup = GroupTextBox.Text;
         }
 
         private async void ActivateDsaBtn_ClickAsync(object sender, System.Windows.RoutedEventArgs e)

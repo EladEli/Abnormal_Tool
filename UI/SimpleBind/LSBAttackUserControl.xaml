@@ -40,28 +40,27 @@
         <StackPanel DockPanel.Dock="Right" >
             <ListBox Width="200" 
                      Height="100" 
-                     Margin="20"
+                     Margin="25"
                      x:Name="BoxDCs" 
-                     ItemsSource="{Binding DomainControllers}"
+                     ItemsSource="{Binding DomainControllers}" 
                      DisplayMemberPath="name"
                      SelectionMode="Extended"
                      SelectedIndex="0"
-                     HorizontalAlignment="Left">
-            </ListBox>
+                     HorizontalAlignment="Left"/>
             <StackPanel HorizontalAlignment="Left" Margin="20">
-            <Button Width="200" 
+                <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="LSBIntense"
                     x:Name="BtnLSBIntense" 
                     Click="BtnLSBDintense_OnClickAsync"/>
-            <Button Width="200" 
+                <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="LSB Distinct"
                     x:Name="BtnLSBDistinct" 
                     Click="BtnLSBDistinct_OnClickAsync"/>
-            <Button Width="200" 
+                <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="LSB Specific"

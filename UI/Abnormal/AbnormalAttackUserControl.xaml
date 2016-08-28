@@ -48,7 +48,7 @@
                          BorderThickness="2"
                          Name="LogTextBox"
                          Background="White"
-                         Text="{Binding LogString}" />
+                         Text="{Binding LogString}" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Visible" />
         </StackPanel>
         <StackPanel DockPanel.Dock="Right" >
             <ListBox Width="200" 
@@ -110,7 +110,7 @@
                     Margin="5"
                     Content="Reset Abnormal Profile"
                     x:Name="BtnMakeItRun" 
-                    Click="BtnMakeItRun_OnClick"/>
+                    Click="ResetAbnormalProfile_OnClick"/>
                 <Button Width="200" 
                     Height="30" 
                     Margin="0 5 0 20"

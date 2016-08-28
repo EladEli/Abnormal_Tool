@@ -38,7 +38,7 @@ namespace Abnormal_UI.UI
 
         public AttackViewModel()
         {
-            _dbClient = DBClient.getDBClient();
+            _dbClient = DBClient.GetDbClient();
             Users = new ObservableCollection<EntityObject>();
             SelectedUsers = new ObservableCollection<EntityObject>();
             Machines = new ObservableCollection<EntityObject>();

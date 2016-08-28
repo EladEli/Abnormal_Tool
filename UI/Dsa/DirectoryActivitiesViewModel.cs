@@ -9,11 +9,11 @@ namespace Abnormal_UI.UI.Dsa
 {
     public class DirectoryActivitiesViewModel : AttackViewModel
     {
-        public Dictionary<string, string> _dsaDictionary { get; set; }
-        public List<string> _selectedActivitiesList { get; set; }
-        public string _selectedUser { get; set; }
-        public string _selectedComputer { get; set; }
-        public string _selectedGroup { get; set; }
+        public Dictionary<string, string> DsaDictionary { get; set; }
+        public List<string> SelectedActivitiesList { get; set; }
+        public string SelectedUser { get; set; }
+        public string SelectedComputer { get; set; }
+        public string SelectedGroup { get; set; }
 
         public DirectoryActivitiesViewModel() : base()
         {
@@ -22,7 +22,7 @@ namespace Abnormal_UI.UI.Dsa
 
         public void PopulateDictionary()
         {
-            _dsaDictionary = new Dictionary<string, string>()
+            DsaDictionary = new Dictionary<string, string>()
             {
                 {"SecurityPrincipalCreated", "command"},
                 {"AccountDelegationChanged", "command"},
@@ -59,10 +59,9 @@ namespace Abnormal_UI.UI.Dsa
             try
             {
                 _dbClient.SetGatewayProfileForDsa();
-                _dbClient.CleaDsaCollection();
-                foreach (var command in _selectedActivitiesList.Select(selectedActivity => _dsaDictionary[selectedActivity]))
+                _dbClient.ClearDsaCollection();
+                foreach (var command in SelectedActivitiesList.Select(selectedActivity => DsaDictionary[selectedActivity]))
                 {
-                    MessageBox.Show(command);
                     PowershellExec(command);
                 }
             }
@@ -71,15 +70,15 @@ namespace Abnormal_UI.UI.Dsa
                Logger.Error(dsaEx);
             }
             
-        }
+        } 
 
         public void AutoDsa()
         {
             try
             {
                 _dbClient.SetGatewayProfileForDsa();
-                _dbClient.CleaDsaCollection();
-                foreach (var dsa in _dsaDictionary)
+                _dbClient.ClearDsaCollection();
+                foreach (var dsa in DsaDictionary)
                 {
 
                     PowershellExec(dsa.Value);
