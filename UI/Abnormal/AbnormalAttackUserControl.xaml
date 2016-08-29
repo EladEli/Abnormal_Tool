@@ -109,7 +109,7 @@
                     Height="30" 
                     Margin="5"
                     Content="Reset Abnormal Profile"
-                    x:Name="BtnMakeItRun" 
+                    x:Name="ResetAbnormalProfile" 
                     Click="ResetAbnormalProfile_OnClickAsync"/>
                 <Button Width="200" 
                     Height="30" 

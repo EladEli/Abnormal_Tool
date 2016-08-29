@@ -63,8 +63,10 @@ namespace Abnormal_UI.UI.Abnormal
 
         private async void ResetAbnormalProfile_OnClickAsync(object sender, RoutedEventArgs e)
         {
-            await Task.Run(() => _model.DisposeAbnormalDetector());
+            ResetAbnormalProfile.IsEnabled = false;
+            await Task.Run(() => _model.ResetAbnormalProfile());
             MessageBox.Show("Abnormal profile restarted");
+            ResetAbnormalProfile.IsEnabled = true;
         }
 
         private async void AutoAbnormal_OnClickAsync(object sender, RoutedEventArgs e)

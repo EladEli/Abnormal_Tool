@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.ServiceProcess;
 using System.Threading;
 using Abnormal_UI.Imported;
 using Abnormal_UI.Infra;
@@ -16,6 +15,8 @@ namespace Abnormal_UI.UI.Abnormal
     [SuppressMessage("ReSharper", "TooWideLocalVariableScope")]
     public class AbnormalViewModel : AttackViewModel
     {
+        #region Data Members
+
         private readonly Random _random = new Random();
         private readonly string[] _spns;
         private bool _isResultsShown;
@@ -43,6 +44,9 @@ namespace Abnormal_UI.UI.Abnormal
         }
         public int MinMachines { get; set; }
         public int MaxMachines { get; set; }
+
+        #endregion
+        #region Ctors
         public AbnormalViewModel()
         {
             IncludeKerberos = true;
@@ -62,6 +66,10 @@ namespace Abnormal_UI.UI.Abnormal
                 "RPC"
             };
         }
+
+        #endregion
+        #region Methods
+
         public bool ActivateUsers()
         {
             try
@@ -326,7 +334,7 @@ namespace Abnormal_UI.UI.Abnormal
             _dbClient.SetCenterProfileForReplay();
         }
 
-        public void DisposeAbnormalDetector()
+        public void ResetAbnormalProfile()
         {
             SvcCtrl.StopService("ATACenter");
             _dbClient._database.DropCollection("UniqueEntityProfile");
@@ -340,5 +348,8 @@ namespace Abnormal_UI.UI.Abnormal
             Ntlm,
             Event
         }
+
+        #endregion
+
     }
 }
