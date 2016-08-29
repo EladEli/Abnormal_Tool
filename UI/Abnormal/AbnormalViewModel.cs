@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.ServiceProcess;
 using System.Threading;
 using Abnormal_UI.Imported;
 using Abnormal_UI.Infra;
@@ -325,9 +326,12 @@ namespace Abnormal_UI.UI.Abnormal
             _dbClient.SetCenterProfileForReplay();
         }
 
-        public void TriggerAbnormalModeling()
+        public void DisposeAbnormalDetector()
         {
-            _dbClient.TriggerAbnormalModeling();
+            SvcCtrl.StopService("ATACenter");
+            _dbClient._database.DropCollection("UniqueEntityProfile");
+            _dbClient.DisposeAbnormalDetectorProfile();
+            SvcCtrl.StartService("ATACenter");
         }
 
         private enum ActivityType

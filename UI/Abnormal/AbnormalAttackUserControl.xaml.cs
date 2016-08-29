@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Abnormal_UI.Imported;
-using MessageBox = System.Windows.MessageBox;
 
 namespace Abnormal_UI.UI.Abnormal
 {
@@ -36,7 +35,7 @@ namespace Abnormal_UI.UI.Abnormal
             selectedEntityObjects.Clear();
         }
 
-        private async void BtnActivateUsers_OnClickAsync(object sender, RoutedEventArgs e)
+        private async void ActivateUsers_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
             _model.IsResultsShown = true;
@@ -49,7 +48,7 @@ namespace Abnormal_UI.UI.Abnormal
             _model.IsResultsShown = false;
         }
 
-        private async void BtnAbnormalActivity_OnClickAsync(object sender, RoutedEventArgs e)
+        private async void AbnormalActivity_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
             _model.IsResultsShown = true;
@@ -62,12 +61,13 @@ namespace Abnormal_UI.UI.Abnormal
             _model.IsResultsShown = false;
         }
 
-        private void ResetAbnormalProfile_OnClick(object sender, RoutedEventArgs e)
+        private async void ResetAbnormalProfile_OnClickAsync(object sender, RoutedEventArgs e)
         {
-            _model.TriggerAbnormalModeling();
+            await Task.Run(() => _model.DisposeAbnormalDetector());
+            MessageBox.Show("Abnormal profile restarted");
         }
 
-        private async void BtnAutoAbnormal_OnClickAsync(object sender, RoutedEventArgs e)
+        private async void AutoAbnormal_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
             BtnAutoAbnormal.IsEnabled = false;

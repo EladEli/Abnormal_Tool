@@ -98,25 +98,25 @@
                     Margin="5"
                     Content="Activate Users"
                     x:Name="BtnActivateUsers" 
-                    Click="BtnActivateUsers_OnClickAsync"/>
+                    Click="ActivateUsers_OnClickAsync"/>
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="Abnormal Activity"
                     x:Name="BtnAbnormalActivity" 
-                    Click="BtnAbnormalActivity_OnClickAsync"/>
+                    Click="AbnormalActivity_OnClickAsync"/>
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="Reset Abnormal Profile"
                     x:Name="BtnMakeItRun" 
-                    Click="ResetAbnormalProfile_OnClick"/>
+                    Click="ResetAbnormalProfile_OnClickAsync"/>
                 <Button Width="200" 
                     Height="30" 
                     Margin="0 5 0 20"
                     Content="Auto-Abnormal"
                     x:Name="BtnAutoAbnormal" 
-                    Click="BtnAutoAbnormal_OnClickAsync"/>
+                    Click="AutoAbnormal_OnClickAsync"/>
             </StackPanel>
         </StackPanel>
     </DockPanel>

@@ -15,7 +15,7 @@ namespace Abnormal_UI.Imported
         #region Data Members
 
         private static DBClient _dbClient;
-        private readonly IMongoDatabase _database;
+        public readonly IMongoDatabase _database;
         public readonly IMongoDatabase _testDatabase;
         private readonly IMongoCollection<BsonDocument> _uniqueEntitiesCollection;
         public readonly IMongoCollection<BsonDocument> _systemProfilesCollection;
@@ -91,7 +91,7 @@ namespace Abnormal_UI.Imported
             return _gatewayIdsCollection;
         }
 
-        public void TriggerAbnormalModeling()
+        public void DisposeAbnormalDetectorProfile()
         {
             var mongoQuery = Query.EQ("_t", "AbnormalBehaviorDetectorProfile");
             _systemProfilesCollection.DeleteMany(mongoQuery.ToBsonDocument());
