@@ -11,7 +11,7 @@
                      Height="Auto" 
                      Margin="20,32,20,8"
                      x:Name="DsaListBox" 
-                     ItemsSource="{Binding _dsaDictionary.Keys}"
+                     ItemsSource="{Binding DsaDictionary.Keys}"
                      SelectionMode="Extended" 
                      SelectedIndex="0">
             </ListBox>

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Management.Automation;
-using System.Windows;
 
 
 namespace Abnormal_UI.UI.Dsa
@@ -24,9 +24,9 @@ namespace Abnormal_UI.UI.Dsa
         {
             DsaDictionary = new Dictionary<string, string>()
             {
-                {"SecurityPrincipalCreated", "command"},
+                {"SecurityPrincipalCreated", "New-ADComputer -Name $computerName -SAMAccountName $computerName -Path \"CN=Computers,DC=domain1,DC=test,DC=local\""},
                 {"AccountDelegationChanged", "command"},
-                {"AccountConstrainedDelegationStateChanged", "death"},
+                {"AccountConstrainedDelegationStateChanged", "command"},
                 {"AccountConstrainedDelegationSpnsChanged", "command"},
                 {"ComputerOperatingSystemChanged", "command"},
                 {"AccountPasswordChanged", "command"},
@@ -90,13 +90,25 @@ namespace Abnormal_UI.UI.Dsa
             }
         }
 
-        private static void PowershellExec(string command)
+        private void PowershellExec(string command)
         {
-            using (var powerShellInstance = PowerShell.Create())
+            try
             {
-                powerShellInstance.AddScript(command);
-                powerShellInstance.Invoke();
+                using (var powerShellInstance = PowerShell.Create())
+                {
+                    powerShellInstance.AddScript(command);
+                    powerShellInstance.AddParameter("computerName", SelectedComputer);
+                    Logger.Debug($"Before invoke: {command}");
+                    powerShellInstance.Invoke();
+                    Logger.Debug(powerShellInstance.Streams.Error.ReadAll());
+                    Logger.Debug("After invoke");
+                }
             }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+            }
+
         }
     }
 }

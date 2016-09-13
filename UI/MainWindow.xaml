@@ -1,23 +1,27 @@
 ﻿<Window x:Class="Abnormal_UI.UI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Test Toolbox" Height="550" Width="950" Closing="Window_Closing" Background="Silver" WindowStartupLocation="CenterScreen">
+        Title="Test Toolbox" 
+        Height="550" 
+        Width="950" 
+        Closing="Window_Closing" 
+        Background="Silver" 
+        WindowStartupLocation="CenterScreen">
     <Grid>
         <TabControl TabStripPlacement="Left" Background="Silver">
             <TabItem Header="Abnormal">
                 <ContentControl Content="{Binding _abnormalAttackWindow, Mode=OneWay}"/>
             </TabItem>
-
             <TabItem Header="LSB">
                 <ContentControl Content="{Binding _lsbAttackWindow, Mode=OneWay}"/>
             </TabItem>
-
             <TabItem Header="Test">
                 <ContentControl Content="{Binding _testWindow, Mode=OneWay}"/>
             </TabItem>
             <TabItem Header="Dsa">
                 <ContentControl Content="{Binding _dsaWindow, Mode=OneWay}"/>
             </TabItem>
+            
         </TabControl>
     </Grid>
 </Window>

@@ -46,6 +46,7 @@ namespace Abnormal_UI.UI.Abnormal
         public int MaxMachines { get; set; }
 
         #endregion
+
         #region Ctors
         public AbnormalViewModel()
         {
@@ -68,36 +69,25 @@ namespace Abnormal_UI.UI.Abnormal
         }
 
         #endregion
+
         #region Methods
 
         public bool ActivateUsers()
         {
             try
             {
-                if (SelectedMachines.Count/SelectedUsers.Count < MaxMachines)
+                if (SelectedMachines.Count / SelectedUsers.Count < MaxMachines)
                 {
                     Logger.Debug("Not enough users");
                     LogString += "Not enough users\n";
                     return false;
                 }
-                var choosenTypes = new List<ActivityType>();
-                if (IncludeKerberos)
-                {
-                    choosenTypes.Add(ActivityType.Kerberos);
-                }
-                if (IncludeEvent)
-                {
-                    choosenTypes.Add(ActivityType.Event);
-                }
-                if (IncludeNtlm)
-                {
-                    choosenTypes.Add(ActivityType.Ntlm);
-                }
+                var choosenTypes = ChooseActivtyType();
                 PrepareDatabaseForInsertion();
                 SvcCtrl.StopService("ATACenter");
                 Logger.Debug("Center profile set for insertion");
                 LogString += "Center profile set for insertion\n";
-                var activities = GenerateRandomActivities(choosenTypes.ToArray());
+                var activities = GenerateRandomActivities(choosenTypes);
                 _dbClient.InsertBatch(activities);
                 Logger.Debug("Done inserting normal activity");
                 LogString += "Done inserting normal activity\n";
@@ -118,6 +108,8 @@ namespace Abnormal_UI.UI.Abnormal
             }
         }
 
+        
+
         public bool AbnormalActivity(ObservableCollection<EntityObject> specificUser = null)
         {
             try
@@ -126,22 +118,9 @@ namespace Abnormal_UI.UI.Abnormal
                     _dbClient._systemProfilesCollection.Find(
                         Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
                 var activities = new List<BsonDocument>();
-                var choosenTypes = new List<ActivityType>();
                 var hoursCounter = 4;
                 ActivityType selectedActivityType;
-                if (IncludeKerberos)
-                {
-                    choosenTypes.Add(ActivityType.Kerberos);
-                }
-                if (IncludeEvent)
-                {
-                    choosenTypes.Add(ActivityType.Event);
-                }
-                if (IncludeNtlm)
-                {
-                    choosenTypes.Add(ActivityType.Ntlm);
-                }
-                var choosenArray = choosenTypes.ToArray();
+                var choosenArray = ChooseActivtyType();
                 _dbClient.ClearTestNaCollection();
                 SvcCtrl.RestartService("ATACenter");
                 Logger.Debug("Gone to sleep for tree build");
@@ -325,6 +304,24 @@ namespace Abnormal_UI.UI.Abnormal
             return networkActivities;
         }
 
+        private ActivityType[] ChooseActivtyType()
+        {
+            var choosenTypes = new List<ActivityType>();
+            if (IncludeKerberos)
+            {
+                choosenTypes.Add(ActivityType.Kerberos);
+            }
+            if (IncludeEvent)
+            {
+                choosenTypes.Add(ActivityType.Event);
+            }
+            if (IncludeNtlm)
+            {
+                choosenTypes.Add(ActivityType.Ntlm);
+            }
+            return choosenTypes.ToArray();
+        }
+
         private void PrepareDatabaseForInsertion()
         {
             _dbClient.RenameKerbCollections();
@@ -350,6 +347,5 @@ namespace Abnormal_UI.UI.Abnormal
         }
 
         #endregion
-
     }
 }
