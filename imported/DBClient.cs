@@ -279,7 +279,6 @@ namespace Abnormal_UI.Imported
             }
             catch (Exception ex)
             {
-                
                 _logger.Error(ex);
             }
             

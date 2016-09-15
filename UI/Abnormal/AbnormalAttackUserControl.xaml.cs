@@ -40,6 +40,7 @@ namespace Abnormal_UI.UI.Abnormal
             UpdateSelected();
             _model.IsResultsShown = true;
             BtnActivateUsers.IsEnabled = false;
+            LogTextBox.CaretIndex = LogTextBox.Text.Length;
             var result = await Task.Run(() => _model.ActivateUsers());
             BtnActivateUsers.IsEnabled = true;
             MessageBox.Show(result
@@ -53,6 +54,7 @@ namespace Abnormal_UI.UI.Abnormal
             UpdateSelected();
             _model.IsResultsShown = true;
             BtnAbnormalActivity.IsEnabled = false;
+            LogTextBox.CaretIndex = LogTextBox.Text.Length;
             var result = await Task.Run(() => _model.AbnormalActivity());
             BtnAbnormalActivity.IsEnabled = true;
             MessageBox.Show(result 
@@ -72,10 +74,13 @@ namespace Abnormal_UI.UI.Abnormal
         private async void AutoAbnormal_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
+            _model.IsResultsShown = true;
             BtnAutoAbnormal.IsEnabled = false;
+            LogTextBox.CaretIndex = LogTextBox.Text.Length;
             var result = await Task.Run(() => _model.AutoAbnormal());
             BtnAutoAbnormal.IsEnabled = true;
             MessageBox.Show("User activity insertion ended, you should expect an SA on " + result);
+            BtnAbnormalActivity.IsEnabled = true;
         }
     }
 }

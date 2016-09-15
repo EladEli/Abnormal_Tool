@@ -107,19 +107,22 @@ namespace Abnormal_UI.UI.Abnormal
                 return false;
             }
         }
-
-        
-
         public bool AbnormalActivity(ObservableCollection<EntityObject> specificUser = null)
         {
             try
             {
+                if (SelectedUsers.Count == 0 && specificUser == null)
+                {
+                    return false;
+                }
+                if (specificUser != null)
+                {
+                    SelectedUsers = specificUser;
+                }
+
                 var abnormalDetectorProfile =
                     _dbClient._systemProfilesCollection.Find(
                         Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
-                var activities = new List<BsonDocument>();
-                var hoursCounter = 4;
-                ActivityType selectedActivityType;
                 var choosenArray = ChooseActivtyType();
                 _dbClient.ClearTestNaCollection();
                 SvcCtrl.RestartService("ATACenter");
@@ -135,59 +138,7 @@ namespace Abnormal_UI.UI.Abnormal
                 Logger.Debug("Woke up!");
                 LogString += "Woke up!\n";
                 SvcCtrl.StopService("ATACenter");
-                if (SelectedUsers.Count == 0 && specificUser == null)
-                {
-                    return false;
-                }
-                if (specificUser != null)
-                {
-                    SelectedUsers = specificUser;
-                }
-                foreach (var selectedUser in SelectedUsers)
-                {
-                    Logger.Debug($"inserting abnormal activity for {selectedUser.name}");
-                    LogString += $"inserting abnormal activity for {selectedUser.name}\n";
-                    foreach (var selectedComputer in SelectedMachines)
-                    {
-                        hoursCounter++;
-                        selectedActivityType = choosenArray[_random.Next(0, choosenArray.Length)];
-                        switch (selectedActivityType)
-                        {
-                            case ActivityType.Kerberos:
-                                activities.Add(
-                                    DocumentCreator.KerberosCreator(selectedUser,
-                                        selectedComputer, SelectedDomainControllers.FirstOrDefault(),
-                                        DomainName, SourceGateway, null, null, "As", 0, hoursCounter));
-                                activities.Add(
-                                    DocumentCreator.KerberosCreator(selectedUser,
-                                        selectedComputer, SelectedDomainControllers.FirstOrDefault(),
-                                        DomainName, SourceGateway,
-                                        $"{_spns[_random.Next(0, 5)]}/{selectedComputer.name}",
-                                        selectedComputer, "Tgs", 0, hoursCounter, activities.Last()["_id"].AsObjectId));
-                                break;
-                            case ActivityType.Event:
-                                activities.Add(
-                                    DocumentCreator.EventCreator(selectedUser,
-                                        selectedComputer, SelectedDomainControllers.FirstOrDefault(),
-                                        DomainName, SourceGateway));
-                                break;
-                            case ActivityType.Ntlm:
-                                activities.Add(
-                                    DocumentCreator.NtlmCreator(selectedUser,
-                                        selectedComputer, SelectedDomainControllers.FirstOrDefault(),
-                                        DomainName, SourceGateway,
-                                        $"{_spns[_random.Next(0, 5)]}/{selectedComputer.name}"));
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
-                        Logger.Trace("Inserted abnormal {2} activity for {1} on {0}",
-                            DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 0, 0)),
-                            selectedUser.name, selectedActivityType);
-                    }
-                    Logger.Debug($"Expect abnormal activity on {selectedUser.name}");
-                    LogString += $"Expect abnormal activity on {selectedUser.name}\n";
-                }
+                var activities = GenerateRandomActivities(choosenArray, true);
                 _dbClient.InsertBatch(activities);
                 Logger.Debug("Done inserting abnormal activity");
                 LogString += "Done inserting abnormal activity";
@@ -214,7 +165,7 @@ namespace Abnormal_UI.UI.Abnormal
                 {
                     SelectedUsers.Add(Users[i]);
                 }
-                for (var i = 0; i < 250; i++)
+                for (var i = 0; i < 280; i++)
                 {
                     SelectedMachines.Add(Machines[i]);
                 }
@@ -223,9 +174,9 @@ namespace Abnormal_UI.UI.Abnormal
                 ActivateUsers();
 
                 SelectedMachines = new ObservableCollection<EntityObject>();
-                for (var i = 0; i < 10; i++)
+                for (var i = 0; i < 16; i++)
                 {
-                    SelectedMachines.Add(Machines[250 + i]);
+                    SelectedMachines.Add(Machines[400 + i]);
                 }
 
                 AbnormalActivity(new ObservableCollection<EntityObject> {SelectedUsers[_random.Next(1, 60)]});
@@ -240,27 +191,44 @@ namespace Abnormal_UI.UI.Abnormal
             }
         }
 
-        private List<BsonDocument> GenerateRandomActivities(ActivityType[] choosenTypes)
+        private List<BsonDocument> GenerateRandomActivities(ActivityType[] choosenTypes, bool isAbnormal=false)
         {
-            var networkActivities = new List<BsonDocument>();
             var currentMachinesCounter = 0;
+            var computersUsedTodayCounter = 0;
+            var networkActivities = new List<BsonDocument>();
+            var daysToRun = 23;
+            var abnormalString = "normal";
+            var limit = 1;
+            if (isAbnormal)
+            {
+                daysToRun = 0;
+                abnormalString = "abnormal";
+                limit = 0;
+            }
             EntityObject currentSelectedMachine;
             ActivityType selectedActivityType;
-            var computersUsedTodayCounter = 0;
             foreach (var selectedUser in SelectedUsers)
             {
-                Logger.Debug($"inserting normal activity for {selectedUser.name}");
-                LogString += $"inserting normal activity for {selectedUser.name}\n";
-                for (var daysToGenerate = 1; daysToGenerate <= 23; daysToGenerate++)
+                Logger.Debug($"inserting {abnormalString} activity for {selectedUser.name}");
+                LogString += $"inserting {abnormalString} activity for {selectedUser.name}\n";
+                
+                for (var daysToGenerate = limit; daysToGenerate <= daysToRun; daysToGenerate++)
                 {
-                    computersUsedTodayCounter = _random.Next(MinMachines, MaxMachines + 1);
+                    computersUsedTodayCounter = isAbnormal ? SelectedMachines.Count : _random.Next(MinMachines, MaxMachines + 1);
                     for (var i = 0; i < computersUsedTodayCounter; i++)
                     {
-                        if (currentMachinesCounter + computersUsedTodayCounter >= SelectedMachines.Count - 1)
+                        if (!isAbnormal)
                         {
-                            currentMachinesCounter = 0;
+                            if (currentMachinesCounter + computersUsedTodayCounter >= SelectedMachines.Count - 1)
+                            {
+                                currentMachinesCounter = 0;
+                            }
+                            currentSelectedMachine = SelectedMachines[currentMachinesCounter + i];
                         }
-                        currentSelectedMachine = SelectedMachines[currentMachinesCounter + i];
+                        else
+                        {
+                            currentSelectedMachine = SelectedMachines[i];
+                        }
                         selectedActivityType = choosenTypes[_random.Next(0, choosenTypes.Length)];
                         switch (selectedActivityType)
                         {
@@ -294,9 +262,9 @@ namespace Abnormal_UI.UI.Abnormal
                             default:
                                 throw new ArgumentOutOfRangeException();
                         }
-                        Logger.Trace("Inserted {2} activity for {1} on {0}",
+                        Logger.Trace("Inserted {3} {2} activity for {1} on {0}",
                             DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)),
-                            selectedUser.name, selectedActivityType);
+                            selectedUser.name,abnormalString, selectedActivityType);
                     }
                 }
                 currentMachinesCounter += computersUsedTodayCounter;
