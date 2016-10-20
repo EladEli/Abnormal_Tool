@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Abnormal_UI.Imported;
+using Abnormal_UI.Infra;
 
 namespace Abnormal_UI.UI.SimpleBind
 {

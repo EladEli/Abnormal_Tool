@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Abnormal_UI.Imported;
+using Abnormal_UI.Infra;
 
 namespace Abnormal_UI.UI.Abnormal
 {
@@ -79,6 +79,7 @@ namespace Abnormal_UI.UI.Abnormal
             LogTextBox.CaretIndex = LogTextBox.Text.Length;
             var result = await Task.Run(() => _model.AutoAbnormal());
             BtnAutoAbnormal.IsEnabled = true;
+            _model.IsResultsShown = false;
             MessageBox.Show("User activity insertion ended, you should expect an SA on " + result);
             BtnAbnormalActivity.IsEnabled = true;
         }

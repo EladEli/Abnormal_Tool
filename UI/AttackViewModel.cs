@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Abnormal_UI.Imported;
+using Abnormal_UI.Infra;
 using MongoDB.Bson;
 using NLog;
 
@@ -58,16 +58,16 @@ namespace Abnormal_UI.UI
             try
             {
                 var allUsers = _dbClient.GetUniqueEntity(UniqueEntityType.User);
-                Users = new ObservableCollection<EntityObject>(allUsers.OrderBy(entityObject => entityObject.name).AsEnumerable());
+                Users = new ObservableCollection<EntityObject>(allUsers.OrderBy(entityObject => entityObject.Name).AsEnumerable());
 
                 var domainControllers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer,true);
-                DomainControllers = new ObservableCollection<EntityObject>(domainControllers.OrderBy(entityObject => entityObject.name).AsEnumerable());
+                DomainControllers = new ObservableCollection<EntityObject>(domainControllers.OrderBy(entityObject => entityObject.Name).AsEnumerable());
 
                 var allComputers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer);
-                Machines = new ObservableCollection<EntityObject>(allComputers.OrderBy(entityObject => entityObject.name).AsEnumerable());
+                Machines = new ObservableCollection<EntityObject>(allComputers.OrderBy(entityObject => entityObject.Name).AsEnumerable());
 
                 var domain = _dbClient.GetUniqueEntity(UniqueEntityType.Domain);
-                DomainName = domain.FirstOrDefault().name;
+                DomainName = domain.FirstOrDefault().Name;
             }
             catch (Exception pmException)
             {

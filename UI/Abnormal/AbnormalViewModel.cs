@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
-using Abnormal_UI.Imported;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -78,32 +77,26 @@ namespace Abnormal_UI.UI.Abnormal
             {
                 if (SelectedMachines.Count / SelectedUsers.Count < MaxMachines)
                 {
-                    Logger.Debug("Not enough users");
-                    LogString += "Not enough users\n";
+                    LogString = Helper.Log("Not enough users",LogString);
                     return false;
                 }
                 var choosenTypes = ChooseActivtyType();
                 PrepareDatabaseForInsertion();
                 SvcCtrl.StopService("ATACenter");
-                Logger.Debug("Center profile set for insertion");
-                LogString += "Center profile set for insertion\n";
+                LogString = Helper.Log("Center profile set for insertion", LogString);
                 var activities = GenerateRandomActivities(choosenTypes);
                 _dbClient.InsertBatch(activities);
-                Logger.Debug("Done inserting normal activity");
-                LogString += "Done inserting normal activity\n";
+                LogString = Helper.Log("Done inserting normal activity", LogString);
                 SvcCtrl.StartService("ATACenter");
-                Logger.Debug("Gone to sleep for 3 minutes of user profilling");
-                LogString += "Gone to sleep for 3 minutes of user profilling\n";
+                LogString = Helper.Log("Gone to sleep for 3 minutes of user profilling", LogString);
                 Thread.Sleep(180000);
-                Logger.Debug("Woke up!");
-                LogString += "Woke up!\n";
+                LogString = Helper.Log("Woke up!", LogString);
                 _dbClient.ClearTestNaCollection();
                 return true;
             }
             catch (Exception acException)
             {
-                Logger.Error(acException);
-                LogString += acException.ToString();
+                LogString = Helper.Log(acException, LogString);
                 return false;
             }
         }
@@ -121,34 +114,30 @@ namespace Abnormal_UI.UI.Abnormal
                 }
 
                 var abnormalDetectorProfile =
-                    _dbClient._systemProfilesCollection.Find(
+                    _dbClient.SystemProfilesCollection.Find(
                         Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
                 var choosenArray = ChooseActivtyType();
                 _dbClient.ClearTestNaCollection();
                 SvcCtrl.RestartService("ATACenter");
-                Logger.Debug("Gone to sleep for tree build");
-                LogString += "Gone to sleep for tree build\n";
+                LogString = Helper.Log("Gone to sleep for tree build", LogString);
                 while (!abnormalDetectorProfile["AccountTypeToModelMapping"].AsBsonArray.Any())
                 {
                     Thread.Sleep(5000);
                     abnormalDetectorProfile =
-                    _dbClient._systemProfilesCollection.Find(
+                    _dbClient.SystemProfilesCollection.Find(
                         Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
                 }
-                Logger.Debug("Woke up!");
-                LogString += "Woke up!\n";
+                LogString = Helper.Log("Woke up!", LogString);
                 SvcCtrl.StopService("ATACenter");
                 var activities = GenerateRandomActivities(choosenArray, true);
                 _dbClient.InsertBatch(activities);
-                Logger.Debug("Done inserting abnormal activity");
-                LogString += "Done inserting abnormal activity";
+                LogString = Helper.Log("Done insertings Abnormal activities", LogString);
                 SvcCtrl.StartService("ATACenter");
                 return true;
             }
             catch (Exception aaException)
             {
-                Logger.Error(aaException);
-                LogString += aaException.ToString();
+                LogString = Helper.Log(aaException, LogString);
                 return false;
             }
         }
@@ -181,12 +170,11 @@ namespace Abnormal_UI.UI.Abnormal
 
                 AbnormalActivity(new ObservableCollection<EntityObject> {SelectedUsers[_random.Next(1, 60)]});
 
-                return SelectedUsers[0].name;
+                return SelectedUsers[0].Name;
             }
             catch (Exception autoException)
             {
-                Logger.Error(autoException);
-                LogString += autoException.ToString();
+                LogString = Helper.Log(autoException, LogString);
                 return "Not Succeded";
             }
         }
@@ -209,26 +197,17 @@ namespace Abnormal_UI.UI.Abnormal
             ActivityType selectedActivityType;
             foreach (var selectedUser in SelectedUsers)
             {
-                Logger.Debug($"inserting {abnormalString} activity for {selectedUser.name}");
-                LogString += $"inserting {abnormalString} activity for {selectedUser.name}\n";
-                
+                LogString = Helper.Log($"inserting {abnormalString} activity for {selectedUser.Name}", LogString);
                 for (var daysToGenerate = limit; daysToGenerate <= daysToRun; daysToGenerate++)
                 {
                     computersUsedTodayCounter = isAbnormal ? SelectedMachines.Count : _random.Next(MinMachines, MaxMachines + 1);
                     for (var i = 0; i < computersUsedTodayCounter; i++)
                     {
-                        if (!isAbnormal)
+                        if (currentMachinesCounter + computersUsedTodayCounter >= SelectedMachines.Count - 1)
                         {
-                            if (currentMachinesCounter + computersUsedTodayCounter >= SelectedMachines.Count - 1)
-                            {
-                                currentMachinesCounter = 0;
-                            }
-                            currentSelectedMachine = SelectedMachines[currentMachinesCounter + i];
+                            currentMachinesCounter = 0;
                         }
-                        else
-                        {
-                            currentSelectedMachine = SelectedMachines[i];
-                        }
+                        currentSelectedMachine = !isAbnormal ? SelectedMachines[currentMachinesCounter + i] : SelectedMachines[i];
                         selectedActivityType = choosenTypes[_random.Next(0, choosenTypes.Length)];
                         switch (selectedActivityType)
                         {
@@ -242,7 +221,7 @@ namespace Abnormal_UI.UI.Abnormal
                                     DocumentCreator.KerberosCreator(selectedUser,
                                         currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(),
                                         DomainName, SourceGateway,
-                                        $"{_spns[_random.Next(0, 5)]}/{currentSelectedMachine.name}",
+                                        $"{_spns[_random.Next(0, 5)]}/{SelectedMachines[currentMachinesCounter].Name}",
                                         currentSelectedMachine, "Tgs",
                                         daysToGenerate, 0, networkActivities.Last()["_id"].AsObjectId));
                                 break;
@@ -264,7 +243,7 @@ namespace Abnormal_UI.UI.Abnormal
                         }
                         Logger.Trace("Inserted {3} {2} activity for {1} on {0}",
                             DateTime.UtcNow.Subtract(new TimeSpan(daysToGenerate, 0, 0, 0)),
-                            selectedUser.name,abnormalString, selectedActivityType);
+                            selectedUser.Name,abnormalString, selectedActivityType);
                     }
                 }
                 currentMachinesCounter += computersUsedTodayCounter;
@@ -302,7 +281,7 @@ namespace Abnormal_UI.UI.Abnormal
         public void ResetAbnormalProfile()
         {
             SvcCtrl.StopService("ATACenter");
-            _dbClient._database.DropCollection("UniqueEntityProfile");
+            _dbClient.ResetUniqueEntityProfile();
             _dbClient.DisposeAbnormalDetectorProfile();
             SvcCtrl.StartService("ATACenter");
         }

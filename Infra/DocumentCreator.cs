@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Abnormal_UI.Imported;
+using Abnormal_UI.Infra;
 using MongoDB.Bson;
 
 
@@ -11,13 +11,13 @@ namespace Abnormal_UI.Infra
         public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSpn = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0, ObjectId parentId = new ObjectId())
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
-            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
+            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
 
             var resourceIdentifier = new BsonDocument();
             var targetAccount = targetMachine ?? domainController;
             var targetSpnName = $"krbtgt/{domainName}";
             if (targetSpn != null) { targetSpnName = targetSpn; }
-            resourceIdentifier.Add("AccountId", targetAccount.id);
+            resourceIdentifier.Add("AccountId", targetAccount.Id);
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
 
@@ -44,19 +44,19 @@ namespace Abnormal_UI.Infra
                 {"EndTime", oldTime},
                 {"SourceIpAddress", "[daf::daf]"},
                 {"SourcePort", 51510},
-                {"SourceComputerId", computerEntity.id},
+                {"SourceComputerId", computerEntity.Id},
                 {"SourceComputerSiteId", BsonValue.Create(null)},
                 {"SourceComputerCertainty", "High"},
                 {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
                 {"DestinationIpAddress", "[daf::daf]"},
                 {"DestinationPort", 88},
-                {"DestinationComputerId", domainController.id},
+                {"DestinationComputerId", domainController.Id},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
                 {"TransportProtocol", "Tcp"},
                 {"SourceAccountName", sourceAccount},
-                {"SourceAccountId", userEntity.id},
+                {"SourceAccountId", userEntity.Id},
                 {"SourceComputerSupportedEncryptionTypes", new BsonArray(new string[1] {"Rc4Hmac"})},
                 {"ResourceIdentifier", resourceIdentifier},
                 
@@ -76,7 +76,7 @@ namespace Abnormal_UI.Infra
                 networkActivityDocument.Add("IsIncludePac", BsonValue.Create(true));
                 networkActivityDocument.Add("SourceAccountSupportedEncryptionTypes", new BsonArray(new string[0]));
                 networkActivityDocument.Add("SourceAccountBadPasswordTime", BsonValue.Create(null));
-                networkActivityDocument.Add("SourceComputerNetbiosName", computerEntity.name);
+                networkActivityDocument.Add("SourceComputerNetbiosName", computerEntity.Name);
                 networkActivityDocument.Add("EncryptedTimestampEncryptionType", BsonValue.Create(null));
                 networkActivityDocument.Add("EncryptedTimestamp", BsonValue.Create(null));
                 networkActivityDocument.Add("RequestTicket", BsonValue.Create(null));
@@ -100,9 +100,9 @@ namespace Abnormal_UI.Infra
         public static BsonDocument SimpleBindCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainControllerName, string domainName, ObjectId sourceGateway, int daysToSubtruct = 0)
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, 0, 0, 0, 0));
-            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
+            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
 
-            var resourceIdentifier = new BsonDocument {{"AccountId", domainControllerName.id}};
+            var resourceIdentifier = new BsonDocument {{"AccountId", domainControllerName.Id}};
             var targetSpnName = $"krbtgt/{domainName}";
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
@@ -116,20 +116,20 @@ namespace Abnormal_UI.Infra
                 {"HorizontalParentId", new ObjectId()},
                 {"SourceIpAddress", "[daf::daf]"},
                 {"SourcePort", 6666},
-                {"SourceComputerId", computerEntity.id},
+                {"SourceComputerId", computerEntity.Id},
                 {"SourceComputerSiteId", BsonValue.Create(null)},
                 {"SourceComputerCertainty", "High"},
                 {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
                 {"DestinationIpAddress", "[daf::daf]"},
                 {"DestinationPort", 389},
-                {"DestinationComputerId", domainControllerName.id},
+                {"DestinationComputerId", domainControllerName.Id},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
                 {"TransportProtocol", "Tcp"},
                 {"AuthenticationType", "Simple"},
                 {"SourceAccountName", sourceAccount},
-                {"SourceAccountId", userEntity.id},
+                {"SourceAccountId", userEntity.Id},
                 {
                     "SourceAccountPasswordHash",
                     "9apJEBIqcse0SNKVm4WzIxaHoLkUareMCDlAzhADI72CLmxOMmA8WzicPPI84xxlewEEIqZZOJJ1VqpE5VJT4g=="
@@ -150,31 +150,31 @@ namespace Abnormal_UI.Infra
             {
                 {"StartTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
                 {"EndTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
-                {"SourceComputerId", computerEntity[rnd.Next(0, computerEntity.Count)].id},
+                {"SourceComputerId", computerEntity[rnd.Next(0, computerEntity.Count)].Id},
                 {
                     "SourceAccountIds", new BsonArray(new string[20]
                     {
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id
                     })
                 },
                 {
                     "DestinationComputerIds", new BsonArray(new string[1]
                     {
-                        computerEntity[rnd.Next(0, computerEntity.Count)].id
+                        computerEntity[rnd.Next(0, computerEntity.Count)].Id
                     })
                 }
             };
-            var a = userEntity[rnd.Next(0, userEntity.Count)].id;
-            var b = userEntity[rnd.Next(0, userEntity.Count)].id;
+            var a = userEntity[rnd.Next(0, userEntity.Count)].Id;
+            var b = userEntity[rnd.Next(0, userEntity.Count)].Id;
 
             var suspicousActivityDocument = new BsonDocument
             {
@@ -208,16 +208,16 @@ namespace Abnormal_UI.Infra
                 {
                     "RelatedUniqueEntityIds", new BsonArray(new string[20]
                     {
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id,
-                        userEntity[rnd.Next(0, userEntity.Count)].id, userEntity[rnd.Next(0, userEntity.Count)].id
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
+                        userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id
                     })
                 },
                 {"DetailsRecords", new BsonArray(new BsonDocument[1] {detailRecord})},
@@ -267,19 +267,19 @@ namespace Abnormal_UI.Infra
                 {
                     "RelatedUniqueEntityIds", new BsonArray(new string[9]
                     {
-                        computerEntity[2].id, domainController.id, userEntity[0].id, userEntity[1].id, userEntity[2].id,
-                        userEntity[3].id, userEntity[4].id,
-                        userEntity[5].id, userEntity[6].id
+                        computerEntity[2].Id, domainController.Id, userEntity[0].Id, userEntity[1].Id, userEntity[2].Id,
+                        userEntity[3].Id, userEntity[4].Id,
+                        userEntity[5].Id, userEntity[6].Id
                     })
                 },
-                {"SourceComputerId", computerEntity[2].id},
-                {"DestinationComputerIds", new BsonArray(new string[1] {domainController.id})},
+                {"SourceComputerId", computerEntity[2].Id},
+                {"DestinationComputerIds", new BsonArray(new string[1] {domainController.Id})},
                 {"FailedSourceAccountNames", failedSourceAccountNames},
                 {
                     "SuccessSourceAccountIds", new BsonArray(new string[7]
                     {
-                        userEntity[0].id, userEntity[1].id, userEntity[2].id, userEntity[3].id, userEntity[4].id,
-                        userEntity[5].id, userEntity[6].id
+                        userEntity[0].Id, userEntity[1].Id, userEntity[2].Id, userEntity[3].Id, userEntity[4].Id,
+                        userEntity[5].Id, userEntity[6].Id
                     })
                 }
             };
@@ -311,13 +311,13 @@ namespace Abnormal_UI.Infra
             var sourceComputer = new BsonDocument
             {
                 {"DomainName", BsonValue.Create(null)},
-                {"Name", computerEntity.name}
+                {"Name", computerEntity.Name}
             };
 
             var destinationComputer = new BsonDocument
             {
                 {"DomainName", BsonValue.Create(null)},
-                {"Name", domainControllerName.name}
+                {"Name", domainControllerName.Name}
             };
 
             var eventActivityDocument = new BsonDocument
@@ -328,16 +328,16 @@ namespace Abnormal_UI.Infra
                     new BsonArray(new string[5] {"Entity", "Activity", "EventActivity", "WindowsEvent", "NtlmEvent"})
                 },
                 {"SourceGatewaySystemProfileId", sourceGateway},
-                {"SourceComputerId", computerEntity.id},
-                {"DomainControllerId", domainControllerName.id},
+                {"SourceComputerId", computerEntity.Id},
+                {"DomainControllerId", domainControllerName.Id},
                 {"Time", DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, 4, 0, 0, 0))},
                 {"SourceComputerName", sourceComputer},
                 {"DomainControllerName", destinationComputer},
                 {"IsTimeMillisecondsAccurate", BsonValue.Create(true)},
                 {"CategoryName", "Security"},
                 {"ProviderName", "Microsoft-Windows-Security-Auditing"},
-                {"SourceAccountName", userEntity.name},
-                {"SourceAccountId", userEntity.id},
+                {"SourceAccountName", userEntity.Name},
+                {"SourceAccountId", userEntity.Id},
                 {"ErrorCode", "Success"},
                 {"IsSuccess", BsonValue.Create(true)}
             };
@@ -349,13 +349,13 @@ namespace Abnormal_UI.Infra
         public static BsonDocument NtlmCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, int daysToSubtruct = 0, int hoursToSubtract = 0)
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
-            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.name}};
+            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
 
             var resourceIdentifier = new BsonDocument();
             var targetAccount = targetMachine ?? domainController;
             var targetSpnName = $"krbtgt/{domainName}";
             if (targetSPN != null) { targetSpnName = targetSPN; }
-            resourceIdentifier.Add("AccountId", targetAccount.id);
+            resourceIdentifier.Add("AccountId", targetAccount.Id);
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
 
@@ -364,8 +364,8 @@ namespace Abnormal_UI.Infra
                 {"_id", new ObjectId()},
                 {"_t", new BsonArray(new string[3] {"Entity", "NetworkActivity", "Ntlm"})},
                 {"SourceGatewaySystemProfileId", sourceGateway},
-                {"SourceComputerId", computerEntity.id},
-                {"DestinationComputerId", targetAccount.id},
+                {"SourceComputerId", computerEntity.Id},
+                {"DestinationComputerId", targetAccount.Id},
                 {"HorizontalParentId", new ObjectId()},
                 {"StartTime", oldTime},
                 {"EndTime", oldTime},
@@ -381,9 +381,9 @@ namespace Abnormal_UI.Infra
                 {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
                 {"TransportProtocol", "Tcp"},
                 {"Version", 2},
-                {"SourceComputerNetbiosName", computerEntity.name},
+                {"SourceComputerNetbiosName", computerEntity.Name},
                 {"SourceAccountName", sourceAccount},
-                {"SourceAccountId", userEntity.id},
+                {"SourceAccountId", userEntity.Id},
                 {"ResourceIdentifier", resourceIdentifier},
                 {"DceRpcStatus", BsonValue.Create(null)},
                 {"LdapResultCode", BsonValue.Create(null)},

@@ -86,12 +86,16 @@
                         <Label Content="NTLM"/>
                     </CheckBox>
                     <CheckBox IsChecked="{Binding IncludeEvent}" 
-                          x:Name="CheckBxEvent">
+                              x:Name="CheckBxEvent">
                         <Label Content="Events"/>
                     </CheckBox>
                 </StackPanel>
-
             </StackPanel>
+            <CheckBox IsChecked="{Binding ShowLog}" 
+                              x:Name="LogCheckBox"
+                              HorizontalAlignment="Center">
+                <Label Content="Show Log"/>
+            </CheckBox>
             <StackPanel HorizontalAlignment="Left" Margin="20">
                 <Button Width="200" 
                     Height="30" 

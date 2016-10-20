@@ -131,6 +131,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Infra\Helper.cs" />
     <Compile Include="UI\Dsa\DirectoryActivitiesViewModel.cs" />
     <Compile Include="UI\Dsa\DirectoryActivitiesUserControl.xaml.cs">
       <DependentUpon>DirectoryActivitiesUserControl.xaml</DependentUpon>
@@ -159,8 +160,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Imported\DBClient.cs" />
-    <Compile Include="Imported\EntityObject.cs" />
+    <Compile Include="Infra\DBClient.cs" />
+    <Compile Include="Infra\EntityObject.cs" />
     <Compile Include="Infra\DocumentCreator.cs" />
     <Compile Include="Infra\SvcCtrl.cs" />
     <Compile Include="UI\Abnormal\AbnormalViewModel.cs" />

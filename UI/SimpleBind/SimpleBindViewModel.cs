@@ -73,7 +73,7 @@ namespace Abnormal_UI.UI.SimpleBind
             {
                 _dbClient.ClearTestNaCollection();
                 var networkActivitities = new List<BsonDocument>();
-                if (SelectedUsers.Count < 1 || SelectedMachines[0].name == null)
+                if (SelectedUsers.Count < 1 || SelectedMachines[0].Name == null)
                 {
                     return false;
                 }
