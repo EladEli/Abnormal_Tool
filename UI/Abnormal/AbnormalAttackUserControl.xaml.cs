@@ -45,7 +45,7 @@ namespace Abnormal_UI.UI.Abnormal
             BtnActivateUsers.IsEnabled = true;
             MessageBox.Show(result
                             ? "User activity insertion ended."
-                            : "Please make sure that user-computer ratio is at least 1-2");
+                            : $"Please make sure that user-computer ratio is at least 1-{_model.MaxMachines}");
             _model.IsResultsShown = false;
         }
 

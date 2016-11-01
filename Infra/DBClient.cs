@@ -141,7 +141,7 @@ namespace Abnormal_UI.Infra
             foreach (var centerProfile in centerSystemProfile)
             {
                 var configurationBson = centerProfile["Configuration"];
-                configurationBson["UniqueEntityProfileCacheConfiguration"]["StoreUniqueEntityProfilesInterval"] =
+                configurationBson["UniqueEntityProfileCacheConfiguration"]["StoreUniqueEntityProfilesConfiguration"]["Interval"] =
                     "00:00:30";
                 configurationBson["ActivitySimulatorConfiguration"]["DelayInterval"] = "00:00:05";
                 configurationBson["ActivitySimulatorConfiguration"]["SimulationState"] = "Replay";

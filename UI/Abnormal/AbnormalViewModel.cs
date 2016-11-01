@@ -55,7 +55,7 @@ namespace Abnormal_UI.UI.Abnormal
             _isResultsShown = false;
             LogString = "";
             MinMachines = 1;
-            MaxMachines = 4;
+            MaxMachines = 3;
             _spns = new[]
             {
                 "HOST",

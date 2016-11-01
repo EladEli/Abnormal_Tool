@@ -13,7 +13,7 @@
                      Margin="20"
                      x:Name="BoxUsers" 
                      ItemsSource="{Binding Users}"
-                     DisplayMemberPath="name"
+                     DisplayMemberPath="Name"
                      SelectionMode="Extended"
                      SelectedIndex="0" >
             </ListBox>
@@ -28,7 +28,7 @@
                      Margin="20"
                      x:Name="BoxMachines" 
                      ItemsSource="{Binding Machines}"
-                     DisplayMemberPath="name"
+                     DisplayMemberPath="Name"
                      SelectionMode="Extended"
                      SelectedIndex="0">
             </ListBox>
@@ -45,7 +45,7 @@
                      Margin="20"
                      x:Name="BoxDCs" 
                      ItemsSource="{Binding DomainControllers}"
-                     DisplayMemberPath="name"
+                     DisplayMemberPath="Name"
                      SelectionMode="Extended"
                      SelectedIndex="0"
                      HorizontalAlignment="Left">

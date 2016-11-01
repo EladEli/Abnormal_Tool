@@ -12,15 +12,16 @@ namespace Abnormal_UI.Infra
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
-
+            var sourceComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", computerEntity.Name } };
             var resourceIdentifier = new BsonDocument();
             var targetAccount = targetMachine ?? domainController;
             var targetSpnName = $"krbtgt/{domainName}";
+
             if (targetSpn != null) { targetSpnName = targetSpn; }
             resourceIdentifier.Add("AccountId", targetAccount.Id);
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
-
+            var destinationComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", targetAccount.Name } };
             var responseTicket = new BsonDocument
             {
                 {"EncryptionType", "Aes256CtsHmacSha196"},
@@ -30,7 +31,6 @@ namespace Abnormal_UI.Infra
                 {"Size", 1084},
                 {"Hash", new byte[16]}
             };
-
             var networkActivityDocument = new BsonDocument
             {
                 {"_id", new ObjectId()},
@@ -54,39 +54,36 @@ namespace Abnormal_UI.Infra
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"DestinationComputerName",destinationComputerName},
                 {"TransportProtocol", "Tcp"},
                 {"SourceAccountName", sourceAccount},
                 {"SourceAccountId", userEntity.Id},
                 {"SourceComputerSupportedEncryptionTypes", new BsonArray(new string[1] {"Rc4Hmac"})},
                 {"ResourceIdentifier", resourceIdentifier},
-                
+                {"SourceComputerName",sourceComputerName},
                 {"Error", "Success"},
                 {"NtStatus", BsonValue.Create(null)},
                 {"IsSuccess", BsonValue.Create(false)},
                 {"Options", new BsonArray(new string[4] {"RenewableOk", "Canonicalize", "Renewable", "Forwardable"})},
                 {"RequestedTicketExpiration", DateTime.UtcNow},
                 {"SourceGatewaySystemProfileId", sourceGateway},
+                {"RequestTicketKerberosId", parentId},
+                {"ArmoringEncryptionType",BsonValue.Create(null)},
+                {"SourceAccountBadPasswordTime", BsonValue.Create(null)},
+                {"IsOldPassword", BsonValue.Create(null)}
         };
-
-
             if (actionType == "As")
             {
-                networkActivityDocument.Add("RequestTicketKerberosId", parentId);
-                networkActivityDocument.Add("IsOldPassword", BsonValue.Create(null));
+                networkActivityDocument.Add("SourceComputerNetbiosName", computerEntity.Name);
                 networkActivityDocument.Add("IsIncludePac", BsonValue.Create(true));
                 networkActivityDocument.Add("SourceAccountSupportedEncryptionTypes", new BsonArray(new string[0]));
-                networkActivityDocument.Add("SourceAccountBadPasswordTime", BsonValue.Create(null));
-                networkActivityDocument.Add("SourceComputerNetbiosName", computerEntity.Name);
                 networkActivityDocument.Add("EncryptedTimestampEncryptionType", BsonValue.Create(null));
                 networkActivityDocument.Add("EncryptedTimestamp", BsonValue.Create(null));
                 networkActivityDocument.Add("RequestTicket", BsonValue.Create(null));
                 networkActivityDocument.Add("ResponseTicket", responseTicket);
-
-
             }
             else
             {
-                networkActivityDocument.Add("RequestTicketKerberosId", parentId);
                 networkActivityDocument.Add("IsServiceForUserToSelf", BsonValue.Create(false));
                 networkActivityDocument.Add("AuthorizationDataSize", BsonValue.Create(null));
                 networkActivityDocument.Add("AuthorizationDataEncryptionType", BsonValue.Create(null));
@@ -313,12 +310,17 @@ namespace Abnormal_UI.Infra
                 {"DomainName", BsonValue.Create(null)},
                 {"Name", computerEntity.Name}
             };
-
+            var sourceAccount = new BsonDocument { { "DomainName", domainName }, { "Name", userEntity.Name } };
             var destinationComputer = new BsonDocument
             {
                 {"DomainName", BsonValue.Create(null)},
                 {"Name", domainControllerName.Name}
             };
+            var resourceIdentifier = new BsonDocument();
+            var targetSpnName = $"krbtgt/{domainName}";
+            resourceIdentifier.Add("AccountId", domainControllerName.Id);
+            var resourceName = new BsonDocument { { "DomainName", domainName }, { "Name", targetSpnName } };
+            resourceIdentifier.Add("ResourceName", resourceName);
 
             var eventActivityDocument = new BsonDocument
             {
@@ -336,29 +338,31 @@ namespace Abnormal_UI.Infra
                 {"IsTimeMillisecondsAccurate", BsonValue.Create(true)},
                 {"CategoryName", "Security"},
                 {"ProviderName", "Microsoft-Windows-Security-Auditing"},
-                {"SourceAccountName", userEntity.Name},
+                {"SourceAccountName", sourceAccount},
                 {"SourceAccountId", userEntity.Id},
+                {"SourceAccountBadPasswordTime", BsonValue.Create(null)},
                 {"ErrorCode", "Success"},
-                {"IsSuccess", BsonValue.Create(true)}
+                {"IsOldPassword", BsonValue.Create(null)},
+                {"IsSuccess", BsonValue.Create(true)},
+                {"ResourceIdentifier", resourceIdentifier}
             };
 
 
             return eventActivityDocument;
         }
 
-        public static BsonDocument NtlmCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSPN = null, EntityObject targetMachine = null, int daysToSubtruct = 0, int hoursToSubtract = 0)
+        public static BsonDocument NtlmCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, EntityObject targetMachine = null, int daysToSubtruct = 0, int hoursToSubtract = 0)
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
-
+            var sourceComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", computerEntity.Name } };
             var resourceIdentifier = new BsonDocument();
             var targetAccount = targetMachine ?? domainController;
             var targetSpnName = $"krbtgt/{domainName}";
-            if (targetSPN != null) { targetSpnName = targetSPN; }
             resourceIdentifier.Add("AccountId", targetAccount.Id);
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
-
+            var destinationComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", targetAccount.Name } };
             var networkActivityDocument = new BsonDocument
             {
                 {"_id", new ObjectId()},
@@ -375,24 +379,26 @@ namespace Abnormal_UI.Infra
                 {"SourceComputerCertainty", "High"},
                 {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
                 {"DestinationIpAddress", "[daf::daf]"},
-                {"DestinationPort", 88},
+                {"DestinationPort", 445},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"DestinationComputerName", destinationComputerName},
                 {"TransportProtocol", "Tcp"},
                 {"Version", 2},
+                {"SourceComputerName", sourceComputerName},
                 {"SourceComputerNetbiosName", computerEntity.Name},
                 {"SourceAccountName", sourceAccount},
                 {"SourceAccountId", userEntity.Id},
+                {"SourceAccountBadPasswordTime", BsonValue.Create(null)},
                 {"ResourceIdentifier", resourceIdentifier},
                 {"DceRpcStatus", BsonValue.Create(null)},
                 {"LdapResultCode", BsonValue.Create(null)},
                 {"SmbStatus", "Success"},
                 {"Smb1Status", BsonValue.Create(null)},
+                {"IsOldPassword", BsonValue.Create(null)},
                 {"IsSuccess", BsonValue.Create(true)}
             };
-
-
             return networkActivityDocument;
         }
     }
