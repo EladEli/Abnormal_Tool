@@ -152,21 +152,6 @@ namespace Abnormal_UI.Infra
           
         }
 
-        public void SetGatewayProfileForDsa()
-        {
-            var gatewaySystemProfile =
-                SystemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument()).ToEnumerable();
-            foreach (var gatewayProfile in gatewaySystemProfile)
-            {
-                var configurationBson = gatewayProfile["Configuration"];
-                configurationBson["DirectoryServicesResolverConfiguration"]["UpdateDirectoryEntityChangesInterval"] =
-                    "00:00:01";
-                gatewayProfile["Configuration"] = configurationBson;
-                SystemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", gatewayProfile["_id"]),
-                    gatewayProfile);
-            }
-        }
-
         public void RenameKerbCollections()
         {
             var monthAgo = DateTime.UtcNow.Subtract(new TimeSpan(27, 0, 0, 0)).ToString("yyyyMMddhhmmss", CultureInfo.InvariantCulture);
@@ -268,20 +253,6 @@ namespace Abnormal_UI.Infra
             TestDatabase.CreateCollection("EventActivity");
             _logger.Debug("Cleared Test collections");
         }
-
-        public void ClearDsaCollection()
-        {
-            Database.DropCollection("DirectoryServicesActivity");
-            Database.CreateCollection("DirectoryServicesActivity");
-            _logger.Debug("Cleared Dsa's collection");
-        }
-
-        public bool CheckDatabaseForDsa(string dsaForCheck)
-        {
-            var dsaCollection = Database.GetCollection<BsonDocument>("DirectoryServicesActivity");
-            return dsaCollection.ToBsonDocument().Any(dsa => dsaForCheck == dsa.ToString());
-        }
-
         public void SetNewGateway(int amount)
         {
             try
@@ -301,7 +272,6 @@ namespace Abnormal_UI.Infra
             }
             
         }
-
         public void DisposeDatabae()
         {
             TestDatabase.Client.DropDatabase("ATAActivitySimulator");

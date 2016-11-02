@@ -98,11 +98,12 @@ namespace Abnormal_UI.Infra
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, 0, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
-
+            var sourceComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", computerEntity.Name } };
             var resourceIdentifier = new BsonDocument {{"AccountId", domainControllerName.Id}};
             var targetSpnName = $"krbtgt/{domainName}";
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
+            var destinationComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", domainControllerName.Name } };
 
             var networkActivityDocument = new BsonDocument
             {
@@ -114,6 +115,7 @@ namespace Abnormal_UI.Infra
                 {"SourceIpAddress", "[daf::daf]"},
                 {"SourcePort", 6666},
                 {"SourceComputerId", computerEntity.Id},
+                {"SourceComputerName",sourceComputerName},
                 {"SourceComputerSiteId", BsonValue.Create(null)},
                 {"SourceComputerCertainty", "High"},
                 {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
@@ -122,6 +124,7 @@ namespace Abnormal_UI.Infra
                 {"DestinationComputerId", domainControllerName.Id},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
+                {"DestinationComputerName",destinationComputerName},
                 {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
                 {"TransportProtocol", "Tcp"},
                 {"AuthenticationType", "Simple"},
@@ -134,6 +137,8 @@ namespace Abnormal_UI.Infra
                 {"ResultCode", "Success"},
                 {"IsSuccess", BsonValue.Create(true)},
                 {"SourceGatewaySystemProfileId", sourceGateway},
+                {"SourceAccountBadPasswordTime", BsonValue.Create(null)},
+                {"IsOldPassword", BsonValue.Create(null)},
                 {"ResourceIdentifier", resourceIdentifier}
             };
 
@@ -235,7 +240,6 @@ namespace Abnormal_UI.Infra
                 detailRecord = new BsonDocument();
             }
             var failedSourceAccountNames = new BsonArray(records);
-
             var suspicousActivityDocument = new BsonDocument
             {
                 {"_id", new ObjectId()},
@@ -281,26 +285,6 @@ namespace Abnormal_UI.Infra
                 }
             };
             return suspicousActivityDocument;
-        }
-        public static BsonDocument NotificationCreator(ObjectId alertId)
-        {
-            var notificationDocument = new BsonDocument
-            {
-                {"_id", new ObjectId()},
-                {
-                    "_t", new BsonArray(new string[4]
-                    {
-                        "Entity", "Notification", "AlertNotification", "SuspiciousActivityNotification",
-                    })
-                },
-                {"Level", "Notice"},
-                {"CreationTime", DateTime.UtcNow},
-                {"ExpirationTime", DateTime.UtcNow.AddDays(100)},
-                {"CategoryKey", "SuspiciousActivityNotificationCategory"},
-                {"AlertId", alertId},
-                {"AlertTitleKey", "LdapSimpleBindCleartextPasswordSuspiciousActivityTitleService"}
-            };
-            return notificationDocument;
         }
         public static BsonDocument EventCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainControllerName, string domainName,ObjectId sourceGateway, int daysToSubtruct = 0)
         {
@@ -350,7 +334,6 @@ namespace Abnormal_UI.Infra
 
             return eventActivityDocument;
         }
-
         public static BsonDocument NtlmCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, EntityObject targetMachine = null, int daysToSubtruct = 0, int hoursToSubtract = 0)
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));

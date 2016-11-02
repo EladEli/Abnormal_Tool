@@ -18,10 +18,6 @@
             <TabItem Header="Test">
                 <ContentControl Content="{Binding _testWindow, Mode=OneWay}"/>
             </TabItem>
-            <TabItem Header="Dsa">
-                <ContentControl Content="{Binding _dsaWindow, Mode=OneWay}"/>
-            </TabItem>
-            
         </TabControl>
     </Grid>
 </Window>
