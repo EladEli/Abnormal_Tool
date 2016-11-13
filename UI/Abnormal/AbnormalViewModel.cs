@@ -92,6 +92,19 @@ namespace Abnormal_UI.UI.Abnormal
                 Thread.Sleep(180000);
                 LogString = Helper.Log("Woke up!", LogString);
                 _dbClient.ClearTestNaCollection();
+                var abnormalDetectorProfile =
+                    _dbClient.SystemProfilesCollection.Find(
+                        Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
+                SvcCtrl.RestartService("ATACenter");
+                LogString = Helper.Log("Gone to sleep for tree build", LogString);
+                while (!abnormalDetectorProfile["AccountTypeToModelMapping"].AsBsonArray.Any())
+                {
+                    Thread.Sleep(5000);
+                    abnormalDetectorProfile =
+                    _dbClient.SystemProfilesCollection.Find(
+                        Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
+                }
+                LogString = Helper.Log("Woke up!", LogString);
                 return true;
             }
             catch (Exception acException)
@@ -112,27 +125,13 @@ namespace Abnormal_UI.UI.Abnormal
                 {
                     SelectedUsers = specificUser;
                 }
-
-                var abnormalDetectorProfile =
-                    _dbClient.SystemProfilesCollection.Find(
-                        Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
                 var choosenArray = ChooseActivtyType();
-                _dbClient.ClearTestNaCollection();
-                SvcCtrl.RestartService("ATACenter");
-                LogString = Helper.Log("Gone to sleep for tree build", LogString);
-                while (!abnormalDetectorProfile["AccountTypeToModelMapping"].AsBsonArray.Any())
-                {
-                    Thread.Sleep(5000);
-                    abnormalDetectorProfile =
-                    _dbClient.SystemProfilesCollection.Find(
-                        Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
-                }
-                LogString = Helper.Log("Woke up!", LogString);
                 SvcCtrl.StopService("ATACenter");
                 var activities = GenerateRandomActivities(choosenArray, true);
                 _dbClient.InsertBatch(activities);
                 LogString = Helper.Log("Done insertings Abnormal activities", LogString);
                 SvcCtrl.StartService("ATACenter");
+                _dbClient.ClearTestNaCollection();
                 return true;
             }
             catch (Exception aaException)

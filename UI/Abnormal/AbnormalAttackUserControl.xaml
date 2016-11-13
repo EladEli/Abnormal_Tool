@@ -48,7 +48,7 @@
                          BorderThickness="2"
                          Name="LogTextBox"
                          Background="White"
-                         Text="{Binding LogString}" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Visible" />
+                         Text="{Binding LogString}" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Visible" TextChanged="LogTextBox_TextChanged" />
         </StackPanel>
         <StackPanel DockPanel.Dock="Right" >
             <ListBox Width="200" 

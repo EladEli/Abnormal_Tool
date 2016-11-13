@@ -83,5 +83,10 @@ namespace Abnormal_UI.UI.Abnormal
             MessageBox.Show("User activity insertion ended, you should expect an SA on " + result);
             BtnAbnormalActivity.IsEnabled = true;
         }
+
+        private void LogTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            LogTextBox.ScrollToEnd();
+        }
     }
 }
