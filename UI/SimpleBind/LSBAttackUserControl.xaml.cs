@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using Abnormal_UI.Infra;
 
 namespace Abnormal_UI.UI.SimpleBind
@@ -64,17 +63,6 @@ namespace Abnormal_UI.UI.SimpleBind
             var result = await Task.Run(() => _model.LSBSingle());
             BtnLSBSpecific.IsEnabled = true;
             MessageBox.Show(result ? "User activity insertion ended." : "Please select at least 1 user and 1 machine!");
-        }
-    }
-
-    public static class ControlExtension
-    {
-        public static void UpdateControlSafe(this Control control, Action code)
-        {
-            if (!control.Dispatcher.CheckAccess())
-                control.Dispatcher.BeginInvoke(code);
-            else
-                code.Invoke();
         }
     }
 }

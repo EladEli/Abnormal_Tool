@@ -16,7 +16,7 @@ namespace Abnormal_UI.UI.SimpleBind
         {
             try
             {
-                _dbClient.ClearTestNaCollection();
+                _dbClient.ClearTestCollections();
                 SvcCtrl.StopService("ATACenter");
                 _dbClient.SetCenterProfileForReplay();
                 Logger.Debug("Center profile set for replay");
@@ -51,7 +51,7 @@ namespace Abnormal_UI.UI.SimpleBind
                 {
                     return false;
                 }
-                _dbClient.ClearTestNaCollection();
+                _dbClient.ClearTestCollections();
                 SvcCtrl.StopService("ATACenter");
                 _dbClient.SetCenterProfileForReplay();
                 Logger.Debug("Center profile set for replay");
@@ -71,7 +71,7 @@ namespace Abnormal_UI.UI.SimpleBind
         {
             try
             {
-                _dbClient.ClearTestNaCollection();
+                _dbClient.ClearTestCollections();
                 var networkActivitities = new List<BsonDocument>();
                 if (SelectedUsers.Count < 1 || SelectedMachines[0].Name == null)
                 {

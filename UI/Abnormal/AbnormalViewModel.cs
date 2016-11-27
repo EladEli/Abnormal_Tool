@@ -91,7 +91,7 @@ namespace Abnormal_UI.UI.Abnormal
                 LogString = Helper.Log("Gone to sleep for 3 minutes of user profilling", LogString);
                 Thread.Sleep(180000);
                 LogString = Helper.Log("Woke up!", LogString);
-                _dbClient.ClearTestNaCollection();
+                _dbClient.ClearTestCollections();
                 var abnormalDetectorProfile =
                     _dbClient.SystemProfilesCollection.Find(
                         Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
@@ -131,7 +131,7 @@ namespace Abnormal_UI.UI.Abnormal
                 _dbClient.InsertBatch(activities);
                 LogString = Helper.Log("Done insertings Abnormal activities", LogString);
                 SvcCtrl.StartService("ATACenter");
-                _dbClient.ClearTestNaCollection();
+                _dbClient.ClearTestCollections();
                 return true;
             }
             catch (Exception aaException)
@@ -273,7 +273,7 @@ namespace Abnormal_UI.UI.Abnormal
             _dbClient.RenameKerbCollections();
             _dbClient.RenameNtlmCollections();
             _dbClient.RenameNtlmEventsCollections();
-            _dbClient.ClearTestNaCollection();
+            _dbClient.ClearTestCollections();
             _dbClient.SetCenterProfileForReplay();
         }
 

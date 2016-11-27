@@ -73,10 +73,10 @@ namespace Abnormal_UI.UI.Test
             _dbClient.SetNewGateway(_saAmount);
         }
 
-        public bool StopService(string serviceName)
+        public bool GoldenTicketActivity()
         {
-            SvcCtrl.StopService(serviceName);
-            return true;
+
+            return false;
         }
 
     }

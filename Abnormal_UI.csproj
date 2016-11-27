@@ -132,6 +132,10 @@
       <DependentUpon>TestUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Test\TestViewModel.cs" />
+    <Compile Include="UI\Vpn\VpnUserControl.xaml.cs">
+      <DependentUpon>VpnUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Vpn\VpnViewModel.cs" />
     <Page Include="UI\Abnormal\AbnormalAttackUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -164,6 +168,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UI\Test\TestUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Vpn\VpnUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

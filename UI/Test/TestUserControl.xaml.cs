@@ -66,5 +66,12 @@ namespace Abnormal_UI.UI.Test
                 ? "Gateway Creation ended."
                 : "Please enter Gateways amount");
         }
+
+        private async void GoldenTicketBtn_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            GoldenTicketBtn.IsEnabled = false;
+            await Task.Run(() => _model.GoldenTicketActivity());
+            GoldenTicketBtn.IsEnabled = true;
+        }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Abnormal_UI.Infra;
 using MongoDB.Bson;
 
 
@@ -383,6 +382,46 @@ namespace Abnormal_UI.Infra
                 {"IsSuccess", BsonValue.Create(true)}
             };
             return networkActivityDocument;
+        }
+
+        public static BsonDocument VpnEventCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway,string externalSourceIp)
+        {
+
+            var sourceComputer = new BsonDocument
+            {
+                {"DomainName", BsonValue.Create(null)},
+                {"Name", computerEntity.Name}
+            };
+            var serverName = new BsonDocument
+            {
+                {"DomainName", BsonValue.Create(null)},
+                {"Name", "MS-VPN"}
+            };
+            var sourceAccount = new BsonDocument { { "DomainName", domainName }, { "Name", userEntity.Name } };
+            var vpnEventActivityDocument = new BsonDocument
+            {
+                {"_id", new ObjectId()},
+                {
+                    "_t",
+                    new BsonArray(new string[4] {"Entity", "Activity", "EventActivity","VpnAuthenticationEvent"})
+                },
+                {"SourceGatewaySystemProfileId", sourceGateway},
+                {"Time", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
+                {"IsTimeMillisecondsAccurate", BsonValue.Create(false)},
+                {"EventType","Connect" },
+                {"SourceAccountName", sourceAccount},
+                {"SourceAccountId", userEntity.Id},
+                {"SourceComputerName", sourceComputer},
+                {"SourceComputerId", computerEntity.Id},
+                {"ExternalSourceIpAddress",externalSourceIp},
+                {"ServerName",serverName},
+                {"ServerInternalIpAddress", "192.168.0.200"},
+                {"ServerId", domainController.Id},
+                {"GeoLocationInformation", BsonValue.Create(null)},
+                {"NetworkInformation", BsonValue.Create(null)},
+                {"ProxyInformation", BsonValue.Create(null)}
+            };
+            return vpnEventActivityDocument;
         }
     }
 }

@@ -117,7 +117,7 @@ namespace Abnormal_UI.Infra
 
         public void InsertBatch(List<BsonDocument> documents)
         {
-            var events = documents.Where(_ => _["_t"].ToString().Contains("NtlmEvent")).ToList();
+            var events = documents.Where(_ => _["_t"].ToString().Contains("EventActivity")).ToList();
             var networkActivities = documents.Where(_ => _["_t"].ToString().Contains("NetworkActivity")).ToList();
             if (events.Any())
             {
@@ -245,7 +245,7 @@ namespace Abnormal_UI.Infra
                 _logger.Error(ex);
             }
         }
-        public void ClearTestNaCollection()
+        public void ClearTestCollections()
         {
             TestDatabase.DropCollection("NetworkActivity");
             TestDatabase.CreateCollection("NetworkActivity");

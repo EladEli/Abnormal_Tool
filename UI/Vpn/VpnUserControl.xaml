@@ -1,21 +1,19 @@
-﻿<UserControl x:Class="Abnormal_UI.UI.Test.TestUserControl"
+﻿<UserControl x:Class="Abnormal_UI.UI.Vpn.VpnUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Abnormal_UI.UI.Test"
-             mc:Ignorable="d" 
-            >
+             mc:Ignorable="d">
     <DockPanel>
         <StackPanel Orientation="Horizontal">
             <ListBox Width="250" 
                      Height="Auto" 
                      Margin="20"
                      x:Name="BoxUsers" 
-                     ItemsSource="{Binding Users}"
+                     ItemsSource="{Binding Users}" 
                      DisplayMemberPath="Name"
-                     SelectionMode="Extended"
-                     SelectedIndex="0" >
+                     SelectionMode="Extended" 
+                     SelectedIndex="0">
             </ListBox>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxUsers}" 
                        Name="SelUsersCount"
@@ -27,67 +25,59 @@
                      Height="Auto" 
                      Margin="20"
                      x:Name="BoxMachines" 
-                     ItemsSource="{Binding Machines}"
+                     ItemsSource="{Binding Machines}" 
                      DisplayMemberPath="Name"
                      SelectionMode="Extended"
                      SelectedIndex="0">
             </ListBox>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxMachines}" 
                        Name="SelMachinesCount"
-                       Width="35" 
+                       Width="20" 
                        Height="20"
                        VerticalAlignment="Bottom"
-                       Margin="-10 0 0 20" RenderTransformOrigin="0.319,0.474"/>
+                       Margin="-10 0 0 20"/>
         </StackPanel>
         <StackPanel DockPanel.Dock="Right" >
             <ListBox Width="200" 
                      Height="100" 
-                     Margin="20"
+                     Margin="25"
                      x:Name="BoxDCs" 
-                     ItemsSource="{Binding DomainControllers}"
+                     ItemsSource="{Binding DomainControllers}" 
                      DisplayMemberPath="Name"
                      SelectionMode="Extended"
                      SelectedIndex="0"
-                     HorizontalAlignment="Left">
-            </ListBox>
+                     HorizontalAlignment="Left"/>
             <StackPanel
-                HorizontalAlignment="Left" Margin="20">
-                <Label Content="SA'/GW's amount" />
+                HorizontalAlignment="Left" Margin="30">
+                <Label Content="RecordsAmount amount"/>
                 <StackPanel Orientation="Horizontal" >
                     <TextBox Height="20" 
                          Width="40"
-                         Text="{Binding SaAmount, Mode=TwoWay}" 
+                         Text="{Binding RecordsAmount, Mode=TwoWay}" 
                          x:Name="TextBoxSaAmount" />
                 </StackPanel>
             </StackPanel>
-            <StackPanel HorizontalAlignment="Center" Margin="20" Height="200">
+            <StackPanel HorizontalAlignment="Center" Width="200">
+                <Button
+                    HorizontalAlignment="Right"
+                    Width="40" 
+                    Height="30" 
+                    Content="Add IP"
+                    x:Name="AddIpBtn" 
+                    Click="AddIpBtn_OnClick" Margin="0,0,10,-30" />
+                <TextBox Height="30" 
+                         Width="120"
+                         HorizontalAlignment="Left"
+                         Text="0.0.0.0" 
+                         x:Name="IpBox" />
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Left" Margin="20">
                 <Button Width="200" 
-            		Height="30" 
-            		Margin="5"
-            		Content="SAEC"
-            		x:Name="Btn1" 
-            		Click="Btn1_OnClickAsync"/>
-                <Button Width="200" 
-            		Height="30" 
-            		Margin="5"
-            		Content="AE"
-            		x:Name="Btn2" 
-            		Click="Btn2_OnClickAsync"/>
-                <Button Width="200" 
-            		Height="30" 
-            		Margin="5"
-            		Content="Test service control"
-            		x:Name="Btn3"/>
-                <Button Width="200" 
-            		Height="30" 
-            		Margin="5"
-            		Content="Create Gateways"
-            		x:Name="Btn4" Click="Btn4_ClickAsync"/>
-                <Button Width="200" 
-            		Height="30" 
-            		Margin="5"
-            		Content="Golden Ticket"
-            		x:Name="GoldenTicketBtn" Click="GoldenTicketBtn_ClickAsync"/>
+                    Height="30" 
+                    Margin="5"
+                    Content="Execute"
+                    x:Name="ExecuteVpnBtn" 
+                    Click="ExecuteVpnBtn_OnClickAsync"/>
             </StackPanel>
         </StackPanel>
     </DockPanel>

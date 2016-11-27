@@ -6,7 +6,7 @@
         Width="950" 
         Closing="Window_Closing" 
         Background="Silver" 
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"  WindowStyle="SingleBorderWindow">
     <Grid>
         <TabControl TabStripPlacement="Left" Background="Silver">
             <TabItem Header="Abnormal">
@@ -17,6 +17,9 @@
             </TabItem>
             <TabItem Header="Test">
                 <ContentControl Content="{Binding _testWindow, Mode=OneWay}"/>
+            </TabItem>
+            <TabItem Header="Vpn">
+                <ContentControl Content="{Binding _vpnWindow, Mode=OneWay}"/>
             </TabItem>
         </TabControl>
     </Grid>
