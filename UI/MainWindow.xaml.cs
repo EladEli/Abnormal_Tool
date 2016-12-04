@@ -1,4 +1,6 @@
-﻿using Abnormal_UI.UI.Abnormal;
+﻿using Abnormal_UI.Infra;
+using Abnormal_UI.UI.Abnormal;
+using Abnormal_UI.UI.Samr;
 using Abnormal_UI.UI.SimpleBind;
 using Abnormal_UI.UI.Test;
 using Abnormal_UI.UI.Vpn;
@@ -7,42 +9,44 @@ namespace Abnormal_UI.UI
 {
     public partial class MainWindow 
     {
-        private readonly AbnormalViewModel _abnormalModel;
-        private readonly SimpleBindViewModel _sbModel;
-        private readonly TestViewModel _testModel;
-        private readonly VpnViewModel _vpnModel;
-        public AbnormalAttackUserControl _abnormalAttackWindow { get; set; }
-        public LsbAttackUserControl _lsbAttackWindow { get; set; }
-        public TestUserControl _testWindow { get; set; }
-        public VpnUserControl _vpnWindow { get; set; }
+        private readonly AbnormalViewModel abnormalModel;
+        public AbnormalAttackUserControl AbnormalAttackWindow { get; set; }
+        public LsbAttackUserControl LsbAttackWindow { get; set; }
+        public TestUserControl TestWindow { get; set; }
+        public VpnUserControl VpnWindow { get; set; }
+        public SamrUserControl SamrWindow { get; set; }
 
 
         public MainWindow()
         {
             InitializeComponent();
            
-            _abnormalModel = new AbnormalViewModel();
-            _abnormalModel.PopulateModel();
-            _abnormalAttackWindow = new AbnormalAttackUserControl(_abnormalModel);
+            abnormalModel = new AbnormalViewModel();
+            abnormalModel.PopulateModel();
+            AbnormalAttackWindow = new AbnormalAttackUserControl(abnormalModel);
 
-            _sbModel = new SimpleBindViewModel();
-            _sbModel.PopulateModel();
-            _lsbAttackWindow = new LsbAttackUserControl(_sbModel);
+            var sbModel = new SimpleBindViewModel();
+            sbModel.PopulateModel();
+            LsbAttackWindow = new LsbAttackUserControl(sbModel);
 
-            _testModel = new TestViewModel();
-            _testModel.PopulateModel();
-            _testWindow = new TestUserControl(_testModel);
+            var testModel = new TestViewModel();
+            testModel.PopulateModel();
+            TestWindow = new TestUserControl(testModel);
             
-            _vpnModel = new VpnViewModel();
-            _vpnModel.PopulateModel();
-            _vpnWindow = new VpnUserControl(_vpnModel);
+            var vpnModel = new VpnViewModel();
+            vpnModel.PopulateModel();
+            VpnWindow = new VpnUserControl(vpnModel);
+
+            var samrModel = new SamrViewModel();
+            samrModel.PopulateModel(UniqueEntityType.Group);
+            SamrWindow = new SamrUserControl(samrModel);
 
             DataContext = this;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            _abnormalModel._dbClient.DisposeDatabae();
+            abnormalModel._dbClient.DisposeDatabae();
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Abnormal_UI.UI
 
         #region Methods
 
-        public void PopulateModel()
+        public void PopulateModel(UniqueEntityType uniqueType = UniqueEntityType.Computer)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace Abnormal_UI.UI
                 var domainControllers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer,true);
                 DomainControllers = new ObservableCollection<EntityObject>(domainControllers.OrderBy(entityObject => entityObject.Name).AsEnumerable());
 
-                var allComputers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer);
+                var allComputers = _dbClient.GetUniqueEntity(uniqueType);
                 Machines = new ObservableCollection<EntityObject>(allComputers.OrderBy(entityObject => entityObject.Name).AsEnumerable());
 
                 var domain = _dbClient.GetUniqueEntity(UniqueEntityType.Domain);
@@ -73,7 +73,6 @@ namespace Abnormal_UI.UI
             {
                 Logger.Error(pmException);
             }
-            
         }
 
         #endregion
@@ -83,7 +82,6 @@ namespace Abnormal_UI.UI
 
         public void OnPropertyChanged(
             [CallerMemberName] string caller = "")
-
         {
             PropertyChanged?.Invoke( this, new PropertyChangedEventArgs(caller));
         }

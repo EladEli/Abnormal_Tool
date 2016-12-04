@@ -10,16 +10,19 @@
     <Grid>
         <TabControl TabStripPlacement="Left" Background="Silver">
             <TabItem Header="Abnormal">
-                <ContentControl Content="{Binding _abnormalAttackWindow, Mode=OneWay}"/>
+                <ContentControl Content="{Binding AbnormalAttackWindow, Mode=OneWay}"/>
             </TabItem>
             <TabItem Header="LSB">
-                <ContentControl Content="{Binding _lsbAttackWindow, Mode=OneWay}"/>
+                <ContentControl Content="{Binding LsbAttackWindow, Mode=OneWay}"/>
             </TabItem>
             <TabItem Header="Test">
-                <ContentControl Content="{Binding _testWindow, Mode=OneWay}"/>
+                <ContentControl Content="{Binding TestWindow, Mode=OneWay}"/>
             </TabItem>
             <TabItem Header="Vpn">
-                <ContentControl Content="{Binding _vpnWindow, Mode=OneWay}"/>
+                <ContentControl Content="{Binding VpnWindow, Mode=OneWay}"/>
+            </TabItem>
+            <TabItem Header="Samr">
+                <ContentControl Content="{Binding SamrWindow, Mode=OneWay}"/>
             </TabItem>
         </TabControl>
     </Grid>

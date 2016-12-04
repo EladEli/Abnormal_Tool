@@ -31,15 +31,9 @@ namespace Abnormal_UI.Infra
         private DBClient()
         {
             _logger = LogManager.GetLogger("TestToolboxLog");
+            const string connectionString = "mongodb://127.0.0.1:27017";
             try
             {
-                string connectionString;
-                if ("mongodb://:27017" ==
-                    (connectionString =
-                        $"mongodb://{Interaction.InputBox("Please enter the server Address", "Target Server", "127.0.0.1", -1, -1)}:27017"))
-                {
-                    connectionString = "mongodb://127.0.0.1:27017";
-                }
                 var client = new MongoClient(connectionString);
                 Database = client.GetDatabase("ATA");
                 TestDatabase = client.GetDatabase("ATAActivitySimulator");
@@ -150,6 +144,27 @@ namespace Abnormal_UI.Infra
                     centerProfile);
             }
           
+        }
+        public void SetCenterProfileForVpn()
+        {
+
+            var centerSystemProfile =
+                SystemProfilesCollection.Find(Query.EQ("_t", "CenterSystemProfile").ToBsonDocument()).ToEnumerable();
+            foreach (var centerProfile in centerSystemProfile)
+            {
+                var commonConfigurationBson = centerProfile["GatewayCommonConfiguration"];
+                var radiusSharedSecret = new BsonDocument
+                {
+                    {"CertificateThumbprint", commonConfigurationBson["HashKeyEncrypted"]["CertificateThumbprint"]},
+                    {"EncryptedBytes", new byte[16]}
+                };
+                
+                commonConfigurationBson["IsRadiusEventListenerEnabled"] = BsonValue.Create(true);
+                commonConfigurationBson["RadiusEventListenerSharedSecretEncrypted"] = radiusSharedSecret;
+                centerProfile["GatewayCommonConfiguration"] = commonConfigurationBson;
+                SystemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", centerProfile["_id"]),
+                    centerProfile);
+            }
         }
 
         public void RenameKerbCollections()

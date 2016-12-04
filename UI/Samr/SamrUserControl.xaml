@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Abnormal_UI.UI.Vpn.VpnUserControl"
+﻿<UserControl x:Class="Abnormal_UI.UI.Samr.SamrUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -41,51 +41,31 @@
             <ListBox Width="200" 
                      Height="100" 
                      Margin="25"
-                     x:Name="IpsListBox" 
-                     ItemsSource="{Binding ExternalIPs}" 
+                     x:Name="BoxDCs" 
+                     ItemsSource="{Binding DomainControllers}" 
+                     DisplayMemberPath="Name"
                      SelectionMode="Extended"
+                     SelectedIndex="0"
                      HorizontalAlignment="Left"/>
-            
-            <StackPanel HorizontalAlignment="Center" Width="220">
-                <Button
-                    HorizontalAlignment="Right"
-                    Width="40"
-                    Height="30"
-                    Content="Add IP"
-                    x:Name="AddIpBtn" 
-                    Click="AddIpBtn_OnClick" 
-                    Margin="0,0,0,-30"/>
-                <Button
-                    HorizontalAlignment="Right"
-                    Width="50"
-                    Height="30"
-                    Content="Remove"
-                    x:Name="RemoveIpBtn" 
-                    Click="RemoveIpBtn_OnClick" 
-                    Margin="0,0,45,-30"/>
-                <TextBox Height="30"
-                         Width="120"
-                         HorizontalAlignment="Left"
-                         Text="0.0.0.0" 
-                         x:Name="IpBox" />
-            </StackPanel>
-            <StackPanel
-                HorizontalAlignment="Left" Margin="30">
-                <Label Content="Records amount"/>
-                <StackPanel Orientation="Horizontal">
-                    <TextBox Height="20" 
-                         Width="40"
-                         Text="{Binding RecordsAmount, Mode=TwoWay}" 
-                         x:Name="TextBoxSaAmount"/>
-                </StackPanel>
-            </StackPanel>
             <StackPanel HorizontalAlignment="Left" Margin="20">
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
-                    Content="Execute"
-                    x:Name="ExecuteVpnBtn" 
-                    Click="ExecuteVpnBtn_OnClickAsync"/>
+                    Content="Samr1_OnClickAsync"
+                    x:Name="Samr1" 
+                    Click="Samr1_OnClickAsync"/>
+                <Button Width="200" 
+                    Height="30" 
+                    Margin="5"
+                    Content="Samr2_OnClickAsync"
+                    x:Name="Samr2" 
+                    Click="Samr2_OnClickAsync"/>
+                <Button Width="200" 
+                    Height="30" 
+                    Margin="5"
+                    Content="Samr3_OnClickAsync"
+                    x:Name="Samr3" 
+                    Click="Samr3_OnClickAsync"/>
             </StackPanel>
         </StackPanel>
     </DockPanel>

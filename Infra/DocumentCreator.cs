@@ -398,7 +398,7 @@ namespace Abnormal_UI.Infra
                 {"Name", "MS-VPN"}
             };
             var sourceAccount = new BsonDocument { { "DomainName", domainName }, { "Name", userEntity.Name } };
-            var vpnEventActivityDocument = new BsonDocument
+            return new BsonDocument
             {
                 {"_id", new ObjectId()},
                 {
@@ -421,7 +421,6 @@ namespace Abnormal_UI.Infra
                 {"NetworkInformation", BsonValue.Create(null)},
                 {"ProxyInformation", BsonValue.Create(null)}
             };
-            return vpnEventActivityDocument;
         }
     }
 }

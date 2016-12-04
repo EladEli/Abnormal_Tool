@@ -31,7 +31,7 @@ namespace Abnormal_UI.UI.Vpn
             _model.SelectedMachines = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
 
-            selectedEntityObjects.AddRange(BoxDCs.SelectedItems.Cast<EntityObject>());
+            selectedEntityObjects.AddRange(IpsListBox.SelectedItems.Cast<EntityObject>());
             _model.SelectedDomainControllers = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
         }
@@ -51,6 +51,11 @@ namespace Abnormal_UI.UI.Vpn
         {
             _model.ExternalIPs.Add(IpBox.Text);
             IpBox.Text = "0.0.0.0";
+        }
+
+        private void RemoveIpBtn_OnClick(object sender, RoutedEventArgs e)
+        {
+            _model.ExternalIPs.Remove(IpsListBox.SelectedItem.ToString());
         }
     }
 }

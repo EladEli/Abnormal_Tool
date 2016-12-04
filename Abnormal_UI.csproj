@@ -128,6 +128,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Infra\Helper.cs" />
+    <Compile Include="UI\Samr\SamrUserControl.xaml.cs">
+      <DependentUpon>SamrUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Samr\SamrViewModel.cs" />
     <Compile Include="UI\Test\TestUserControl.xaml.cs">
       <DependentUpon>TestUserControl.xaml</DependentUpon>
     </Compile>
@@ -137,6 +141,10 @@
     </Compile>
     <Compile Include="UI\Vpn\VpnViewModel.cs" />
     <Page Include="UI\Abnormal\AbnormalAttackUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Samr\SamrUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
