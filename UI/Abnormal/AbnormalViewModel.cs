@@ -89,13 +89,13 @@ namespace Abnormal_UI.UI.Abnormal
                 LogString = Helper.Log("Done inserting normal activity", LogString);
                 SvcCtrl.StartService("ATACenter");
                 LogString = Helper.Log("Gone to sleep for 3 minutes of user profilling", LogString);
-                Thread.Sleep(180000);
+                Thread.Sleep(270000);
                 LogString = Helper.Log("Woke up!", LogString);
                 _dbClient.ClearTestCollections();
+                SvcCtrl.RestartService("ATACenter");
                 var abnormalDetectorProfile =
                     _dbClient.SystemProfilesCollection.Find(
                         Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
-                SvcCtrl.RestartService("ATACenter");
                 LogString = Helper.Log("Gone to sleep for tree build", LogString);
                 while (!abnormalDetectorProfile["AccountTypeToModelMapping"].AsBsonArray.Any())
                 {
@@ -125,13 +125,13 @@ namespace Abnormal_UI.UI.Abnormal
                 {
                     SelectedUsers = specificUser;
                 }
+                _dbClient.ClearTestCollections();
                 var choosenArray = ChooseActivtyType();
                 SvcCtrl.StopService("ATACenter");
                 var activities = GenerateRandomActivities(choosenArray, true);
                 _dbClient.InsertBatch(activities);
-                LogString = Helper.Log("Done insertings Abnormal activities", LogString);
+                LogString = Helper.Log("Done inserting Abnormal activities", LogString);
                 SvcCtrl.StartService("ATACenter");
-                _dbClient.ClearTestCollections();
                 return true;
             }
             catch (Exception aaException)
@@ -148,7 +148,6 @@ namespace Abnormal_UI.UI.Abnormal
                 SelectedUsers = new ObservableCollection<EntityObject>();
                 SelectedMachines = new ObservableCollection<EntityObject>();
                 SelectedDomainControllers = new ObservableCollection<EntityObject>();
-
                 for (var i = 0; i < 70; i++)
                 {
                     SelectedUsers.Add(Users[i]);
@@ -166,9 +165,7 @@ namespace Abnormal_UI.UI.Abnormal
                 {
                     SelectedMachines.Add(Machines[400 + i]);
                 }
-
                 AbnormalActivity(new ObservableCollection<EntityObject> {SelectedUsers[_random.Next(1, 60)]});
-
                 return SelectedUsers[0].Name;
             }
             catch (Exception autoException)

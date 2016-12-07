@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Microsoft.VisualBasic;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -19,7 +18,7 @@ namespace Abnormal_UI.Infra
         public readonly IMongoDatabase TestDatabase;
         private readonly IMongoCollection<BsonDocument> _uniqueEntitiesCollection;
         public readonly IMongoCollection<BsonDocument> SystemProfilesCollection;
-        readonly List<ObjectId> _gatewayIdsCollection;
+        public readonly List<ObjectId> _gatewayIdsCollection;
         public List<string> KerberosCollections;
         public List<string> NtlmCollections;
         public List<string> NtlmEventsCollections;
@@ -139,6 +138,8 @@ namespace Abnormal_UI.Infra
                     "00:00:30";
                 configurationBson["ActivitySimulatorConfiguration"]["DelayInterval"] = "00:00:05";
                 configurationBson["ActivitySimulatorConfiguration"]["SimulationState"] = "Replay";
+                configurationBson["AbnormalBehaviorDetectorConfiguration"]["UpsertProfileConfiguration"]["Interval"] =
+                    "00:00:05";
                 centerProfile["Configuration"] = configurationBson;
                 SystemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", centerProfile["_id"]),
                     centerProfile);

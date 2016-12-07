@@ -80,6 +80,7 @@ namespace Abnormal_UI.Infra
                 networkActivityDocument.Add("EncryptedTimestamp", BsonValue.Create(null));
                 networkActivityDocument.Add("RequestTicket", BsonValue.Create(null));
                 networkActivityDocument.Add("ResponseTicket", responseTicket);
+                networkActivityDocument.Add("IsSmartcardRequiredRc4", BsonValue.Create(false));
             }
             else
             {
