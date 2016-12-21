@@ -39,7 +39,7 @@ namespace Abnormal_UI.UI
             VpnWindow = new VpnUserControl(vpnModel);
 
             var samrModel = new SamrViewModel();
-            samrModel.PopulateModel(UniqueEntityType.Group);
+            samrModel.PopulateModel();
             SamrWindow = new SamrUserControl(samrModel);
 
             var bruteForceModel = new BruteForceViewModel();
