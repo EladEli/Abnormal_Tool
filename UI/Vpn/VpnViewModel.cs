@@ -16,7 +16,7 @@ namespace Abnormal_UI.UI.Vpn
             set
             {
                 _recordsAmount = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(RecordsAmount));
             }
         }
         public VpnViewModel()
@@ -47,10 +47,10 @@ namespace Abnormal_UI.UI.Vpn
                 machinesIndex++;
                 ipsIndex++;
             }
-            _dbClient.SetCenterProfileForReplay();
-            _dbClient.SetCenterProfileForVpn();
+            DbClient.SetCenterProfileForReplay();
+            DbClient.SetCenterProfileForVpn();
             SvcCtrl.StopService("ATACenter");
-            _dbClient.InsertBatch(vpnActivities);
+            DbClient.InsertBatch(vpnActivities);
             SvcCtrl.StartService("ATACenter");
             Logger.Debug("Done inserting vpn activities");
             return true;

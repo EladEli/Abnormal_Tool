@@ -2,12 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using Abnormal_UI.Infra;
 
 namespace Abnormal_UI.UI.Vpn
 {
-    public partial class VpnUserControl : UserControl
+    public partial class VpnUserControl
     {
         private readonly VpnViewModel _model;
         public VpnUserControl()
@@ -36,7 +35,7 @@ namespace Abnormal_UI.UI.Vpn
             selectedEntityObjects.Clear();
         }
 
-        private async void ExecuteVpnBtn_OnClickAsync(object sender, System.Windows.RoutedEventArgs e)
+        private async void ExecuteVpnBtn_OnClickAsync(object sender, RoutedEventArgs e)
         {
             ExecuteVpnBtn.IsEnabled = false;
             UpdateSelected();
@@ -47,7 +46,7 @@ namespace Abnormal_UI.UI.Vpn
                 : "Please select at least 1 user,machine,ip!");
         }
 
-        private void AddIpBtn_OnClick(object sender, System.Windows.RoutedEventArgs e)
+        private void AddIpBtn_OnClick(object sender, RoutedEventArgs e)
         {
             _model.ExternalIPs.Add(IpBox.Text);
             IpBox.Text = "0.0.0.0";

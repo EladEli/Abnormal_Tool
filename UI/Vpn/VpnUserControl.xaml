@@ -45,7 +45,6 @@
                      ItemsSource="{Binding ExternalIPs}" 
                      SelectionMode="Extended"
                      HorizontalAlignment="Left"/>
-            
             <StackPanel HorizontalAlignment="Center" Width="220">
                 <Button
                     HorizontalAlignment="Right"

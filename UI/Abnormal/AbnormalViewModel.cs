@@ -29,7 +29,7 @@ namespace Abnormal_UI.UI.Abnormal
             set
             {
                 _logString = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(LogString));
             }
         }
         public bool IsResultsShown
@@ -38,7 +38,7 @@ namespace Abnormal_UI.UI.Abnormal
             set
             {
                 _isResultsShown = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsResultsShown));
             }
         }
         public int MinMachines { get; set; }
@@ -85,23 +85,23 @@ namespace Abnormal_UI.UI.Abnormal
                 SvcCtrl.StopService("ATACenter");
                 LogString = Helper.Log("Center profile set for insertion", LogString);
                 var activities = GenerateRandomActivities(choosenTypes);
-                _dbClient.InsertBatch(activities);
+                DbClient.InsertBatch(activities);
                 LogString = Helper.Log("Done inserting normal activity", LogString);
                 SvcCtrl.StartService("ATACenter");
                 LogString = Helper.Log("Gone to sleep for 3 minutes of user profilling", LogString);
                 Thread.Sleep(270000);
                 LogString = Helper.Log("Woke up!", LogString);
-                _dbClient.ClearTestCollections();
+                DbClient.ClearTestCollections();
                 SvcCtrl.RestartService("ATACenter");
                 var abnormalDetectorProfile =
-                    _dbClient.SystemProfilesCollection.Find(
+                    DbClient.SystemProfilesCollection.Find(
                         Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
                 LogString = Helper.Log("Gone to sleep for tree build", LogString);
                 while (!abnormalDetectorProfile["AccountTypeToModelMapping"].AsBsonArray.Any())
                 {
                     Thread.Sleep(5000);
                     abnormalDetectorProfile =
-                    _dbClient.SystemProfilesCollection.Find(
+                    DbClient.SystemProfilesCollection.Find(
                         Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
                 }
                 LogString = Helper.Log("Woke up!", LogString);
@@ -125,11 +125,11 @@ namespace Abnormal_UI.UI.Abnormal
                 {
                     SelectedUsers = specificUser;
                 }
-                _dbClient.ClearTestCollections();
+                DbClient.ClearTestCollections();
                 var choosenArray = ChooseActivtyType();
                 SvcCtrl.StopService("ATACenter");
                 var activities = GenerateRandomActivities(choosenArray, true);
-                _dbClient.InsertBatch(activities);
+                DbClient.InsertBatch(activities);
                 LogString = Helper.Log("Done inserting Abnormal activities", LogString);
                 SvcCtrl.StartService("ATACenter");
                 return true;
@@ -267,18 +267,18 @@ namespace Abnormal_UI.UI.Abnormal
 
         private void PrepareDatabaseForInsertion()
         {
-            _dbClient.RenameKerbCollections();
-            _dbClient.RenameNtlmCollections();
-            _dbClient.RenameNtlmEventsCollections();
-            _dbClient.ClearTestCollections();
-            _dbClient.SetCenterProfileForReplay();
+            DbClient.RenameKerbCollections();
+            DbClient.RenameNtlmCollections();
+            DbClient.RenameNtlmEventsCollections();
+            DbClient.ClearTestCollections();
+            DbClient.SetCenterProfileForReplay();
         }
 
         public void ResetAbnormalProfile()
         {
             SvcCtrl.StopService("ATACenter");
-            _dbClient.ResetUniqueEntityProfile();
-            _dbClient.DisposeAbnormalDetectorProfile();
+            DbClient.ResetUniqueEntityProfile();
+            DbClient.DisposeAbnormalDetectorProfile();
             SvcCtrl.StartService("ATACenter");
         }
 

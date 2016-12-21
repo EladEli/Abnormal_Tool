@@ -1,12 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using Abnormal_UI.Infra;
 
 namespace Abnormal_UI.UI.Samr
 {
-    public partial class SamrUserControl : UserControl
+    public partial class SamrUserControl
     {
         private readonly SamrViewModel _model;
         public SamrUserControl()
@@ -37,17 +36,17 @@ namespace Abnormal_UI.UI.Samr
 
         private void Samr1_OnClickAsync(object sender, RoutedEventArgs e)
         {
-
+            UpdateSelected();
         }
 
         private void Samr2_OnClickAsync(object sender, RoutedEventArgs e)
         {
-
+            UpdateSelected();
         }
 
         private void Samr3_OnClickAsync(object sender, RoutedEventArgs e)
         {
-
+            UpdateSelected();
         }
     }
 }

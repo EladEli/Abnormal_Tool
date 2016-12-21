@@ -16,11 +16,11 @@ namespace Abnormal_UI.UI.Test
             set
             {
                 _saAmount = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(SaAmount));
             }
         }
 
-        public TestViewModel() : base()
+        public TestViewModel()
         {
             _saAmount = 200;
         }
@@ -29,15 +29,15 @@ namespace Abnormal_UI.UI.Test
         {
             try
             {
-                var userEntity = _dbClient.GetUniqueEntity(UniqueEntityType.User);
-                var computerEntity = _dbClient.GetUniqueEntity(UniqueEntityType.Computer);
+                var userEntity = DbClient.GetUniqueEntity(UniqueEntityType.User);
+                var computerEntity = DbClient.GetUniqueEntity(UniqueEntityType.Computer);
                 var suspicousActivitities = new List<BsonDocument>();
                 var rnd = new Random();
                 for (var i = 0; i < _saAmount; i++)
                 {
                     suspicousActivitities.Add(DocumentCreator.SaFillerSeac(userEntity, computerEntity, rnd));
                 }
-                _dbClient.InsertSaBatch(suspicousActivitities);
+                DbClient.InsertSaBatch(suspicousActivitities);
                 return true;
             }
             catch (Exception seacException)
@@ -51,14 +51,14 @@ namespace Abnormal_UI.UI.Test
         {
             try
             {
-                var userEntity = _dbClient.GetUniqueEntity(UniqueEntityType.User);
-                var computerEntity = _dbClient.GetUniqueEntity(UniqueEntityType.Computer);
+                var userEntity = DbClient.GetUniqueEntity(UniqueEntityType.User);
+                var computerEntity = DbClient.GetUniqueEntity(UniqueEntityType.Computer);
                 var suspicousActivitities = new List<BsonDocument>();
                 for (var i = 0; i < _saAmount; i++)
                 {
                     suspicousActivitities.Add(DocumentCreator.SaFillerAe(userEntity, computerEntity, SelectedDomainControllers.FirstOrDefault(), DomainName));
                 }
-                _dbClient.InsertSaBatch(suspicousActivitities);
+                DbClient.InsertSaBatch(suspicousActivitities);
                 return true;
             }
             catch (Exception aeException)
@@ -70,7 +70,7 @@ namespace Abnormal_UI.UI.Test
 
         public void AddGateway()
         {
-            _dbClient.SetNewGateway(_saAmount);
+            DbClient.SetNewGateway(_saAmount);
         }
 
         public bool GoldenTicketActivity()

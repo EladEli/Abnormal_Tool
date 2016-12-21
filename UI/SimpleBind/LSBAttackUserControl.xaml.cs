@@ -39,7 +39,7 @@ namespace Abnormal_UI.UI.SimpleBind
         {
             UpdateSelected();
             BtnLSBDistinct.IsEnabled = false;
-            var result = await Task.Run(() => _model.LSBDistinct());
+            var result = await Task.Run(() => _model.LsbDistinct());
             BtnLSBDistinct.IsEnabled = true;
             MessageBox.Show(result
                 ? "User activity insertion ended."
@@ -49,7 +49,7 @@ namespace Abnormal_UI.UI.SimpleBind
         {
             UpdateSelected();
             BtnLSBIntense.IsEnabled = false;
-            var result = await Task.Run(() => _model.LSBIntense());
+            var result = await Task.Run(() => _model.LsbIntense());
             BtnLSBIntense.IsEnabled = true;
             MessageBox.Show(result
                 ? "User activity insertion ended." 
@@ -59,7 +59,7 @@ namespace Abnormal_UI.UI.SimpleBind
         {
             UpdateSelected();
             BtnLSBSpecific.IsEnabled = false;
-            var result = await Task.Run(() => _model.LSBSingle());
+            var result = await Task.Run(() => _model.LsbSingle());
             BtnLSBSpecific.IsEnabled = true;
             MessageBox.Show(result ? "User activity insertion ended." : "Please select at least 1 user and 1 machine!");
         }

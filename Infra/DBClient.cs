@@ -18,7 +18,7 @@ namespace Abnormal_UI.Infra
         public readonly IMongoDatabase TestDatabase;
         private readonly IMongoCollection<BsonDocument> _uniqueEntitiesCollection;
         public readonly IMongoCollection<BsonDocument> SystemProfilesCollection;
-        public readonly List<ObjectId> _gatewayIdsCollection;
+        public readonly List<ObjectId> GatewayIdsCollection;
         public List<string> KerberosCollections;
         public List<string> NtlmCollections;
         public List<string> NtlmEventsCollections;
@@ -38,8 +38,8 @@ namespace Abnormal_UI.Infra
                 TestDatabase = client.GetDatabase("ATAActivitySimulator");
                 _uniqueEntitiesCollection = Database.GetCollection<BsonDocument>("UniqueEntity");
                 SystemProfilesCollection = Database.GetCollection<BsonDocument>("SystemProfile");
-                _gatewayIdsCollection = new List<ObjectId>(0);
-                _gatewayIdsCollection = FilterGwIds();
+                GatewayIdsCollection = new List<ObjectId>(0);
+                GatewayIdsCollection = FilterGwIds();
                 CreateActivityCollectionsOnTestDb();
             }
             catch (Exception dbException)
@@ -62,11 +62,11 @@ namespace Abnormal_UI.Infra
                 ? _uniqueEntitiesCollection.Find(Query.EQ("_t", entityType.ToString()).ToBsonDocument()).
                     ToList().
                     Where(_ => _["IsDomainController"].AsBoolean).
-                    Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString, entityType)).
+                    Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString,null, entityType)).
                     ToList()
                 : _uniqueEntitiesCollection.Find(Query.EQ("_t", entityType.ToString()).ToBsonDocument())
                     .ToList().Where(_ => _["Name"] != BsonNull.Value)
-                    .Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString, entityType))
+                    .Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString, _.Contains("SamName") ? _["SamName"].AsString:"", entityType))
                     .ToList();
         }
 
@@ -81,7 +81,7 @@ namespace Abnormal_UI.Infra
 
         public List<ObjectId> GetGwOids()
         {
-            return _gatewayIdsCollection;
+            return GatewayIdsCollection;
         }
 
         public void DisposeAbnormalDetectorProfile()
@@ -178,21 +178,30 @@ namespace Abnormal_UI.Infra
                     ;
             try
             {
-                foreach (var collection in KerberosCollections)
+                if (KerberosCollections.Any())
                 {
-                    if (collection.Contains("KerberosAs"))
+                    foreach (var collection in KerberosCollections)
                     {
-                        Database.RenameCollection(collection,
-                       "KerberosAs_" + monthAgo);
-                    }
+                        if (collection.Contains("KerberosAs"))
+                        {
+                            Database.RenameCollection(collection,
+                                "KerberosAs_" + monthAgo);
+                        }
 
-                    else if (collection.Contains("KerberosTgs"))
-                    {
-                        Database.RenameCollection(collection,
-                        "KerberosTgs_" + monthAgo);
+                        else if (collection.Contains("KerberosTgs"))
+                        {
+                            Database.RenameCollection(collection,
+                                "KerberosTgs_" + monthAgo);
+                        }
                     }
+                    _logger.Debug("Renamed Kerberos Collection");
                 }
-                _logger.Debug("Renamed Kerberos Collection");
+                else
+                {
+                    Database.CreateCollection("KerberosAs_" + monthAgo);
+                    Database.CreateCollection("KerberosTgs_" + monthAgo);
+                    _logger.Debug("Created Kerberos Collection");
+                }
             }
             catch (Exception)
             {
@@ -200,7 +209,6 @@ namespace Abnormal_UI.Infra
             }
             
         }
-
         public void RenameNtlmEventsCollections()
         {
             var monthAgo = DateTime.UtcNow.Subtract(new TimeSpan(27, 0, 0, 0))
@@ -212,10 +220,18 @@ namespace Abnormal_UI.Infra
                     ;
             try
             {
-                foreach (var collection in NtlmEventsCollections)
+                if (NtlmEventsCollections.Any())
                 {
-                    Database.RenameCollection(collection, "NtlmEvent_" + monthAgo);
+                    foreach (var collection in NtlmEventsCollections)
+                    {
+                        Database.RenameCollection(collection, "NtlmEvent_" + monthAgo);
+                    }
                     _logger.Debug("Renamed NTLM event collection");
+                }
+                else
+                {
+                    Database.CreateCollection("NtlmEvent_" + monthAgo);
+                    _logger.Debug("Created NTLM event collection");
                 }
             }
             catch (Exception)
@@ -236,10 +252,18 @@ namespace Abnormal_UI.Infra
                     ;
             try
             {
-                foreach (var collection in NtlmCollections)
+                if (NtlmCollections.Any())
                 {
-                    Database.RenameCollection(collection, "Ntlm_" + monthAgo);
+                    foreach (var collection in NtlmCollections)
+                    {
+                        Database.RenameCollection(collection, "Ntlm_" + monthAgo);
+                    }
                     _logger.Debug("Renamed NTLM collection");
+                }
+                else
+                {
+                    Database.CreateCollection("Ntlm_" + monthAgo);
+                    _logger.Debug("Created NTLM collection");
                 }
             }
             catch (Exception)

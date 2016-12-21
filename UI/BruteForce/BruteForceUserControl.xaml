@@ -1,0 +1,78 @@
+﻿<UserControl x:Class="Abnormal_UI.UI.BruteForce.BruteForceUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+            >
+    <DockPanel>
+        <StackPanel Orientation="Horizontal">
+            <ListBox Width="250" 
+                     Height="Auto" 
+                     Margin="20"
+                     x:Name="BoxUsers" 
+                     ItemsSource="{Binding UsersList}"
+                     DisplayMemberPath="Name"
+                     SelectionMode="Extended"
+                     SelectedIndex="0" >
+            </ListBox>
+            <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxUsers}" 
+                       Name="SelUsersCount"
+                       Width="20" 
+                       Height="20"
+                       VerticalAlignment="Bottom"
+                       Margin="-10 0 0 20"/>
+            <ListBox Width="250" 
+                     Height="Auto" 
+                     Margin="20"
+                     x:Name="BoxPasswords" 
+                     ItemsSource="{Binding PasswordList}"
+                     SelectionMode="Extended">
+            </ListBox>
+            <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxPasswords}" 
+                       Name="SelMachinesCount"
+                       Width="35" 
+                       Height="20"
+                       VerticalAlignment="Bottom"
+                       Margin="-10 0 0 20" RenderTransformOrigin="0.319,0.474"/>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Right" >
+            <ListBox Width="200" 
+                     Height="100" 
+                     Margin="20"
+                     x:Name="BoxDCs" 
+                     ItemsSource="{Binding DomainControllers}"
+                     DisplayMemberPath="Name"
+                     SelectionMode="Extended"
+                     SelectedIndex="0"
+                     HorizontalAlignment="Left">
+            </ListBox>
+            <StackPanel HorizontalAlignment="Center" Margin="20" Height="160">
+                <Button Width="200" 
+            		Height="30" 
+            		Margin="5"
+            		Content="Kerberos"
+            		x:Name="KerberosBtn" 
+            		Click="KerberonBtn_OnClickAsync"/>
+                <Button Width="200" 
+            		Height="30" 
+            		Margin="5"
+            		Content="Ntlm"
+            		x:Name="NtlmBtn" 
+            		Click="NtlmBtn_OnClickAsync"/>
+                <Button Width="200" 
+            		Height="30" 
+            		Margin="5"
+            		Content="Ldap"
+            		x:Name="LdapBtn" 
+            		Click="LdapBtn_OnClickAsync"/>
+                <Button Width="200" 
+            		Height="30" 
+            		Margin="5"
+            		Content="Load Password Dictionary"
+            		x:Name="LoadBtn"
+                    Click="LoadBtn_OnClickAsync"/>
+            </StackPanel>
+        </StackPanel>
+    </DockPanel>
+</UserControl>
