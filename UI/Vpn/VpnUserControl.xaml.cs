@@ -47,6 +47,17 @@ namespace Abnormal_UI.UI.Vpn
                 : "Please select at least 1 user,machine,ip!");
         }
 
+        private async void ExecuteAutoVpnBtn_OnClickAsync(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ExecuteAutoVpnBtn.IsEnabled = false;
+            UpdateSelected();
+            var result = await Task.Run(() => _model.ExecuteAutoVpnActivity());
+            ExecuteAutoVpnBtn.IsEnabled = true;
+            MessageBox.Show(result
+                ? "Auto Vpn activity insertion ended."
+                : "Please select at least 1 user,machine!");
+        }
+
         private void AddIpBtn_OnClick(object sender, System.Windows.RoutedEventArgs e)
         {
             _model.ExternalIPs.Add(IpBox.Text);

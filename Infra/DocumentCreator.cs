@@ -410,6 +410,7 @@ namespace Abnormal_UI.Infra
                 {"Time", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
                 {"IsTimeMillisecondsAccurate", BsonValue.Create(false)},
                 {"EventType","Connect" },
+                {"SessionId", "1" },
                 {"SourceAccountName", sourceAccount},
                 {"SourceAccountId", userEntity.Id},
                 {"SourceComputerName", sourceComputer},

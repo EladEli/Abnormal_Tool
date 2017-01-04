@@ -157,7 +157,7 @@ namespace Abnormal_UI.Infra
                 var radiusSharedSecret = new BsonDocument
                 {
                     {"CertificateThumbprint", commonConfigurationBson["HashKeyEncrypted"]["CertificateThumbprint"]},
-                    {"EncryptedBytes", new byte[16]}
+                    {"EncryptedBytes", CreateSpecialByteArray(256)}
                 };
                 
                 commonConfigurationBson["IsRadiusEventListenerEnabled"] = BsonValue.Create(true);
@@ -292,6 +292,16 @@ namespace Abnormal_UI.Infra
         {
             TestDatabase.Client.DropDatabase("ATAActivitySimulator");
 
+        }
+
+        public static byte[] CreateSpecialByteArray(int length)
+        {
+            var arr = new byte[length];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                arr[i] = 0x20;
+            }
+            return arr;
         }
 
         #endregion
