@@ -1,5 +1,6 @@
 ﻿using Abnormal_UI.Infra;
 using Abnormal_UI.UI.Abnormal;
+using Abnormal_UI.UI.BruteForce;
 using Abnormal_UI.UI.Samr;
 using Abnormal_UI.UI.SimpleBind;
 using Abnormal_UI.UI.Test;
@@ -15,7 +16,7 @@ namespace Abnormal_UI.UI
         public TestUserControl TestWindow { get; set; }
         public VpnUserControl VpnWindow { get; set; }
         public SamrUserControl SamrWindow { get; set; }
-
+        public BruteForceUserControl BruteForceWindow { get; set; }
 
         public MainWindow()
         {
@@ -38,15 +39,19 @@ namespace Abnormal_UI.UI
             VpnWindow = new VpnUserControl(vpnModel);
 
             var samrModel = new SamrViewModel();
-            samrModel.PopulateModel(UniqueEntityType.Group);
+            samrModel.PopulateModel();
             SamrWindow = new SamrUserControl(samrModel);
+
+            var bruteForceModel = new BruteForceViewModel();
+            bruteForceModel.PopulateModel();
+            BruteForceWindow = new BruteForceUserControl(bruteForceModel);
 
             DataContext = this;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            abnormalModel._dbClient.DisposeDatabae();
+            abnormalModel.DbClient.DisposeDatabae();
         }
     }
 }

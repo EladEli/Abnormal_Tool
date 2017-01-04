@@ -6,7 +6,7 @@ namespace Abnormal_UI.Infra
 {
     internal class SvcCtrl
     {
-        private static readonly Logger _logger = LogManager.GetLogger("TestToolboxLog");
+        private static readonly Logger Logger = LogManager.GetLogger("TestToolboxLog");
 
         public static bool StartService(string serviceName, int timeoutSeconds = 50)
         {
@@ -17,15 +17,16 @@ namespace Abnormal_UI.Infra
                 {
                     return true;
                 }
+                Logger.Debug($"Starting service {serviceName}");
                 var timeout = TimeSpan.FromSeconds(timeoutSeconds);
                 service.Start();
                 service.WaitForStatus(ServiceControllerStatus.Running, timeout);
-                _logger.Debug($"Started service {serviceName}");
+                Logger.Debug($"Started service {serviceName}");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.ToString(), "Got exception!");
+                Logger.Error(ex.ToString(), "Got exception!");
                 return false;
             }
         }
@@ -39,16 +40,16 @@ namespace Abnormal_UI.Infra
             }
             try
             {
+                Logger.Debug($"Stopping service {serviceName}");
                 var timeout = TimeSpan.FromSeconds(timeoutSeconds);
                 service.Stop();
                 service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
-                _logger.Debug($"Stopped service {serviceName}");
-
+                Logger.Debug($"Stopped service {serviceName}");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.ToString(), "Got exception!");
+                Logger.Error(ex.ToString(), "Got exception!");
                 return false;
             }
         }
@@ -63,13 +64,13 @@ namespace Abnormal_UI.Infra
                 service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
                 service.Start();
                 service.WaitForStatus(ServiceControllerStatus.Running, timeout);
-                _logger.Debug($"Restarted service {serviceName}");
+                Logger.Debug($"Restarted service {serviceName}");
 
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.ToString(), "Got exception!");
+                Logger.Error(ex.ToString(), "Got exception!");
                 return false;
             }
         }

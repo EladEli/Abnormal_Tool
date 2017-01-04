@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 using NLog;
@@ -12,7 +11,7 @@ namespace Abnormal_UI.UI
     public class AttackViewModel : INotifyPropertyChanged
     {
         #region Data Members
-        public DBClient _dbClient;
+        public DBClient DbClient;
         
         public ObjectId SourceGateway;
 
@@ -37,7 +36,7 @@ namespace Abnormal_UI.UI
 
         public AttackViewModel()
         {
-            _dbClient = DBClient.GetDbClient();
+            DbClient = DBClient.GetDbClient();
             Users = new ObservableCollection<EntityObject>();
             SelectedUsers = new ObservableCollection<EntityObject>();
             Machines = new ObservableCollection<EntityObject>();
@@ -45,7 +44,7 @@ namespace Abnormal_UI.UI
             DomainControllers = new ObservableCollection<EntityObject>();
             SelectedDomainControllers = new ObservableCollection<EntityObject>();
             DomainName = string.Empty;
-            SourceGateway = _dbClient.GetGwOids().FirstOrDefault();
+            SourceGateway = DbClient.GetGwOids().FirstOrDefault();
             Logger = LogManager.GetLogger("TestToolboxLog");
         }
 
@@ -57,17 +56,17 @@ namespace Abnormal_UI.UI
         {
             try
             {
-                var allUsers = _dbClient.GetUniqueEntity(UniqueEntityType.User);
+                var allUsers = DbClient.GetUniqueEntity(UniqueEntityType.User);
                 Users = new ObservableCollection<EntityObject>(allUsers.OrderBy(entityObject => entityObject.Name).AsEnumerable());
 
-                var domainControllers = _dbClient.GetUniqueEntity(UniqueEntityType.Computer,true);
+                var domainControllers = DbClient.GetUniqueEntity(UniqueEntityType.Computer,true);
                 DomainControllers = new ObservableCollection<EntityObject>(domainControllers.OrderBy(entityObject => entityObject.Name).AsEnumerable());
 
-                var allComputers = _dbClient.GetUniqueEntity(uniqueType);
+                var allComputers = DbClient.GetUniqueEntity(uniqueType);
                 Machines = new ObservableCollection<EntityObject>(allComputers.OrderBy(entityObject => entityObject.Name).AsEnumerable());
 
-                var domain = _dbClient.GetUniqueEntity(UniqueEntityType.Domain);
-                DomainName = domain.FirstOrDefault().Name;
+                var domain = DbClient.GetUniqueEntity(UniqueEntityType.Domain);
+                DomainName = domain.FirstOrDefault()?.Name;
             }
             catch (Exception pmException)
             {
@@ -80,10 +79,9 @@ namespace Abnormal_UI.UI
         #region INotifyPropertyChange
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnPropertyChanged(
-            [CallerMemberName] string caller = "")
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke( this, new PropertyChangedEventArgs(caller));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion

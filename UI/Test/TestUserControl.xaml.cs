@@ -2,12 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using Abnormal_UI.Infra;
 
 namespace Abnormal_UI.UI.Test
 {
-    public partial class TestUserControl : UserControl
+    public partial class TestUserControl
     {
         private readonly TestViewModel _model;
         public TestUserControl()

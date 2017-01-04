@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using Abnormal_UI.Infra;
 
 namespace Abnormal_UI.UI.Samr
 {
-    public partial class SamrUserControl : UserControl
+    public partial class SamrUserControl
     {
         private readonly SamrViewModel _model;
         public SamrUserControl()
@@ -35,19 +35,17 @@ namespace Abnormal_UI.UI.Samr
             selectedEntityObjects.Clear();
         }
 
-        private void Samr1_OnClickAsync(object sender, RoutedEventArgs e)
+        private async void LearningButton_OnClickAsync(object sender, RoutedEventArgs e)
         {
-
+            LearningButton.IsEnabled = false;
+            UpdateSelected();
+            var result = await Task.Run(() => _model.GenerateLearningTime());
+            MessageBox.Show(result ? "Learning time inserted succesfully" : "Learning time failed");
+            LearningButton.IsEnabled = true;
         }
 
-        private void Samr2_OnClickAsync(object sender, RoutedEventArgs e)
+        private void SaButton_OnClickAsync(object sender, RoutedEventArgs e)
         {
-
-        }
-
-        private void Samr3_OnClickAsync(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

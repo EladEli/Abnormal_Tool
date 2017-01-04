@@ -51,21 +51,15 @@
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
-                    Content="Samr1_OnClickAsync"
-                    x:Name="Samr1" 
-                    Click="Samr1_OnClickAsync"/>
+                    Content="Generate Learning Time"
+                    x:Name="LearningButton" 
+                    Click="LearningButton_OnClickAsync"/>
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
-                    Content="Samr2_OnClickAsync"
-                    x:Name="Samr2" 
-                    Click="Samr2_OnClickAsync"/>
-                <Button Width="200" 
-                    Height="30" 
-                    Margin="5"
-                    Content="Samr3_OnClickAsync"
-                    x:Name="Samr3" 
-                    Click="Samr3_OnClickAsync"/>
+                    Content="Generate Samr SA"
+                    x:Name="SaButton" 
+                    Click="SaButton_OnClickAsync"/>
             </StackPanel>
         </StackPanel>
     </DockPanel>

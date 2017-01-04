@@ -24,6 +24,9 @@
             <TabItem Header="Samr">
                 <ContentControl Content="{Binding SamrWindow, Mode=OneWay}"/>
             </TabItem>
+            <TabItem Header="BruteForce">
+                <ContentControl Content="{Binding BruteForceWindow, Mode=OneWay}"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

@@ -1,26 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using Abnormal_UI.UI.Samr;
 using MongoDB.Bson;
-
 
 namespace Abnormal_UI.Infra
 {
     public static class DocumentCreator
     {
-        public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSpn = null, EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0, ObjectId parentId = new ObjectId())
+        public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity,
+            EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSpn = null,
+            EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0,
+            ObjectId parentId = new ObjectId())
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
-            var sourceComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", computerEntity.Name } };
+            var sourceComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", computerEntity.Name}};
             var resourceIdentifier = new BsonDocument();
             var targetAccount = targetMachine ?? domainController;
             var targetSpnName = $"krbtgt/{domainName}";
-
-            if (targetSpn != null) { targetSpnName = targetSpn; }
+            if (targetSpn != null)
+            {
+                targetSpnName = targetSpn;
+            }
             resourceIdentifier.Add("AccountId", targetAccount.Id);
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
-            var destinationComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", targetAccount.Name } };
+            var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", targetAccount.Name}};
             var responseTicket = new BsonDocument
             {
                 {"EncryptionType", "Aes256CtsHmacSha196"},
@@ -35,7 +40,7 @@ namespace Abnormal_UI.Infra
                 {"_id", new ObjectId()},
                 {
                     "_t",
-                    new BsonArray(new string[5]
+                    new BsonArray(new[]
                     {"Entity", "NetworkActivity", "Kerberos", "KerberosKdc", "Kerberos" + actionType})
                 },
                 {"HorizontalParentId", new ObjectId()},
@@ -46,31 +51,31 @@ namespace Abnormal_UI.Infra
                 {"SourceComputerId", computerEntity.Id},
                 {"SourceComputerSiteId", BsonValue.Create(null)},
                 {"SourceComputerCertainty", "High"},
-                {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"SourceComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"DestinationIpAddress", "[daf::daf]"},
                 {"DestinationPort", 88},
                 {"DestinationComputerId", domainController.Id},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
-                {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
-                {"DestinationComputerName",destinationComputerName},
+                {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
+                {"DestinationComputerName", destinationComputerName},
                 {"TransportProtocol", "Tcp"},
                 {"SourceAccountName", sourceAccount},
                 {"SourceAccountId", userEntity.Id},
-                {"SourceComputerSupportedEncryptionTypes", new BsonArray(new string[1] {"Rc4Hmac"})},
+                {"SourceComputerSupportedEncryptionTypes", new BsonArray(new[] {"Rc4Hmac"})},
                 {"ResourceIdentifier", resourceIdentifier},
-                {"SourceComputerName",sourceComputerName},
+                {"SourceComputerName", sourceComputerName},
                 {"Error", "Success"},
                 {"NtStatus", BsonValue.Create(null)},
                 {"IsSuccess", BsonValue.Create(false)},
-                {"Options", new BsonArray(new string[4] {"RenewableOk", "Canonicalize", "Renewable", "Forwardable"})},
+                {"Options", new BsonArray(new[] {"RenewableOk", "Canonicalize", "Renewable", "Forwardable"})},
                 {"RequestedTicketExpiration", DateTime.UtcNow},
                 {"SourceGatewaySystemProfileId", sourceGateway},
                 {"RequestTicketKerberosId", parentId},
-                {"ArmoringEncryptionType",BsonValue.Create(null)},
+                {"ArmoringEncryptionType", BsonValue.Create(null)},
                 {"SourceAccountBadPasswordTime", BsonValue.Create(null)},
                 {"IsOldPassword", BsonValue.Create(null)}
-        };
+            };
             if (actionType == "As")
             {
                 networkActivityDocument.Add("SourceComputerNetbiosName", computerEntity.Name);
@@ -94,38 +99,43 @@ namespace Abnormal_UI.Infra
             }
             return networkActivityDocument;
         }
-        public static BsonDocument SimpleBindCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainControllerName, string domainName, ObjectId sourceGateway, int daysToSubtruct = 0)
+
+        public static BsonDocument SimpleBindCreator(EntityObject userEntity, EntityObject computerEntity,
+            EntityObject domainControllerName, string domainName, ObjectId sourceGateway, int daysToSubtruct = 0)
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, 0, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
-            var sourceComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", computerEntity.Name } };
+            var sourceComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", computerEntity.Name}};
             var resourceIdentifier = new BsonDocument {{"AccountId", domainControllerName.Id}};
             var targetSpnName = $"krbtgt/{domainName}";
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
-            var destinationComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", domainControllerName.Name } };
-
+            var destinationComputerName = new BsonDocument
+            {
+                {"DomainName", domainName},
+                {"Name", domainControllerName.Name}
+            };
             var networkActivityDocument = new BsonDocument
             {
                 {"_id", new ObjectId()},
-                {"_t", new BsonArray(new string[5] {"Entity", "Activity", "NetworkActivity", "Ldap", "LdapBind"})},
+                {"_t", new BsonArray(new[] {"Entity", "Activity", "NetworkActivity", "Ldap", "LdapBind"})},
                 {"StartTime", oldTime},
                 {"EndTime", oldTime},
                 {"HorizontalParentId", new ObjectId()},
                 {"SourceIpAddress", "[daf::daf]"},
                 {"SourcePort", 6666},
                 {"SourceComputerId", computerEntity.Id},
-                {"SourceComputerName",sourceComputerName},
+                {"SourceComputerName", sourceComputerName},
                 {"SourceComputerSiteId", BsonValue.Create(null)},
                 {"SourceComputerCertainty", "High"},
-                {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"SourceComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"DestinationIpAddress", "[daf::daf]"},
                 {"DestinationPort", 389},
                 {"DestinationComputerId", domainControllerName.Id},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
-                {"DestinationComputerName",destinationComputerName},
-                {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"DestinationComputerName", destinationComputerName},
+                {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"TransportProtocol", "Tcp"},
                 {"AuthenticationType", "Simple"},
                 {"SourceAccountName", sourceAccount},
@@ -141,12 +151,11 @@ namespace Abnormal_UI.Infra
                 {"IsOldPassword", BsonValue.Create(null)},
                 {"ResourceIdentifier", resourceIdentifier}
             };
-
-
-
             return networkActivityDocument;
         }
-        public static BsonDocument SaFillerSeac(List<EntityObject> userEntity, List<EntityObject> computerEntity, Random rnd)
+
+        public static BsonDocument SaFillerSeac(List<EntityObject> userEntity, List<EntityObject> computerEntity,
+            Random rnd)
         {
             var detailRecord = new BsonDocument
             {
@@ -154,7 +163,7 @@ namespace Abnormal_UI.Infra
                 {"EndTime", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
                 {"SourceComputerId", computerEntity[rnd.Next(0, computerEntity.Count)].Id},
                 {
-                    "SourceAccountIds", new BsonArray(new string[20]
+                    "SourceAccountIds", new BsonArray(new[]
                     {
                         userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
                         userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
@@ -169,20 +178,17 @@ namespace Abnormal_UI.Infra
                     })
                 },
                 {
-                    "DestinationComputerIds", new BsonArray(new string[1]
+                    "DestinationComputerIds", new BsonArray(new[]
                     {
                         computerEntity[rnd.Next(0, computerEntity.Count)].Id
                     })
                 }
             };
-            var a = userEntity[rnd.Next(0, userEntity.Count)].Id;
-            var b = userEntity[rnd.Next(0, userEntity.Count)].Id;
-
             var suspicousActivityDocument = new BsonDocument
             {
                 {"_id", new ObjectId()},
                 {
-                    "_t", new BsonArray(new string[5]
+                    "_t", new BsonArray(new[]
                     {
                         "Entity", "Alert", "SuspiciousActivity", "SuspiciousActivity`1",
                         "LdapSimpleBindCleartextPasswordSuspiciousActivity"
@@ -194,12 +200,12 @@ namespace Abnormal_UI.Infra
                 {"Severity", "Low"},
                 {"Status", "Open"},
                 {"TitleKey", "LdapSimpleBindCleartextPasswordSuspiciousActivityTitleService"},
-                {"TitleDetailKeys", new BsonArray(new string[0] {})},
+                {"TitleDetailKeys", new BsonArray(new string[] {})},
                 {
                     "DescriptionFormatKey",
                     "LdapSimpleBindCleartextPasswordSuspiciousActivityDescriptionServiceSourceAccounts"
                 },
-                {"DescriptionDetailFormatKeys", new BsonArray(new string[0] {})},
+                {"DescriptionDetailFormatKeys", new BsonArray(new string[] {})},
                 {"SystemUpdateTime", DateTime.UtcNow},
                 {"HasDetails", BsonValue.Create(true)},
                 {"HasInput", BsonValue.Create(false)},
@@ -208,7 +214,7 @@ namespace Abnormal_UI.Infra
                 {"Note", BsonValue.Create(null)},
                 {"RelatedActivityCount", 127},
                 {
-                    "RelatedUniqueEntityIds", new BsonArray(new string[20]
+                    "RelatedUniqueEntityIds", new BsonArray(new[]
                     {
                         userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
                         userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id,
@@ -222,17 +228,18 @@ namespace Abnormal_UI.Infra
                         userEntity[rnd.Next(0, userEntity.Count)].Id, userEntity[rnd.Next(0, userEntity.Count)].Id
                     })
                 },
-                {"DetailsRecords", new BsonArray(new BsonDocument[1] {detailRecord})},
+                {"DetailsRecords", new BsonArray(new[] {detailRecord})},
                 {"Scope", "Service"}
             };
             return suspicousActivityDocument;
         }
-        public static BsonDocument SaFillerAe(List<EntityObject> userEntity, List<EntityObject> computerEntity,EntityObject domainController, string domainName)
+
+        public static BsonDocument SaFillerAe(List<EntityObject> userEntity, List<EntityObject> computerEntity,
+            EntityObject domainController, string domainName)
         {
             var records = new List<BsonDocument>();
             var detailRecord = new BsonDocument();
-            
-            for (var i =0; i < 100000; i++)
+            for (var i = 0; i < 100000; i++)
             {
                 detailRecord.Add("DomainName", domainName);
                 detailRecord.Add("Name", "ABCDEFGHIJKLMNOP" + i);
@@ -244,7 +251,7 @@ namespace Abnormal_UI.Infra
             {
                 {"_id", new ObjectId()},
                 {
-                    "_t", new BsonArray(new string[4]
+                    "_t", new BsonArray(new[]
                     {
                         "Entity", "Alert", "SuspiciousActivity", "AccountEnumerationSuspiciousActivity"
                     })
@@ -255,9 +262,9 @@ namespace Abnormal_UI.Infra
                 {"Severity", "Medium"},
                 {"Status", "Open"},
                 {"TitleKey", "AccountEnumerationSuspiciousActivityTitle"},
-                {"TitleDetailKeys", new BsonArray(new string[0] {})},
+                {"TitleDetailKeys", new BsonArray(new string[] {})},
                 {"DescriptionFormatKey", "AccountEnumerationSuspiciousActivityDescription"},
-                {"DescriptionDetailFormatKeys", new BsonArray(new string[0] {})},
+                {"DescriptionDetailFormatKeys", new BsonArray(new string[] {})},
                 {"SystemUpdateTime", DateTime.UtcNow},
                 {"HasDetails", BsonValue.Create(false)},
                 {"HasInput", BsonValue.Create(false)},
@@ -266,7 +273,7 @@ namespace Abnormal_UI.Infra
                 {"Note", BsonValue.Create(null)},
                 {"RelatedActivityCount", 127},
                 {
-                    "RelatedUniqueEntityIds", new BsonArray(new string[9]
+                    "RelatedUniqueEntityIds", new BsonArray(new[]
                     {
                         computerEntity[2].Id, domainController.Id, userEntity[0].Id, userEntity[1].Id, userEntity[2].Id,
                         userEntity[3].Id, userEntity[4].Id,
@@ -274,10 +281,10 @@ namespace Abnormal_UI.Infra
                     })
                 },
                 {"SourceComputerId", computerEntity[2].Id},
-                {"DestinationComputerIds", new BsonArray(new string[1] {domainController.Id})},
+                {"DestinationComputerIds", new BsonArray(new[] {domainController.Id})},
                 {"FailedSourceAccountNames", failedSourceAccountNames},
                 {
-                    "SuccessSourceAccountIds", new BsonArray(new string[7]
+                    "SuccessSourceAccountIds", new BsonArray(new[]
                     {
                         userEntity[0].Id, userEntity[1].Id, userEntity[2].Id, userEntity[3].Id, userEntity[4].Id,
                         userEntity[5].Id, userEntity[6].Id
@@ -286,15 +293,16 @@ namespace Abnormal_UI.Infra
             };
             return suspicousActivityDocument;
         }
-        public static BsonDocument EventCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainControllerName, string domainName,ObjectId sourceGateway, int daysToSubtruct = 0)
-        {
 
+        public static BsonDocument EventCreator(EntityObject userEntity, EntityObject computerEntity,
+            EntityObject domainControllerName, string domainName, ObjectId sourceGateway, int daysToSubtruct = 0)
+        {
             var sourceComputer = new BsonDocument
             {
                 {"DomainName", BsonValue.Create(null)},
                 {"Name", computerEntity.Name}
             };
-            var sourceAccount = new BsonDocument { { "DomainName", domainName }, { "Name", userEntity.Name } };
+            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
             var destinationComputer = new BsonDocument
             {
                 {"DomainName", BsonValue.Create(null)},
@@ -303,15 +311,14 @@ namespace Abnormal_UI.Infra
             var resourceIdentifier = new BsonDocument();
             var targetSpnName = $"krbtgt/{domainName}";
             resourceIdentifier.Add("AccountId", domainControllerName.Id);
-            var resourceName = new BsonDocument { { "DomainName", domainName }, { "Name", targetSpnName } };
+            var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
-
             var eventActivityDocument = new BsonDocument
             {
                 {"_id", new ObjectId()},
                 {
                     "_t",
-                    new BsonArray(new string[5] {"Entity", "Activity", "EventActivity", "WindowsEvent", "NtlmEvent"})
+                    new BsonArray(new[] {"Entity", "Activity", "EventActivity", "WindowsEvent", "NtlmEvent"})
                 },
                 {"SourceGatewaySystemProfileId", sourceGateway},
                 {"SourceComputerId", computerEntity.Id},
@@ -330,26 +337,27 @@ namespace Abnormal_UI.Infra
                 {"IsSuccess", BsonValue.Create(true)},
                 {"ResourceIdentifier", resourceIdentifier}
             };
-
-
             return eventActivityDocument;
         }
-        public static BsonDocument NtlmCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway, EntityObject targetMachine = null, int daysToSubtruct = 0, int hoursToSubtract = 0)
+
+        public static BsonDocument NtlmCreator(EntityObject userEntity, EntityObject computerEntity,
+            EntityObject domainController, string domainName, ObjectId sourceGateway, EntityObject targetMachine = null,
+            int daysToSubtruct = 0, int hoursToSubtract = 0)
         {
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
-            var sourceComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", computerEntity.Name } };
+            var sourceComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", computerEntity.Name}};
             var resourceIdentifier = new BsonDocument();
             var targetAccount = targetMachine ?? domainController;
             var targetSpnName = $"krbtgt/{domainName}";
             resourceIdentifier.Add("AccountId", targetAccount.Id);
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
-            var destinationComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", targetAccount.Name } };
+            var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", targetAccount.Name}};
             var networkActivityDocument = new BsonDocument
             {
                 {"_id", new ObjectId()},
-                {"_t", new BsonArray(new string[3] {"Entity", "NetworkActivity", "Ntlm"})},
+                {"_t", new BsonArray(new[] {"Entity", "NetworkActivity", "Ntlm"})},
                 {"SourceGatewaySystemProfileId", sourceGateway},
                 {"SourceComputerId", computerEntity.Id},
                 {"DestinationComputerId", targetAccount.Id},
@@ -360,12 +368,12 @@ namespace Abnormal_UI.Infra
                 {"SourcePort", 51510},
                 {"SourceComputerSiteId", BsonValue.Create(null)},
                 {"SourceComputerCertainty", "High"},
-                {"SourceComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"SourceComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"DestinationIpAddress", "[daf::daf]"},
                 {"DestinationPort", 445},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
-                {"DestinationComputerResolutionMethod", new BsonArray(new string[1] {"RpcNtlm"})},
+                {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"DestinationComputerName", destinationComputerName},
                 {"TransportProtocol", "Tcp"},
                 {"Version", 2},
@@ -385,7 +393,8 @@ namespace Abnormal_UI.Infra
             return networkActivityDocument;
         }
 
-        public static BsonDocument VpnEventCreator(EntityObject userEntity, EntityObject computerEntity, EntityObject domainController, string domainName, ObjectId sourceGateway,string externalSourceIp)
+        public static BsonDocument VpnEventCreator(EntityObject userEntity, EntityObject computerEntity,
+            EntityObject domainController, string domainName, ObjectId sourceGateway, string externalSourceIp)
         {
 
             var sourceComputer = new BsonDocument
@@ -398,31 +407,84 @@ namespace Abnormal_UI.Infra
                 {"DomainName", BsonValue.Create(null)},
                 {"Name", "MS-VPN"}
             };
-            var sourceAccount = new BsonDocument { { "DomainName", domainName }, { "Name", userEntity.Name } };
+            var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
             return new BsonDocument
             {
                 {"_id", new ObjectId()},
                 {
                     "_t",
-                    new BsonArray(new string[4] {"Entity", "Activity", "EventActivity","VpnAuthenticationEvent"})
+                    new BsonArray(new[] {"Entity", "Activity", "EventActivity", "VpnAuthenticationEvent"})
                 },
                 {"SourceGatewaySystemProfileId", sourceGateway},
                 {"Time", DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0))},
                 {"IsTimeMillisecondsAccurate", BsonValue.Create(false)},
-                {"EventType","Connect" },
+                {"EventType", "Connect"},
                 {"SessionId", "1" },
                 {"SourceAccountName", sourceAccount},
                 {"SourceAccountId", userEntity.Id},
                 {"SourceComputerName", sourceComputer},
                 {"SourceComputerId", computerEntity.Id},
-                {"ExternalSourceIpAddress",externalSourceIp},
-                {"ServerName",serverName},
+                {"ExternalSourceIpAddress", externalSourceIp},
+                {"ServerName", serverName},
                 {"ServerInternalIpAddress", "192.168.0.200"},
                 {"ServerId", domainController.Id},
                 {"GeoLocationInformation", BsonValue.Create(null)},
                 {"NetworkInformation", BsonValue.Create(null)},
                 {"ProxyInformation", BsonValue.Create(null)}
             };
+        }
+
+        public static BsonDocument SamrCreator(EntityObject userEntity, EntityObject computerEntity,
+            EntityObject domainController, string domainName, ObjectId sourceGateway,
+            SamrViewModel.SamrQueryType queryType, string domainId, EntityObject targetMachine = null)
+        {
+            var dateTime = DateTime.UtcNow;
+            var sourceComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", computerEntity.Name}};
+            var targetAccount = targetMachine ?? domainController;
+            var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", targetAccount.Name}};
+            var networkActivityDocument = new BsonDocument
+            {
+                {"_id", new ObjectId()},
+                {"_t", new BsonArray(new[] {"Entity", "Activity", "NetworkActivity", "Samr", queryType.ToString()})},
+                {"SourceGatewaySystemProfileId", sourceGateway},
+                {"HorizontalParentId", new ObjectId()},
+                {"StartTime", dateTime},
+                {"EndTime", dateTime},
+                {"SourceIpAddress", "[daf::daf]"},
+                {"SourcePort", 17393},
+                {"SourceComputerName", sourceComputerName},
+                {"SourceComputerId", computerEntity.Id},
+                {"SourceComputerSiteId", BsonValue.Create(null)},
+                {"SourceComputerCertainty", "High"},
+                {"SourceComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
+                {"DestinationIpAddress", "[daf::daf]"},
+                {"DestinationPort", 445},
+                {"DestinationComputerName", destinationComputerName},
+                {"DestinationComputerId", targetAccount.Id},
+                {"DestinationComputerSiteId", BsonValue.Create(null)},
+                {"DestinationComputerCertainty", "High"},
+                {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
+                {"TransportProtocol", "Tcp"},
+                {"NtStatus","Success"},
+                {"Operation",queryType.ToString()},
+                {"DomainId",domainId}
+            };
+            switch (queryType)
+            {
+                case SamrViewModel.SamrQueryType.EnumerateGroups:
+                    break;
+                case SamrViewModel.SamrQueryType.QueryUser:
+                    break;
+                case SamrViewModel.SamrQueryType.QueryGroup:
+                    break;
+                case SamrViewModel.SamrQueryType.QueryDisplayInformation2:
+                    break;
+                case SamrViewModel.SamrQueryType.EnumerateUsers:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(queryType), queryType, null);
+            }
+            return networkActivityDocument;
         }
     }
 }

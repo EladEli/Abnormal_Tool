@@ -8,17 +8,13 @@ namespace Abnormal_UI.UI.SimpleBind
 {
     public class SimpleBindViewModel : AttackViewModel
     {
-        public SimpleBindViewModel() : base()
-        {
-        }
-
-        public bool LSBIntense()
+        public bool LsbIntense()
         {
             try
             {
-                _dbClient.ClearTestCollections();
+                DbClient.ClearTestCollections();
                 SvcCtrl.StopService("ATACenter");
-                _dbClient.SetCenterProfileForReplay();
+                DbClient.SetCenterProfileForReplay();
                 Logger.Debug("Center profile set for replay");
                 var networkActivitities = new List<BsonDocument>();
                 if (SelectedUsers.Count < 1 || SelectedMachines.Count < 1)
@@ -28,9 +24,9 @@ namespace Abnormal_UI.UI.SimpleBind
                 for (var i = 0; i < 110; i++)
                 {
                     networkActivitities.Add(DocumentCreator.SimpleBindCreator(SelectedUsers.FirstOrDefault(),
-                        SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway, 0));
+                        SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway));
                 }
-                _dbClient.InsertBatch(networkActivitities);
+                DbClient.InsertBatch(networkActivitities);
                 Logger.Debug("Done inserting Ldap activities");
                 SvcCtrl.StartService("ATACenter");
                 return true;
@@ -42,7 +38,7 @@ namespace Abnormal_UI.UI.SimpleBind
             }
             
         }
-        public bool LSBDistinct()
+        public bool LsbDistinct()
         {
             try
             {
@@ -51,12 +47,16 @@ namespace Abnormal_UI.UI.SimpleBind
                 {
                     return false;
                 }
-                _dbClient.ClearTestCollections();
+                DbClient.ClearTestCollections();
                 SvcCtrl.StopService("ATACenter");
-                _dbClient.SetCenterProfileForReplay();
+                DbClient.SetCenterProfileForReplay();
                 Logger.Debug("Center profile set for replay");
-                networkActivitities.AddRange(SelectedUsers.Select(user => DocumentCreator.SimpleBindCreator(user, SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway, 0)));
-                _dbClient.InsertBatch(networkActivitities);
+                networkActivitities.AddRange(
+                    SelectedUsers.Select(
+                        user =>
+                            DocumentCreator.SimpleBindCreator(user, SelectedMachines[0],
+                                SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway)));
+                DbClient.InsertBatch(networkActivitities);
                 Logger.Debug("Done inserting Ldap activities");
                 SvcCtrl.StartService("ATACenter");
                 return true;
@@ -67,19 +67,19 @@ namespace Abnormal_UI.UI.SimpleBind
                 return false;
             }
         }
-        public bool LSBSingle()
+        public bool LsbSingle()
         {
             try
             {
-                _dbClient.ClearTestCollections();
+                DbClient.ClearTestCollections();
                 var networkActivitities = new List<BsonDocument>();
                 if (SelectedUsers.Count < 1 || SelectedMachines[0].Name == null)
                 {
                     return false;
                 }
                 networkActivitities.Add(DocumentCreator.SimpleBindCreator(SelectedUsers.FirstOrDefault(),
-                    SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway, 0));
-                _dbClient.InsertBatch(networkActivitities);
+                    SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway));
+                DbClient.InsertBatch(networkActivitities);
                 return true;
             }
             catch (Exception singleException)
