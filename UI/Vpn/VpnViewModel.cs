@@ -17,7 +17,7 @@ namespace Abnormal_UI.UI.Vpn
             set
             {
                 _recordsAmount = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(RecordsAmount));
             }
         }
         public VpnViewModel()
@@ -28,9 +28,9 @@ namespace Abnormal_UI.UI.Vpn
  
         public string GetRandomIp()
         {
-            Random _random = new Random();
+            var random = new Random();
             System.Threading.Thread.Sleep(20);
-            return string.Format("{0}.{1}.{2}.{3}", _random.Next(0, 223), _random.Next(0, 255), _random.Next(0, 255), _random.Next(0, 255));
+            return $"{random.Next(0, 223)}.{random.Next(0, 255)}.{random.Next(0, 255)}.{random.Next(0, 255)}";
 
         }
         public bool ExecuteVpnActivity()
@@ -56,10 +56,10 @@ namespace Abnormal_UI.UI.Vpn
                 machinesIndex++;
                 ipsIndex++;
             }
-            _dbClient.SetCenterProfileForReplay();
-            //_dbClient.SetCenterProfileForVpn();
+            DbClient.SetCenterProfileForReplay();
+            DbClient.SetCenterProfileForVpn();
             SvcCtrl.StopService("ATACenter");
-            _dbClient.InsertBatch(vpnActivities);
+            DbClient.InsertBatch(vpnActivities);
             SvcCtrl.StartService("ATACenter");
             Logger.Debug("Done inserting vpn activities");
             return true;
@@ -71,29 +71,26 @@ namespace Abnormal_UI.UI.Vpn
             {
                 return false;
             }
-            var ipsIndex = 0;
             var machinesIndex = 0;
             var vpnActivities = new List<BsonDocument>();
             var usersIndex = 0;
-            var ip_address = "";
             for (var i = 0; i < _recordsAmount; i++)
             {
                 if (usersIndex >= SelectedUsers.Count) { usersIndex = 0; }
                 if (machinesIndex >= SelectedMachines.Count) { machinesIndex = 0; }
-                ip_address = GetRandomIp();
+                var ipAddress = GetRandomIp();
                 System.Threading.Thread.Sleep(50);
                 vpnActivities.Add(DocumentCreator.VpnEventCreator(SelectedUsers[usersIndex],
                     SelectedMachines[machinesIndex], DomainControllers.FirstOrDefault(), DomainName,
-                    SourceGateway, ip_address));
-                Logger.Debug($"Inserted Vpn activity for {SelectedUsers[usersIndex]} on IP: {ip_address}");
+                    SourceGateway, ipAddress));
+                Logger.Debug($"Inserted Vpn activity for {SelectedUsers[usersIndex]} on IP: {ipAddress}");
                 usersIndex++;
                 machinesIndex++;
-                ipsIndex++;
             }
-            _dbClient.SetCenterProfileForReplay();
-            //_dbClient.SetCenterProfileForVpn();
+            DbClient.SetCenterProfileForReplay();
+            DbClient.SetCenterProfileForVpn();
             SvcCtrl.StopService("ATACenter");
-            _dbClient.InsertBatch(vpnActivities);
+            DbClient.InsertBatch(vpnActivities);
             SvcCtrl.StartService("ATACenter");
             Logger.Debug("Done inserting vpn activities");
             return true;

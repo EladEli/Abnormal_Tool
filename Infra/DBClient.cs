@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -46,16 +47,16 @@ namespace Abnormal_UI.Infra
             {
                 _logger.Error(dbException);
             }
-            
-            
         }
         public static DBClient GetDbClient()
         {
             return _dbClient ?? (_dbClient = new DBClient());
         }
+
         #endregion
+
         #region Methods
-        
+
         public List<EntityObject> GetUniqueEntity(UniqueEntityType entityType, bool getDomainController = false)
         {
             return getDomainController
@@ -69,7 +70,6 @@ namespace Abnormal_UI.Infra
                     .Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString, _.Contains("SamName") ? _["SamName"].AsString:"", entityType))
                     .ToList();
         }
-
         public List<ObjectId> FilterGwIds()
         {
             return
@@ -78,18 +78,15 @@ namespace Abnormal_UI.Infra
                     .Select(gwProfile => gwProfile.GetElement("_id").Value.AsObjectId)
                     .ToList();
         }
-
         public List<ObjectId> GetGwOids()
         {
             return GatewayIdsCollection;
         }
-
         public void DisposeAbnormalDetectorProfile()
         {
             var mongoQuery = Query.EQ("_t", "AbnormalBehaviorDetectorProfile");
             SystemProfilesCollection.DeleteMany(mongoQuery.ToBsonDocument());
         }
-
         public void ResetUniqueEntityProfile()
         {
             var nullBsonArray = new BsonArray();
@@ -107,7 +104,6 @@ namespace Abnormal_UI.Infra
                         uniqueEntityProfileDocument);
             }
         }
-
         public void InsertBatch(List<BsonDocument> documents)
         {
             var events = documents.Where(_ => _["_t"].ToString().Contains("EventActivity")).ToList();
@@ -121,14 +117,12 @@ namespace Abnormal_UI.Infra
                 TestDatabase.GetCollection<BsonDocument>("NetworkActivity").InsertMany(networkActivities);
             }
         }
-
         public void InsertSaBatch(List<BsonDocument> documents)
         {
             Database.GetCollection<BsonDocument>("SuspiciousActivity").InsertMany(documents);
         }
         public void SetCenterProfileForReplay()
         {
-
             var centerSystemProfile =
                 SystemProfilesCollection.Find(Query.EQ("_t", "CenterSystemProfile").ToBsonDocument()).ToEnumerable();
             foreach (var centerProfile in centerSystemProfile)
@@ -144,11 +138,9 @@ namespace Abnormal_UI.Infra
                 SystemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", centerProfile["_id"]),
                     centerProfile);
             }
-          
         }
         public void SetCenterProfileForVpn()
         {
-
             var centerSystemProfile =
                 SystemProfilesCollection.Find(Query.EQ("_t", "CenterSystemProfile").ToBsonDocument()).ToEnumerable();
             foreach (var centerProfile in centerSystemProfile)
@@ -157,7 +149,7 @@ namespace Abnormal_UI.Infra
                 var radiusSharedSecret = new BsonDocument
                 {
                     {"CertificateThumbprint", commonConfigurationBson["HashKeyEncrypted"]["CertificateThumbprint"]},
-                    {"EncryptedBytes", CreateSpecialByteArray(256)}
+                    {"EncryptedBytes",commonConfigurationBson["HashKeyEncrypted"]["EncryptedBytes"]}
                 };
                 
                 commonConfigurationBson["IsRadiusEventListenerEnabled"] = BsonValue.Create(true);
@@ -167,7 +159,6 @@ namespace Abnormal_UI.Infra
                     centerProfile);
             }
         }
-
         public void RenameKerbCollections()
         {
             var monthAgo = DateTime.UtcNow.Subtract(new TimeSpan(27, 0, 0, 0)).ToString("yyyyMMddhhmmss", CultureInfo.InvariantCulture);
@@ -187,7 +178,6 @@ namespace Abnormal_UI.Infra
                             Database.RenameCollection(collection,
                                 "KerberosAs_" + monthAgo);
                         }
-
                         else if (collection.Contains("KerberosTgs"))
                         {
                             Database.RenameCollection(collection,
@@ -240,7 +230,6 @@ namespace Abnormal_UI.Infra
             }
             
         }
-
         public void RenameNtlmCollections()
         {
             var monthAgo = DateTime.UtcNow.Subtract(new TimeSpan(27, 0, 0, 0))
@@ -272,7 +261,6 @@ namespace Abnormal_UI.Infra
             }
 
         }
-
         public void CreateActivityCollectionsOnTestDb()
         {
             try
@@ -315,19 +303,7 @@ namespace Abnormal_UI.Infra
         public void DisposeDatabae()
         {
             TestDatabase.Client.DropDatabase("ATAActivitySimulator");
-
         }
-
-        public static byte[] CreateSpecialByteArray(int length)
-        {
-            var arr = new byte[length];
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = 0x20;
-            }
-            return arr;
-        }
-
         #endregion
     }
 }
