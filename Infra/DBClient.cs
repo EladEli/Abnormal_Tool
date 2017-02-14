@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -151,7 +150,6 @@ namespace Abnormal_UI.Infra
                     {"CertificateThumbprint", commonConfigurationBson["HashKeyEncrypted"]["CertificateThumbprint"]},
                     {"EncryptedBytes",commonConfigurationBson["HashKeyEncrypted"]["EncryptedBytes"]}
                 };
-                
                 commonConfigurationBson["IsRadiusEventListenerEnabled"] = BsonValue.Create(true);
                 commonConfigurationBson["RadiusEventListenerSharedSecretEncrypted"] = radiusSharedSecret;
                 centerProfile["GatewayCommonConfiguration"] = commonConfigurationBson;
@@ -197,7 +195,6 @@ namespace Abnormal_UI.Infra
             {
                 _logger.Debug("Kerberos collection already renamed");
             }
-            
         }
         public void RenameNtlmEventsCollections()
         {
@@ -228,7 +225,6 @@ namespace Abnormal_UI.Infra
             {
                 _logger.Debug("Ntlm events collection alraedy renamed");
             }
-            
         }
         public void RenameNtlmCollections()
         {

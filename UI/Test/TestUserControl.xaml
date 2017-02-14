@@ -76,11 +76,6 @@
                 <Button Width="200" 
             		Height="30" 
             		Margin="5"
-            		Content="Test service control"
-            		x:Name="Btn3"/>
-                <Button Width="200" 
-            		Height="30" 
-            		Margin="5"
             		Content="Create Gateways"
             		x:Name="Btn4" Click="Btn4_ClickAsync"/>
                 <Button Width="200" 

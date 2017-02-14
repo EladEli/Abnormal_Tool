@@ -19,12 +19,11 @@ namespace Abnormal_UI.UI.Test
                 OnPropertyChanged(nameof(SaAmount));
             }
         }
-
+        private readonly Random _random = new Random();
         public TestViewModel()
         {
             _saAmount = 200;
         }
-
         public bool InsertSeac()
         {
             try
@@ -46,7 +45,6 @@ namespace Abnormal_UI.UI.Test
                 return false;
             }
         }
-
         public bool InsertAe()
         {
             try
@@ -67,17 +65,33 @@ namespace Abnormal_UI.UI.Test
                 return false;
             }
         }
-
         public void AddGateway()
         {
             DbClient.SetNewGateway(_saAmount);
         }
-
         public bool GoldenTicketActivity()
         {
-
-            return false;
+            try
+            {
+                var tgsList = new List<BsonDocument>();
+                var userEntity = Users.First(_ => _.Name == "user1");
+                var machineEntity = Machines.First(_ => _.Name == "CLIENT1");
+                for (var loopIndex = 0; loopIndex <= _saAmount; loopIndex++)
+                {
+                    tgsList.Add(DocumentCreator.KerberosCreator(userEntity, machineEntity,
+                        DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway, $"{(Spn)(_random.Next(0, 5))}/{Machines[loopIndex].Name}", null, "Tgs"));
+                }
+                DbClient.SetCenterProfileForReplay();
+                SvcCtrl.StopService("ATACenter");
+                DbClient.InsertBatch(tgsList);
+                SvcCtrl.StartService("ATACenter");
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                return false;
+            }
         }
-
     }
 }

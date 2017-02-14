@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using Abnormal_UI.UI.Samr;
 using MongoDB.Bson;
 
@@ -7,6 +9,7 @@ namespace Abnormal_UI.Infra
 {
     public static class DocumentCreator
     {
+        private static readonly Random Random = new Random();
         public static BsonDocument KerberosCreator(EntityObject userEntity, EntityObject computerEntity,
             EntityObject domainController, string domainName, ObjectId sourceGateway, string targetSpn = null,
             EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0,
@@ -485,6 +488,19 @@ namespace Abnormal_UI.Infra
                     throw new ArgumentOutOfRangeException(nameof(queryType), queryType, null);
             }
             return networkActivityDocument;
+        }
+        public static byte[] ComputeUnsecureHash(this byte[] data)
+        {
+            using (var md5 = MD5.Create())
+            {
+                return md5.ComputeHash(data);
+            }
+        }
+        public static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
     }
 }

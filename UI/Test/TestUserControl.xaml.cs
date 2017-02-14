@@ -13,14 +13,12 @@ namespace Abnormal_UI.UI.Test
         {
             InitializeComponent();
         }
-
         public TestUserControl(TestViewModel model)
         {
             _model = model;
             InitializeComponent();
             DataContext = _model;
         }
-
         private void UpdateSelected()
         {
             var selectedEntityObjects = BoxUsers.SelectedItems.Cast<EntityObject>().ToList();
@@ -35,7 +33,6 @@ namespace Abnormal_UI.UI.Test
             _model.SelectedDomainControllers = new ObservableCollection<EntityObject>(selectedEntityObjects);
             selectedEntityObjects.Clear();
         }
-
         private async void Btn1_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
@@ -43,13 +40,11 @@ namespace Abnormal_UI.UI.Test
             await Task.Run(() => _model.InsertSeac());
             Btn1.IsEnabled = true;
         }
-
         private async void Btn2_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
             await Task.Run(() => _model.InsertAe());
         }
-
         private async void Btn4_ClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
@@ -65,11 +60,13 @@ namespace Abnormal_UI.UI.Test
                 ? "Gateway Creation ended."
                 : "Please enter Gateways amount");
         }
-
         private async void GoldenTicketBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             GoldenTicketBtn.IsEnabled = false;
-            await Task.Run(() => _model.GoldenTicketActivity());
+            var result = await Task.Run(() => _model.GoldenTicketActivity());
+            MessageBox.Show(result
+                                    ? "Tgs insertion ended successfully" 
+                                    : "Tgs insertion failed");
             GoldenTicketBtn.IsEnabled = true;
         }
     }

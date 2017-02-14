@@ -28,7 +28,15 @@ namespace Abnormal_UI.UI
         public ObservableCollection<EntityObject> SelectedDomainControllers { get; set; }
 
         public Logger Logger;
-
+        public enum Spn
+        {
+            HOST,
+            HTTP,
+            CIFS,
+            LDAP,
+            DNS,
+            RPC
+        }
         public string DomainName { get; set; }
         #endregion
 

@@ -17,7 +17,6 @@ namespace Abnormal_UI.UI.Abnormal
         #region Data Members
 
         private readonly Random _random = new Random();
-        private readonly string[] _spns;
         private bool _isResultsShown;
         private string _logString;
         public bool IncludeKerberos { get; set; }
@@ -56,15 +55,6 @@ namespace Abnormal_UI.UI.Abnormal
             LogString = "";
             MinMachines = 1;
             MaxMachines = 3;
-            _spns = new[]
-            {
-                "HOST",
-                "HTTP",
-                "CIFS",
-                "ldap",
-                "DNS",
-                "RPC"
-            };
         }
 
         #endregion
@@ -217,7 +207,7 @@ namespace Abnormal_UI.UI.Abnormal
                                     DocumentCreator.KerberosCreator(selectedUser,
                                         currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(),
                                         DomainName, SourceGateway,
-                                        $"{_spns[_random.Next(0, 5)]}/{SelectedMachines[currentMachinesCounter].Name}",
+                                        $"{(Spn)(_random.Next(0, 5))}/{SelectedMachines[currentMachinesCounter].Name}",
                                         currentSelectedMachine, "Tgs",
                                         daysToGenerate, 0, networkActivities.Last()["_id"].AsObjectId));
                                 break;
@@ -288,7 +278,6 @@ namespace Abnormal_UI.UI.Abnormal
             Ntlm,
             Event
         }
-
         #endregion
     }
 }
