@@ -438,7 +438,7 @@ namespace Abnormal_UI.Infra
         }
 
         public static BsonDocument SamrCreator(EntityObject userEntity, EntityObject computerEntity,
-            EntityObject domainController, string domainName, ObjectId sourceGateway,
+            EntityObject domainController, string domainName, string groupName, ObjectId sourceGateway, bool sensitive,
             SamrViewModel.SamrQueryType queryType, string domainId, EntityObject targetMachine = null)
         {
             var dateTime = DateTime.UtcNow;
@@ -474,15 +474,23 @@ namespace Abnormal_UI.Infra
             };
             switch (queryType)
             {
-                case SamrViewModel.SamrQueryType.EnumerateGroups:
+                case SamrViewModel.SamrQueryType.QueryUser: 
+                    networkActivityDocument.Add("UserName", userEntity.Name);
+                    networkActivityDocument.Add("UserId", userEntity.Id);
+                    networkActivityDocument.Add("IsSensitiveUser", sensitive.ToJson());
                     break;
-                case SamrViewModel.SamrQueryType.QueryUser:
+                case SamrViewModel.SamrQueryType.QueryGroup: //{    "GroupName" : "Domain Admins", "GroupId" : "93b53035-a881-4535-b336-6770f6da6197", "IsSensitiveGroup" : true      "DomainControllerStartTime" : "2017-02-13T14:26:48.5706149Z", } fields to add
+                    networkActivityDocument.Add("GroupName", groupName);
+                    networkActivityDocument.Add("GroupId", "kljlkjlkjlkjlkjkljlkjlk");
+                    networkActivityDocument.Add("IsSensitiveGroup", sensitive.ToJson());
+                    networkActivityDocument.Add("DomainControllerStartTime", "DATA....");
                     break;
-                case SamrViewModel.SamrQueryType.QueryGroup:
+                case SamrViewModel.SamrQueryType.QueryDisplayInformation2: 
+                    networkActivityDocument.Add("DisplayInformationClass", "DomainDisplayGroup");
+                    networkActivityDocument.Add("DomainControllerStartTime", "DATA....");
                     break;
-                case SamrViewModel.SamrQueryType.QueryDisplayInformation2:
-                    break;
-                case SamrViewModel.SamrQueryType.EnumerateUsers:
+                case SamrViewModel.SamrQueryType.EnumerateUsers: 
+                    networkActivityDocument.Add("DomainControllerStartTime", "DATA....");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(queryType), queryType, null);

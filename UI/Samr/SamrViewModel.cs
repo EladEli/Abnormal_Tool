@@ -23,7 +23,6 @@ namespace Abnormal_UI.UI.Samr
         }
         public enum SamrQueryType
         {
-            EnumerateGroups,
             EnumerateUsers,
             QueryGroup,
             QueryDisplayInformation2,
