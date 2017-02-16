@@ -77,6 +77,7 @@ namespace Abnormal_UI.Infra
                 {"RequestTicketKerberosId", parentId},
                 {"ArmoringEncryptionType", BsonValue.Create(null)},
                 {"SourceAccountBadPasswordTime", BsonValue.Create(null)},
+                {"DomainControllerStartTime",oldTime },
                 {"IsOldPassword", BsonValue.Create(null)}
             };
             if (actionType == "As")
@@ -139,6 +140,7 @@ namespace Abnormal_UI.Infra
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerName", destinationComputerName},
                 {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
+                {"DomainControllerStartTime",oldTime },
                 {"TransportProtocol", "Tcp"},
                 {"AuthenticationType", "Simple"},
                 {"SourceAccountName", sourceAccount},
@@ -378,6 +380,7 @@ namespace Abnormal_UI.Infra
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"DestinationComputerName", destinationComputerName},
+                {"DomainControllerStartTime",oldTime },
                 {"TransportProtocol", "Tcp"},
                 {"Version", 2},
                 {"SourceComputerName", sourceComputerName},
@@ -467,6 +470,7 @@ namespace Abnormal_UI.Infra
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
+                {"DomainControllerStartTime",dateTime },
                 {"TransportProtocol", "Tcp"},
                 {"NtStatus","Success"},
                 {"Operation",queryType.ToString()},
