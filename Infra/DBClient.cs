@@ -9,11 +9,11 @@ using NLog;
 
 namespace Abnormal_UI.Infra
 {
-    public class DBClient
+    public class DbClient
     {
         #region Data Members
         
-        private static DBClient _dbClient;
+        private static DbClient _dbClient;
         public readonly IMongoDatabase Database;
         public readonly IMongoDatabase TestDatabase;
         private readonly IMongoCollection<BsonDocument> _uniqueEntitiesCollection;
@@ -27,7 +27,7 @@ namespace Abnormal_UI.Infra
         #endregion
         
         #region Ctors
-        private DBClient()
+        private DbClient()
         {
             StaticConfiguration.Initialize();
             _logger = LogManager.GetLogger("TestToolboxLog");
@@ -48,9 +48,9 @@ namespace Abnormal_UI.Infra
                 _logger.Error(dbException);
             }
         }
-        public static DBClient GetDbClient()
+        public static DbClient GetDbClient()
         {
-            return _dbClient ?? (_dbClient = new DBClient());
+            return _dbClient ?? (_dbClient = new DbClient());
         }
 
         #endregion
@@ -90,7 +90,7 @@ namespace Abnormal_UI.Infra
         public void SetDetecotorProfileForSamr()
         {
             var dateTime = DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0));
-            var SamrDetecotrSystemProfile = SystemProfilesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", "SamrReconnaissanceDetectorProfile")).ToEnumerable();
+            var samrDetecotrSystemProfile = SystemProfilesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", "SamrReconnaissanceDetectorProfile")).ToEnumerable();
             var centerSystemProfile = SystemProfilesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", "CenterSystemProfile")).ToEnumerable();
             var newDetector = new ComputerProfile
             {
@@ -103,7 +103,7 @@ namespace Abnormal_UI.Infra
                     ["76ebfd99-5722-480a-93b6-cbee134c90c1"] = dateTime,
                 }
             };
-            foreach (var detectorProfile in SamrDetecotrSystemProfile)
+            foreach (var detectorProfile in samrDetecotrSystemProfile)
             {
                 detectorProfile["DestinationComputerIdToDetectionStartTimeMapping"] = newDetector.ToBsonDocument()["DestinationComputerIdToDetectionStartTimeMapping"];
                 SystemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", detectorProfile["_id"]),

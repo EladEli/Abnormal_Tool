@@ -1,8 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
-using Abnormal_UI.Infra;
 
 namespace Abnormal_UI.UI.Samr
 {
@@ -19,16 +16,9 @@ namespace Abnormal_UI.UI.Samr
             InitializeComponent();
             DataContext = _model;
         }
-
-        private void UpdateSelected()
-        {
-
-        }
-
         private async void LearningButton_OnClickAsync(object sender, RoutedEventArgs e)
         {
             LearningButton.IsEnabled = false;
-            UpdateSelected();
             var result = await Task.Run(() => _model.GenerateLearningTime());
             MessageBox.Show(result ? "Learning time inserted succesfully" : "Learning time failed");
             LearningButton.IsEnabled = true;
@@ -37,7 +27,6 @@ namespace Abnormal_UI.UI.Samr
         private async void SaButton_OnClickAsync(object sender, RoutedEventArgs e)
         {
             SaButton.IsEnabled = false;
-            UpdateSelected();
             var result = await Task.Run(() => _model.GenerateSamr());
             MessageBox.Show(result ? "SAMR Activities time inserted succesfully" : "SA failed");
             LearningButton.IsEnabled = true;

@@ -79,7 +79,7 @@ namespace Abnormal_UI.UI.Test
                 for (var loopIndex = 0; loopIndex <= _saAmount; loopIndex++)
                 {
                     tgsList.Add(DocumentCreator.KerberosCreator(userEntity, machineEntity,
-                        DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway, $"{(Spn)(_random.Next(0, 5))}/{Machines[loopIndex].Name}", null, "Tgs"));
+                        DomainControllers.FirstOrDefault(), DomainName, SourceGateway, $"{(Spn)(_random.Next(0, 5))}/{Machines[loopIndex].Name}", null, "Tgs"));
                 }
                 DbClient.SetCenterProfileForReplay();
                 SvcCtrl.StopService("ATACenter");

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Windows;
 using Abnormal_UI.UI.Samr;
 using MongoDB.Bson;
 
@@ -20,21 +19,20 @@ namespace Abnormal_UI.Infra
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
             var sourceComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", computerEntity.Name}};
             var resourceIdentifier = new BsonDocument();
-            var targetAccount = targetMachine ?? domainController;
             var targetSpnName = $"krbtgt/{domainName}";
             if (targetSpn != null)
             {
                 targetSpnName = targetSpn;
             }
-            resourceIdentifier.Add("AccountId", targetAccount.Id);
+            resourceIdentifier.Add("AccountId", targetMachine?.Id ?? domainController.Id);
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
-            var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", targetAccount.Name}};
+            var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", domainController.Name}};
             var responseTicket = new BsonDocument
             {
                 {"EncryptionType", "Aes256CtsHmacSha196"},
                 {"IsReferral", false},
-                {"Realm", "domain1.test.local"},
+                {"Realm", domainName},
                 {"ResourceIdentifier", resourceIdentifier},
                 {"Size", 1084},
                 {"Hash", new byte[16]}
@@ -73,30 +71,28 @@ namespace Abnormal_UI.Infra
                 {"SourceGatewaySystemProfileId", sourceGateway},
                 {"RequestTicketKerberosId", parentId},
                 {"SourceAccountBadPasswordTime", BsonValue.Create(null)},
-                {"IsOldPassword", BsonValue.Create(null)}
+                {"IsOldPassword", BsonValue.Create(null)},
+                {"IsSuccess", BsonValue.Create(true) }
             };
-            if (actionType == "As")
+            switch (actionType)
             {
+                case "As":
 
-                networkActivityDocument.Add("SourceComputerNetbiosName", computerEntity.Name);
-                networkActivityDocument.Add("IsIncludePac", BsonValue.Create(true));
-                networkActivityDocument.Add("SourceAccountSupportedEncryptionTypes", new BsonArray(new string[0]));
-                networkActivityDocument.Add("EncryptedTimestampEncryptionType", BsonValue.Create(null));
-                networkActivityDocument.Add("EncryptedTimestamp", BsonValue.Create(null));
-                networkActivityDocument.Add("RequestTicket", BsonValue.Create(null));
-                networkActivityDocument.Add("ResponseTicket", responseTicket);
-                networkActivityDocument.Add("IsSmartcardRequiredRc4", BsonValue.Create(false));
-                networkActivityDocument.Add("ArmoringEncryptionType", BsonValue.Create(null));
-                networkActivityDocument.Add("RequestedTicketExpiration", DateTime.UtcNow);
-                networkActivityDocument.Add("SourceComputerSupportedEncryptionTypes", new BsonArray(new[] {"Rc4Hmac"}));
-                networkActivityDocument.Add("DestinationPort", "88");
-                networkActivityDocument.Add("IsSuccess", BsonValue.Create(false));
-                networkActivityDocument.Add("Options", new BsonArray(new[] { "RenewableOk", "Canonicalize", "Renewable", "Forwardable" }));
-            }
-            else
-            {
-                if (actionType == "Tgs")
-                {
+                    networkActivityDocument.Add("SourceComputerNetbiosName", computerEntity.Name);
+                    networkActivityDocument.Add("IsIncludePac", BsonValue.Create(true));
+                    networkActivityDocument.Add("SourceAccountSupportedEncryptionTypes", new BsonArray(new string[0]));
+                    networkActivityDocument.Add("EncryptedTimestampEncryptionType", BsonValue.Create(null));
+                    networkActivityDocument.Add("EncryptedTimestamp", BsonValue.Create(null));
+                    networkActivityDocument.Add("RequestTicket", BsonValue.Create(null));
+                    networkActivityDocument.Add("ResponseTicket", responseTicket);
+                    networkActivityDocument.Add("IsSmartcardRequiredRc4", BsonValue.Create(false));
+                    networkActivityDocument.Add("ArmoringEncryptionType", BsonValue.Create(null));
+                    networkActivityDocument.Add("RequestedTicketExpiration", DateTime.UtcNow);
+                    networkActivityDocument.Add("SourceComputerSupportedEncryptionTypes", new BsonArray(new[] {"Rc4Hmac"}));
+                    networkActivityDocument.Add("DestinationPort", "88");
+                    networkActivityDocument.Add("Options", new BsonArray(new[] { "RenewableOk", "Canonicalize", "Renewable", "Forwardable" }));
+                    break;
+                case "Tgs":
                     networkActivityDocument.Add("IsServiceForUserToSelf", BsonValue.Create(false));
                     networkActivityDocument.Add("AuthorizationDataSize", BsonValue.Create(null));
                     networkActivityDocument.Add("AuthorizationDataEncryptionType", BsonValue.Create(null));
@@ -108,17 +104,14 @@ namespace Abnormal_UI.Infra
                     networkActivityDocument.Add("RequestedTicketExpiration", DateTime.UtcNow);
                     networkActivityDocument.Add("SourceComputerSupportedEncryptionTypes", new BsonArray(new[] { "Rc4Hmac" }));
                     networkActivityDocument.Add("DestinationPort", "88");
-                    networkActivityDocument.Add("IsSuccess", BsonValue.Create(false));
                     networkActivityDocument.Add("Options", new BsonArray(new[] { "RenewableOk", "Canonicalize", "Renewable", "Forwardable"}));
-                }
-                else
-                {
+                    break;
+                default:
                     networkActivityDocument.Set(1, new BsonArray(new[]{"Entity", "Activity", "NetworkActivity", "Kerberos", "KerberosAp"}));
                     networkActivityDocument.Add("RequestTicket", responseTicket);
-                    networkActivityDocument.Add("DestinationPort", 445);
-                    networkActivityDocument.Add("IsSuccess", BsonValue.Create(true));
+                    networkActivityDocument.Add("DestinationPort", "445");
                     networkActivityDocument.Add("Options", "MutualRequired");
-                }
+                    break;
             }
             return networkActivityDocument;
         }
@@ -161,6 +154,7 @@ namespace Abnormal_UI.Infra
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerName", destinationComputerName},
                 {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
+                {"DomainControllerStartTime",oldTime},
                 {"TransportProtocol", "Tcp"},
                 {"AuthenticationType", "Simple"},
                 {"SourceAccountName", sourceAccount},
@@ -400,6 +394,7 @@ namespace Abnormal_UI.Infra
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"DestinationComputerName", destinationComputerName},
+                {"DomainControllerStartTime",oldTime},
                 {"TransportProtocol", "Tcp"},
                 {"Version", 2},
                 {"SourceComputerName", sourceComputerName},

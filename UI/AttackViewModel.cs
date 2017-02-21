@@ -11,7 +11,7 @@ namespace Abnormal_UI.UI
     public class AttackViewModel : INotifyPropertyChanged
     {
         #region Data Members
-        public DBClient DbClient;
+        public DbClient DbClient;
         
         public ObjectId SourceGateway;
 
@@ -44,14 +44,14 @@ namespace Abnormal_UI.UI
 
         public AttackViewModel()
         {
-            DbClient = DBClient.GetDbClient();
+            DbClient = DbClient.GetDbClient();
             Users = new ObservableCollection<EntityObject>();
             SelectedUsers = new ObservableCollection<EntityObject>();
             Machines = new ObservableCollection<EntityObject>();
             SelectedMachines = new ObservableCollection<EntityObject>();
             DomainControllers = new ObservableCollection<EntityObject>();
             SelectedDomainControllers = new ObservableCollection<EntityObject>();
-            DomainName = "Domain1";
+            DomainName = "domain1.test.local";
             SourceGateway = DbClient.GetGwOids().FirstOrDefault();
             Logger = LogManager.GetLogger("TestToolboxLog");
         }
@@ -72,9 +72,6 @@ namespace Abnormal_UI.UI
 
                 var allComputers = DbClient.GetUniqueEntity(uniqueType);
                 Machines = new ObservableCollection<EntityObject>(allComputers.OrderBy(entityObject => entityObject.Name).AsEnumerable());
-
-                var domain = DbClient.GetUniqueEntity(UniqueEntityType.Domain);
-                DomainName = "domain1.test.local";
             }
             catch (Exception pmException)
             {

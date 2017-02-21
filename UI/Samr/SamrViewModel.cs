@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Abnormal_UI.Infra;
-using Microsoft.VisualBasic.Devices;
 using MongoDB.Bson;
 
 namespace Abnormal_UI.UI.Samr
@@ -40,7 +37,7 @@ namespace Abnormal_UI.UI.Samr
                 foreach (var samrUser in SamrUsers)
                 {
                     ActivitiesList.Add(DocumentCreator.KerberosCreator(samrUser, SamrMachins[machineCounter],
-                        DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway, null, null, "As",2,0));
+                        DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway, null, null, "As",2));
 
                     ActivitiesList.Add(DocumentCreator.KerberosCreator(samrUser, SamrMachins[machineCounter],
                         DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway,
@@ -67,14 +64,14 @@ namespace Abnormal_UI.UI.Samr
                             DomainName, GroupsList[j], SourceGateway, true,
                             SamrQueryType.QueryGroup,SamrQueryOperation.QueryInformationGroup, domainId,2));
                         Logger.Debug("Inserted {3} {2} activity for {1} on {0}",
-                            SamrMachins[i].Name,SamrUsers[i].Name, GroupsList[j].Name, SamrQueryType.QueryGroup.ToString());
+                            SamrMachins[i].Name,SamrUsers[i].Name, GroupsList[j].Name, SamrQueryType.QueryGroup);
                     }
                     ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[i], SamrMachins[i],
                         DomainControllers.FirstOrDefault(),
                         DomainName, null, SourceGateway, true,
                         SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser, domainId,2));
                     Logger.Debug("Inserted {3} {2} activity for {1} on {0}",
-                        SamrMachins[i].Name, SamrUsers[i].Name, "user", SamrQueryType.QueryUser.ToString());
+                        SamrMachins[i].Name, SamrUsers[i].Name, "user", SamrQueryType.QueryUser);
                 }
 
                 //Create High Rate Machines 
@@ -87,14 +84,14 @@ namespace Abnormal_UI.UI.Samr
                             DomainName, GroupsList[j], SourceGateway, true,
                             SamrQueryType.QueryGroup, SamrQueryOperation.QueryInformationGroup,domainId,2));
                         Logger.Debug("Inserted {3} {2} activity for {1} on {0}",
-                            SamrMachins[i].Name, SamrUsers[i].Name, GroupsList[j].Name, SamrQueryType.QueryGroup.ToString());
+                            SamrMachins[i].Name, SamrUsers[i].Name, GroupsList[j].Name, SamrQueryType.QueryGroup);
                     }
                     ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[i], SamrMachins[i],
                         DomainControllers.FirstOrDefault(),
                         DomainName, null, SourceGateway, true,
                         SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser, domainId,2));
                     Logger.Trace("Inserted {3} {2} activity for {1} on {0}",
-                        SamrMachins[i].Name, SamrUsers[i].Name, "user", SamrQueryType.QueryUser.ToString());
+                        SamrMachins[i].Name, SamrUsers[i].Name, "user", SamrQueryType.QueryUser);
                 }
                 DbClient.ClearTestCollections();
                 SvcCtrl.StopService("ATACenter");
@@ -127,12 +124,12 @@ namespace Abnormal_UI.UI.Samr
                 ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[0], SamrMachins[0],
                     DomainControllers.FirstOrDefault(),
                     DomainName, GroupsList[4], SourceGateway, true,
-                    SamrQueryType.QueryGroup,SamrQueryOperation.QueryInformationGroup, domainId,0));
+                    SamrQueryType.QueryGroup,SamrQueryOperation.QueryInformationGroup, domainId));
 
                 ActivitiesList.Add(DocumentCreator.SamrCreator(sesitiveUser, SamrMachins[0],
                     DomainControllers.FirstOrDefault(),
                     DomainName, GroupsList[4], SourceGateway, true,
-                    SamrQueryType.QueryUser,SamrQueryOperation.QueryInformationUser, domainId,0));
+                    SamrQueryType.QueryUser,SamrQueryOperation.QueryInformationUser, domainId));
 
                 //Create SA for first High Rate Machine
                 for (var i = 0; i < 6; i++)
@@ -140,13 +137,13 @@ namespace Abnormal_UI.UI.Samr
                         ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[4], SamrMachins[4],
                             DomainControllers.FirstOrDefault(),
                             DomainName, GroupsList[20+i], SourceGateway, true,
-                            SamrQueryType.QueryGroup, SamrQueryOperation.QueryInformationGroup, domainId,0));
+                            SamrQueryType.QueryGroup, SamrQueryOperation.QueryInformationGroup, domainId));
 
                 }
                 ActivitiesList.Add(DocumentCreator.SamrCreator(sesitiveUser, SamrMachins[4],
                     DomainControllers.FirstOrDefault(),
                     DomainName, GroupsList[4], SourceGateway, true,
-                    SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser, domainId,0));
+                    SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser, domainId));
 
                 DbClient.ClearTestCollections();
                 SvcCtrl.StopService("ATACenter");
@@ -181,7 +178,7 @@ namespace Abnormal_UI.UI.Samr
                         continue;
                     }
                     temp.Add(Users[i]);
-                    Logger.Trace("Inserted user {0} for for SamR Detection", temp[userCount].Name);
+                    Logger.Trace($"Inserted user {temp[userCount].Name} for for SamR Detection");
                     userCount++;
                     i++;
                 }
@@ -210,7 +207,7 @@ namespace Abnormal_UI.UI.Samr
                         continue;
                     }
                     temp.Add(Machines[i]);
-                    Logger.Trace("Inserted machine {0} for for SamR Detection", temp[machineCount].Name);
+                    Logger.Trace($"Inserted machine {temp[machineCount].Name} for for SamR Detection");
                     machineCount++;
                     i++;
                 }
@@ -236,19 +233,18 @@ namespace Abnormal_UI.UI.Samr
                 MessageBox.Show(ActivitiesList.Count.ToString());
 
                 var machineCounter = 0;
-                var domainId = DbClient.GetUniqueEntity(UniqueEntityType.Domain).First().Id;
                 MessageBox.Show("1");
                 //Create login for the users
                 foreach (var samrUser in SamrUsers)
                 {
                     ActivitiesList.Add(DocumentCreator.KerberosCreator(samrUser, SamrMachins[machineCounter],
                         DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway,
-                        $"{Spn.CIFS}/{SamrMachins[machineCounter].Name}", SamrMachins[machineCounter], "Tgs", 2, 0));
+                        $"{Spn.CIFS}/{SamrMachins[machineCounter].Name}", SamrMachins[machineCounter], "Tgs", 2));
 
                     MessageBox.Show("2");
                     ActivitiesList.Add(DocumentCreator.KerberosCreator(samrUser, SamrMachins[machineCounter],
                         DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway,
-                        $"{Spn.CIFS}/{(DomainControllers.FirstOrDefault()).Name}", DomainControllers.FirstOrDefault(),
+                        $"{Spn.CIFS}/{DomainControllers.FirstOrDefault()?.Name}", DomainControllers.FirstOrDefault(),
                         "Ap", 2,0, ActivitiesList.Last()["_id"].AsObjectId));
                     machineCounter++;
                 }
