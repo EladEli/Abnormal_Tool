@@ -7,7 +7,6 @@ using System.Threading;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
 
 namespace Abnormal_UI.UI.Abnormal
 {
@@ -85,14 +84,14 @@ namespace Abnormal_UI.UI.Abnormal
                 SvcCtrl.RestartService("ATACenter");
                 var abnormalDetectorProfile =
                     DbClient.SystemProfilesCollection.Find(
-                        Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
+                        Builders<BsonDocument>.Filter.Eq("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
                 LogString = Helper.Log("Gone to sleep for tree build", LogString);
                 while (!abnormalDetectorProfile["AccountTypeToModelMapping"].AsBsonArray.Any())
                 {
                     Thread.Sleep(5000);
                     abnormalDetectorProfile =
                     DbClient.SystemProfilesCollection.Find(
-                        Query.EQ("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
+                        Builders<BsonDocument>.Filter.Eq("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
                 }
                 LogString = Helper.Log("Woke up!", LogString);
                 return true;

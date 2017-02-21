@@ -37,7 +37,7 @@ namespace Abnormal_UI.UI
             DNS,
             RPC
         }
-        public string DomainName { get; set; }
+        public string DomainName { get ; set; }
         #endregion
 
         #region Ctors
@@ -51,7 +51,7 @@ namespace Abnormal_UI.UI
             SelectedMachines = new ObservableCollection<EntityObject>();
             DomainControllers = new ObservableCollection<EntityObject>();
             SelectedDomainControllers = new ObservableCollection<EntityObject>();
-            DomainName = string.Empty;
+            DomainName = "Domain1";
             SourceGateway = DbClient.GetGwOids().FirstOrDefault();
             Logger = LogManager.GetLogger("TestToolboxLog");
         }
@@ -74,7 +74,7 @@ namespace Abnormal_UI.UI
                 Machines = new ObservableCollection<EntityObject>(allComputers.OrderBy(entityObject => entityObject.Name).AsEnumerable());
 
                 var domain = DbClient.GetUniqueEntity(UniqueEntityType.Domain);
-                DomainName = domain.FirstOrDefault()?.Name;
+                DomainName = "domain1.test.local";
             }
             catch (Exception pmException)
             {

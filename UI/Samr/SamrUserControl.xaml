@@ -73,6 +73,7 @@
                     x:Name="SaButton" 
                     Click="SaButton_OnClickAsync"/>
             </StackPanel>
+            <Button x:Name="Test" Content="Test" Height="34" Width="126" Click="Test_Click"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" Width="225">
             <Label x:Name="label1" Content="No SA Should Open" Height="22" Width="170" FontSize="9" Margin="5" HorizontalAlignment="Left"/>

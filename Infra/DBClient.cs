@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Tri.Common.Service;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
 using NLog;
 
 namespace Abnormal_UI.Infra
@@ -12,7 +12,7 @@ namespace Abnormal_UI.Infra
     public class DBClient
     {
         #region Data Members
-
+        
         private static DBClient _dbClient;
         public readonly IMongoDatabase Database;
         public readonly IMongoDatabase TestDatabase;
@@ -29,6 +29,7 @@ namespace Abnormal_UI.Infra
         #region Ctors
         private DBClient()
         {
+            StaticConfiguration.Initialize();
             _logger = LogManager.GetLogger("TestToolboxLog");
             const string connectionString = "mongodb://127.0.0.1:27017";
             try
@@ -59,23 +60,64 @@ namespace Abnormal_UI.Infra
         public List<EntityObject> GetUniqueEntity(UniqueEntityType entityType, bool getDomainController = false)
         {
             return getDomainController
-                ? _uniqueEntitiesCollection.Find(Query.EQ("_t", entityType.ToString()).ToBsonDocument()).
+                ? _uniqueEntitiesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", entityType.ToString())).
                     ToList().
                     Where(_ => _["IsDomainController"].AsBoolean).
                     Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString,null, entityType)).
                     ToList()
-                : _uniqueEntitiesCollection.Find(Query.EQ("_t", entityType.ToString()).ToBsonDocument())
+                : _uniqueEntitiesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", entityType.ToString()))
                     .ToList().Where(_ => _["Name"] != BsonNull.Value)
                     .Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString, _.Contains("SamName") ? _["SamName"].AsString:"", entityType))
+                    .ToList();
+        }
+        public List<EntityObject> GetSensitiveGroups()
+        {
+            return
+                _uniqueEntitiesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", UniqueEntityType.Group.ToString()))
+                    .ToList()
+                    .Where(_ => _["IsSensitiveSid"].AsBoolean)
+                    .Select(_ => new EntityObject(_["Name"].AsString, _["_id"].AsString, null, UniqueEntityType.Group))
                     .ToList();
         }
         public List<ObjectId> FilterGwIds()
         {
             return
-                SystemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument())
+                SystemProfilesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", "GatewaySystemProfile"))
                     .ToEnumerable()
                     .Select(gwProfile => gwProfile.GetElement("_id").Value.AsObjectId)
                     .ToList();
+        }
+        public void SetDetecotorProfileForSamr()
+        {
+            var dateTime = DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0));
+            var SamrDetecotrSystemProfile = SystemProfilesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", "SamrReconnaissanceDetectorProfile")).ToEnumerable();
+            var centerSystemProfile = SystemProfilesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", "CenterSystemProfile")).ToEnumerable();
+            var newDetector = new ComputerProfile
+            {
+                DestinationComputerIdToDetectionStartTimeMapping = new Dictionary<string, DateTime>
+                {
+                    ["4d4193e6-46f6-478f-81ff-50b655279e02"] = dateTime,
+                    ["d68772fe-1171-4124-9f73-0f410340bd54"] = dateTime,
+                    ["339fdbbf-fdf4-4ec4-b4a3-100e3ca99289"] = dateTime,
+                    ["503254de-a822-44cc-9b06-a65cc899d408"] = dateTime,
+                    ["76ebfd99-5722-480a-93b6-cbee134c90c1"] = dateTime,
+                }
+            };
+            foreach (var detectorProfile in SamrDetecotrSystemProfile)
+            {
+                detectorProfile["DestinationComputerIdToDetectionStartTimeMapping"] = newDetector.ToBsonDocument()["DestinationComputerIdToDetectionStartTimeMapping"];
+                SystemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", detectorProfile["_id"]),
+                    detectorProfile);
+            }
+
+            
+            foreach (var centerProfile in centerSystemProfile)
+            {
+                var configurationBson = centerProfile["Configuration"];
+                configurationBson["SamrReconnaissanceDetectorConfiguration"]["UpsertProfileConfiguration"]["Interval"] ="00:00:30";
+                centerProfile["Configuration"] = configurationBson;
+                SystemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", centerProfile["_id"]),centerProfile);
+            }
         }
         public List<ObjectId> GetGwOids()
         {
@@ -83,7 +125,7 @@ namespace Abnormal_UI.Infra
         }
         public void DisposeAbnormalDetectorProfile()
         {
-            var mongoQuery = Query.EQ("_t", "AbnormalBehaviorDetectorProfile");
+            var mongoQuery = Builders<BsonDocument>.Filter.Eq("_t", "AbnormalBehaviorDetectorProfile");
             SystemProfilesCollection.DeleteMany(mongoQuery.ToBsonDocument());
         }
         public void ResetUniqueEntityProfile()
@@ -91,7 +133,7 @@ namespace Abnormal_UI.Infra
             var nullBsonArray = new BsonArray();
             var uniqueEntitiesProfileCollection =
                 Database.GetCollection<BsonDocument>("UniqueEntityProfile")
-                    .Find(Query.EQ("_t", "AccountProfile").ToBsonDocument()).ToEnumerable()
+                    .Find(Builders<BsonDocument>.Filter.Eq("_t", "AccountProfile")).ToEnumerable()
                 ;
             foreach (var uniqueEntityProfileDocument in uniqueEntitiesProfileCollection)
             {
@@ -123,7 +165,7 @@ namespace Abnormal_UI.Infra
         public void SetCenterProfileForReplay()
         {
             var centerSystemProfile =
-                SystemProfilesCollection.Find(Query.EQ("_t", "CenterSystemProfile").ToBsonDocument()).ToEnumerable();
+                SystemProfilesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", "CenterSystemProfile")).ToEnumerable();
             foreach (var centerProfile in centerSystemProfile)
             {
                 var configurationBson = centerProfile["Configuration"];
@@ -141,7 +183,7 @@ namespace Abnormal_UI.Infra
         public void SetCenterProfileForVpn()
         {
             var centerSystemProfile =
-                SystemProfilesCollection.Find(Query.EQ("_t", "CenterSystemProfile").ToBsonDocument()).ToEnumerable();
+                SystemProfilesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", "CenterSystemProfile")).ToEnumerable();
             foreach (var centerProfile in centerSystemProfile)
             {
                 var commonConfigurationBson = centerProfile["GatewayCommonConfiguration"];
@@ -281,7 +323,7 @@ namespace Abnormal_UI.Infra
         {
             try
             {
-                var gatewaySystemProfile = SystemProfilesCollection.Find(Query.EQ("_t", "GatewaySystemProfile").ToBsonDocument()).ToEnumerable().First();
+                var gatewaySystemProfile = SystemProfilesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", "GatewaySystemProfile")).ToEnumerable().First();
                 var gatewayName = gatewaySystemProfile["NetbiosName"].AsString;
                 for (var i = 0; i < amount; i++)
                 {
@@ -299,6 +341,11 @@ namespace Abnormal_UI.Infra
         public void DisposeDatabae()
         {
             TestDatabase.Client.DropDatabase("ATAActivitySimulator");
+        }
+
+        public class ComputerProfile
+        {
+            public Dictionary<string, DateTime> DestinationComputerIdToDetectionStartTimeMapping { get; set; }
         }
         #endregion
     }
