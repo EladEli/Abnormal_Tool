@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Windows;
 using Abnormal_UI.UI.Samr;
 using MongoDB.Bson;
 
@@ -18,21 +19,22 @@ namespace Abnormal_UI.Infra
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
             var sourceComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", computerEntity.Name}};
-            var destinationComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", domainController.Name } };
             var resourceIdentifier = new BsonDocument();
+            var targetAccount = targetMachine ?? domainController;
             var targetSpnName = $"krbtgt/{domainName}";
             if (targetSpn != null)
             {
                 targetSpnName = targetSpn;
             }
-            resourceIdentifier.Add("AccountId", targetMachine?.Id ?? domainController.Id);
+            resourceIdentifier.Add("AccountId", targetAccount.Id);
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
+            var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", targetAccount.Name}};
             var responseTicket = new BsonDocument
             {
                 {"EncryptionType", "Aes256CtsHmacSha196"},
                 {"IsReferral", false},
-                {"Realm", BsonValue.Create(null)},
+                {"Realm", "domain1.test.local"},
                 {"ResourceIdentifier", resourceIdentifier},
                 {"Size", 1084},
                 {"Hash", new byte[16]}
@@ -55,52 +57,73 @@ namespace Abnormal_UI.Infra
                 {"SourceComputerCertainty", "High"},
                 {"SourceComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"DestinationIpAddress", "[daf::daf]"},
-                {"DestinationPort", 88},
                 {"DestinationComputerId", domainController.Id},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"DestinationComputerName", destinationComputerName},
                 {"TransportProtocol", "Tcp"},
+                {"DomainControllerStartTime",oldTime},
                 {"SourceAccountName", sourceAccount},
                 {"SourceAccountId", userEntity.Id},
-                {"SourceComputerSupportedEncryptionTypes", new BsonArray(new[] {"Rc4Hmac"})},
                 {"ResourceIdentifier", resourceIdentifier},
                 {"SourceComputerName", sourceComputerName},
                 {"Error", "Success"},
                 {"NtStatus", BsonValue.Create(null)},
-                {"IsSuccess", BsonValue.Create(false)},
-                {"Options", new BsonArray(new[] {"RenewableOk", "Canonicalize", "Renewable", "Forwardable"})},
-                {"RequestedTicketExpiration", DateTime.UtcNow},
                 {"SourceGatewaySystemProfileId", sourceGateway},
                 {"RequestTicketKerberosId", parentId},
-                {"ArmoringEncryptionType", BsonValue.Create(null)},
                 {"SourceAccountBadPasswordTime", BsonValue.Create(null)},
-                {"DomainControllerStartTime",oldTime },
-                {"IsOldPassword", BsonValue.Create(null)},
-                {"ResponseTicket",responseTicket }
+                {"IsOldPassword", BsonValue.Create(null)}
             };
             if (actionType == "As")
             {
+
                 networkActivityDocument.Add("SourceComputerNetbiosName", computerEntity.Name);
                 networkActivityDocument.Add("IsIncludePac", BsonValue.Create(true));
                 networkActivityDocument.Add("SourceAccountSupportedEncryptionTypes", new BsonArray(new string[0]));
                 networkActivityDocument.Add("EncryptedTimestampEncryptionType", BsonValue.Create(null));
                 networkActivityDocument.Add("EncryptedTimestamp", BsonValue.Create(null));
                 networkActivityDocument.Add("RequestTicket", BsonValue.Create(null));
+                networkActivityDocument.Add("ResponseTicket", responseTicket);
                 networkActivityDocument.Add("IsSmartcardRequiredRc4", BsonValue.Create(false));
+                networkActivityDocument.Add("ArmoringEncryptionType", BsonValue.Create(null));
+                networkActivityDocument.Add("RequestedTicketExpiration", DateTime.UtcNow);
+                networkActivityDocument.Add("SourceComputerSupportedEncryptionTypes", new BsonArray(new[] {"Rc4Hmac"}));
+                networkActivityDocument.Add("DestinationPort", "88");
+                networkActivityDocument.Add("IsSuccess", BsonValue.Create(false));
+                networkActivityDocument.Add("Options", new BsonArray(new[] { "RenewableOk", "Canonicalize", "Renewable", "Forwardable" }));
             }
             else
             {
-                networkActivityDocument.Add("IsServiceForUserToSelf", BsonValue.Create(true));
-                networkActivityDocument.Add("AuthorizationDataSize", BsonValue.Create(null));
-                networkActivityDocument.Add("AuthorizationDataEncryptionType", BsonValue.Create(null));
-                networkActivityDocument.Add("ParentsOptions", "None");
-                networkActivityDocument.Add("AdditionalTickets", new BsonArray(new string[0]));
-                networkActivityDocument.Add("RequestTicket", responseTicket);
+                if (actionType == "Tgs")
+                {
+                    networkActivityDocument.Add("IsServiceForUserToSelf", BsonValue.Create(false));
+                    networkActivityDocument.Add("AuthorizationDataSize", BsonValue.Create(null));
+                    networkActivityDocument.Add("AuthorizationDataEncryptionType", BsonValue.Create(null));
+                    networkActivityDocument.Add("ParentsOptions", "None");
+                    networkActivityDocument.Add("AdditionalTickets", new BsonArray(new string[0]));
+                    networkActivityDocument.Add("RequestTicket", responseTicket);
+                    networkActivityDocument.Add("ResponseTicket", responseTicket);
+                    networkActivityDocument.Add("ArmoringEncryptionType", BsonValue.Create(null));
+                    networkActivityDocument.Add("RequestedTicketExpiration", DateTime.UtcNow);
+                    networkActivityDocument.Add("SourceComputerSupportedEncryptionTypes", new BsonArray(new[] { "Rc4Hmac" }));
+                    networkActivityDocument.Add("DestinationPort", "88");
+                    networkActivityDocument.Add("IsSuccess", BsonValue.Create(false));
+                    networkActivityDocument.Add("Options", new BsonArray(new[] { "RenewableOk", "Canonicalize", "Renewable", "Forwardable"}));
+                }
+                else
+                {
+                    networkActivityDocument.Set(1, new BsonArray(new[]{"Entity", "Activity", "NetworkActivity", "Kerberos", "KerberosAp"}));
+                    networkActivityDocument.Add("RequestTicket", responseTicket);
+                    networkActivityDocument.Add("DestinationPort", 445);
+                    networkActivityDocument.Add("IsSuccess", BsonValue.Create(true));
+                    networkActivityDocument.Add("Options", "MutualRequired");
+                }
             }
             return networkActivityDocument;
         }
+
+
 
         public static BsonDocument SimpleBindCreator(EntityObject userEntity, EntityObject computerEntity,
             EntityObject domainControllerName, string domainName, ObjectId sourceGateway, int daysToSubtruct = 0)
@@ -138,7 +161,6 @@ namespace Abnormal_UI.Infra
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerName", destinationComputerName},
                 {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
-                {"DomainControllerStartTime",oldTime },
                 {"TransportProtocol", "Tcp"},
                 {"AuthenticationType", "Simple"},
                 {"SourceAccountName", sourceAccount},
@@ -378,7 +400,6 @@ namespace Abnormal_UI.Infra
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"DestinationComputerName", destinationComputerName},
-                {"DomainControllerStartTime",oldTime },
                 {"TransportProtocol", "Tcp"},
                 {"Version", 2},
                 {"SourceComputerName", sourceComputerName},
@@ -439,13 +460,13 @@ namespace Abnormal_UI.Infra
         }
 
         public static BsonDocument SamrCreator(EntityObject userEntity, EntityObject computerEntity,
-            EntityObject domainController, string domainName, string groupName, ObjectId sourceGateway, bool sensitive,
-            SamrViewModel.SamrQueryType queryType, string domainId, EntityObject targetMachine = null)
+            EntityObject domainController, string domainName, EntityObject group, ObjectId sourceGateway, bool sensitive,
+            SamrViewModel.SamrQueryType queryType, SamrViewModel.SamrQueryOperation queryOperation, string domainId, int daysToSubtruct = 0)
         {
-            var dateTime = DateTime.UtcNow;
+
+            var dateTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, 0, 0, 0, 0));
             var sourceComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", computerEntity.Name}};
-            var targetAccount = targetMachine ?? domainController;
-            var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", targetAccount.Name}};
+            var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", domainController.Name}};
             var networkActivityDocument = new BsonDocument
             {
                 {"_id", new ObjectId()},
@@ -464,14 +485,14 @@ namespace Abnormal_UI.Infra
                 {"DestinationIpAddress", "[daf::daf]"},
                 {"DestinationPort", 445},
                 {"DestinationComputerName", destinationComputerName},
-                {"DestinationComputerId", targetAccount.Id},
+                {"DestinationComputerId", domainController.Id},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
-                {"DomainControllerStartTime",dateTime },
+                {"DomainControllerStartTime",dateTime},
                 {"TransportProtocol", "Tcp"},
                 {"NtStatus","Success"},
-                {"Operation",queryType.ToString()},
+                {"Operation",queryOperation.ToString()},
                 {"DomainId",domainId}
             };
             switch (queryType)
@@ -481,15 +502,15 @@ namespace Abnormal_UI.Infra
                     networkActivityDocument.Add("UserId", userEntity.Id);
                     networkActivityDocument.Add("IsSensitiveUser", sensitive.ToJson());
                     break;
-                case SamrViewModel.SamrQueryType.QueryGroup: //{    "GroupName" : "Domain Admins", "GroupId" : "93b53035-a881-4535-b336-6770f6da6197", "IsSensitiveGroup" : true      "DomainControllerStartTime" : "2017-02-13T14:26:48.5706149Z", } fields to add
-                    networkActivityDocument.Add("GroupName", groupName);
-                    networkActivityDocument.Add("GroupId", "kljlkjlkjlkjlkjkljlkjlk");
+                case SamrViewModel.SamrQueryType.QueryGroup: 
+                    networkActivityDocument.Add("GroupName", group.Name);
+                    networkActivityDocument.Add("GroupId", group.Id);
                     networkActivityDocument.Add("IsSensitiveGroup", sensitive.ToJson());
                     break;
                 case SamrViewModel.SamrQueryType.QueryDisplayInformation2: 
                     networkActivityDocument.Add("DisplayInformationClass", "DomainDisplayGroup");
                     break;
-                case SamrViewModel.SamrQueryType.EnumerateUsers:
+                case SamrViewModel.SamrQueryType.EnumerateUsers: 
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(queryType), queryType, null);

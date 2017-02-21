@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+using Abnormal_UI.Infra;
 
 namespace Abnormal_UI.UI.Samr
 {
@@ -17,31 +20,35 @@ namespace Abnormal_UI.UI.Samr
             DataContext = _model;
         }
 
-        //private void UpdateSelected()
-        //{
-        //    var selectedEntityObjects = BoxUsers.SelectedItems.Cast<EntityObject>().ToList();
-        //    _model.SelectedUsers = new ObservableCollection<EntityObject>(selectedEntityObjects);
-        //    selectedEntityObjects.Clear();
+        private void UpdateSelected()
+        {
 
-        //    selectedEntityObjects.AddRange(BoxMachines.SelectedItems.Cast<EntityObject>());
-        //    _model.SelectedMachines = new ObservableCollection<EntityObject>(selectedEntityObjects);
-        //    selectedEntityObjects.Clear();
-
-        //    selectedEntityObjects.AddRange(BoxDCs.SelectedItems.Cast<EntityObject>());
-        //    _model.SelectedDomainControllers = new ObservableCollection<EntityObject>(selectedEntityObjects);
-        //    selectedEntityObjects.Clear();
-        //}
+        }
 
         private async void LearningButton_OnClickAsync(object sender, RoutedEventArgs e)
         {
             LearningButton.IsEnabled = false;
+            UpdateSelected();
             var result = await Task.Run(() => _model.GenerateLearningTime());
             MessageBox.Show(result ? "Learning time inserted succesfully" : "Learning time failed");
             LearningButton.IsEnabled = true;
         }
 
-        private void SaButton_OnClickAsync(object sender, RoutedEventArgs e)
+        private async void SaButton_OnClickAsync(object sender, RoutedEventArgs e)
         {
+            SaButton.IsEnabled = false;
+            UpdateSelected();
+            var result = await Task.Run(() => _model.GenerateSamr());
+            MessageBox.Show(result ? "SAMR Activities time inserted succesfully" : "SA failed");
+            LearningButton.IsEnabled = true;
+        }
+
+        private async void Test_Click(object sender, RoutedEventArgs e)
+        {
+            Test.IsEnabled = false;
+            var result = await Task.Run(() => _model.Test());
+            MessageBox.Show(result ? "DB Change Succeeded" : "Big Bdad Bom");
+            Test.IsEnabled = true;
         }
     }
 }
