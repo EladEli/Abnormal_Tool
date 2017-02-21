@@ -18,17 +18,16 @@ namespace Abnormal_UI.Infra
             var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
             var sourceComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", computerEntity.Name}};
+            var destinationComputerName = new BsonDocument { { "DomainName", domainName }, { "Name", domainController.Name } };
             var resourceIdentifier = new BsonDocument();
-            var targetAccount = targetMachine ?? domainController;
             var targetSpnName = $"krbtgt/{domainName}";
             if (targetSpn != null)
             {
                 targetSpnName = targetSpn;
             }
-            resourceIdentifier.Add("AccountId", targetAccount.Id);
+            resourceIdentifier.Add("AccountId", targetMachine?.Id ?? domainController.Id);
             var resourceName = new BsonDocument {{"DomainName", domainName}, {"Name", targetSpnName}};
             resourceIdentifier.Add("ResourceName", resourceName);
-            var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", targetAccount.Name}};
             var responseTicket = new BsonDocument
             {
                 {"EncryptionType", "Aes256CtsHmacSha196"},
@@ -78,7 +77,8 @@ namespace Abnormal_UI.Infra
                 {"ArmoringEncryptionType", BsonValue.Create(null)},
                 {"SourceAccountBadPasswordTime", BsonValue.Create(null)},
                 {"DomainControllerStartTime",oldTime },
-                {"IsOldPassword", BsonValue.Create(null)}
+                {"IsOldPassword", BsonValue.Create(null)},
+                {"ResponseTicket",responseTicket }
             };
             if (actionType == "As")
             {
@@ -88,18 +88,16 @@ namespace Abnormal_UI.Infra
                 networkActivityDocument.Add("EncryptedTimestampEncryptionType", BsonValue.Create(null));
                 networkActivityDocument.Add("EncryptedTimestamp", BsonValue.Create(null));
                 networkActivityDocument.Add("RequestTicket", BsonValue.Create(null));
-                networkActivityDocument.Add("ResponseTicket", responseTicket);
                 networkActivityDocument.Add("IsSmartcardRequiredRc4", BsonValue.Create(false));
             }
             else
             {
-                networkActivityDocument.Add("IsServiceForUserToSelf", BsonValue.Create(false));
+                networkActivityDocument.Add("IsServiceForUserToSelf", BsonValue.Create(true));
                 networkActivityDocument.Add("AuthorizationDataSize", BsonValue.Create(null));
                 networkActivityDocument.Add("AuthorizationDataEncryptionType", BsonValue.Create(null));
                 networkActivityDocument.Add("ParentsOptions", "None");
                 networkActivityDocument.Add("AdditionalTickets", new BsonArray(new string[0]));
                 networkActivityDocument.Add("RequestTicket", responseTicket);
-                networkActivityDocument.Add("ResponseTicket", responseTicket);
             }
             return networkActivityDocument;
         }
@@ -487,14 +485,11 @@ namespace Abnormal_UI.Infra
                     networkActivityDocument.Add("GroupName", groupName);
                     networkActivityDocument.Add("GroupId", "kljlkjlkjlkjlkjkljlkjlk");
                     networkActivityDocument.Add("IsSensitiveGroup", sensitive.ToJson());
-                    networkActivityDocument.Add("DomainControllerStartTime", "DATA....");
                     break;
                 case SamrViewModel.SamrQueryType.QueryDisplayInformation2: 
                     networkActivityDocument.Add("DisplayInformationClass", "DomainDisplayGroup");
-                    networkActivityDocument.Add("DomainControllerStartTime", "DATA....");
                     break;
-                case SamrViewModel.SamrQueryType.EnumerateUsers: 
-                    networkActivityDocument.Add("DomainControllerStartTime", "DATA....");
+                case SamrViewModel.SamrQueryType.EnumerateUsers:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(queryType), queryType, null);

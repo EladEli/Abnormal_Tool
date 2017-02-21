@@ -208,7 +208,7 @@ namespace Abnormal_UI.UI.Abnormal
                                         currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(),
                                         DomainName, SourceGateway,
                                         $"{(Spn)(_random.Next(0, 5))}/{SelectedMachines[currentMachinesCounter].Name}",
-                                        currentSelectedMachine, "Tgs",
+                                        SelectedMachines[currentMachinesCounter + 1], "Tgs",
                                         daysToGenerate, 0, networkActivities.Last()["_id"].AsObjectId));
                                 break;
                             case ActivityType.Event:
