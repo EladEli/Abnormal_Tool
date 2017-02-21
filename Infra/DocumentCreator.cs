@@ -39,13 +39,13 @@ namespace Abnormal_UI.Infra
             };
             var networkActivityDocument = new BsonDocument
             {
-                {"_id", new ObjectId()},
+                {"_id", ObjectId.GenerateNewId()},
                 {
                     "_t",
                     new BsonArray(new[]
                     {"Entity", "NetworkActivity", "Kerberos", "KerberosKdc", "Kerberos" + actionType})
                 },
-                {"HorizontalParentId", new ObjectId()},
+                {"HorizontalParentId", ObjectId.GenerateNewId()},
                 {"StartTime", oldTime},
                 {"EndTime", oldTime},
                 {"SourceIpAddress", "[daf::daf]"},
@@ -135,11 +135,11 @@ namespace Abnormal_UI.Infra
             };
             var networkActivityDocument = new BsonDocument
             {
-                {"_id", new ObjectId()},
+                {"_id", ObjectId.GenerateNewId()},
                 {"_t", new BsonArray(new[] {"Entity", "Activity", "NetworkActivity", "Ldap", "LdapBind"})},
                 {"StartTime", oldTime},
                 {"EndTime", oldTime},
-                {"HorizontalParentId", new ObjectId()},
+                {"HorizontalParentId", ObjectId.GenerateNewId()},
                 {"SourceIpAddress", "[daf::daf]"},
                 {"SourcePort", 6666},
                 {"SourceComputerId", computerEntity.Id},
@@ -205,7 +205,7 @@ namespace Abnormal_UI.Infra
             };
             var suspicousActivityDocument = new BsonDocument
             {
-                {"_id", new ObjectId()},
+                {"_id", ObjectId.GenerateNewId()},
                 {
                     "_t", new BsonArray(new[]
                     {
@@ -268,7 +268,7 @@ namespace Abnormal_UI.Infra
             var failedSourceAccountNames = new BsonArray(records);
             var suspicousActivityDocument = new BsonDocument
             {
-                {"_id", new ObjectId()},
+                {"_id", ObjectId.GenerateNewId()},
                 {
                     "_t", new BsonArray(new[]
                     {
@@ -334,7 +334,7 @@ namespace Abnormal_UI.Infra
             resourceIdentifier.Add("ResourceName", resourceName);
             var eventActivityDocument = new BsonDocument
             {
-                {"_id", new ObjectId()},
+                {"_id", ObjectId.GenerateNewId()},
                 {
                     "_t",
                     new BsonArray(new[] {"Entity", "Activity", "EventActivity", "WindowsEvent", "NtlmEvent"})
@@ -375,12 +375,12 @@ namespace Abnormal_UI.Infra
             var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", targetAccount.Name}};
             var networkActivityDocument = new BsonDocument
             {
-                {"_id", new ObjectId()},
+                {"_id", ObjectId.GenerateNewId()},
                 {"_t", new BsonArray(new[] {"Entity", "NetworkActivity", "Ntlm"})},
                 {"SourceGatewaySystemProfileId", sourceGateway},
                 {"SourceComputerId", computerEntity.Id},
                 {"DestinationComputerId", targetAccount.Id},
-                {"HorizontalParentId", new ObjectId()},
+                {"HorizontalParentId", ObjectId.GenerateNewId()},
                 {"StartTime", oldTime},
                 {"EndTime", oldTime},
                 {"SourceIpAddress", "[daf::daf]"},
@@ -430,7 +430,7 @@ namespace Abnormal_UI.Infra
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
             return new BsonDocument
             {
-                {"_id", new ObjectId()},
+                {"_id", ObjectId.GenerateNewId()},
                 {
                     "_t",
                     new BsonArray(new[] {"Entity", "Activity", "EventActivity", "VpnAuthenticationEvent"})
@@ -464,10 +464,10 @@ namespace Abnormal_UI.Infra
             var destinationComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", domainController.Name}};
             var networkActivityDocument = new BsonDocument
             {
-                {"_id", new ObjectId()},
+                {"_id", ObjectId.GenerateNewId()},
                 {"_t", new BsonArray(new[] {"Entity", "Activity", "NetworkActivity", "Samr", queryType.ToString()})},
                 {"SourceGatewaySystemProfileId", sourceGateway},
-                {"HorizontalParentId", new ObjectId()},
+                {"HorizontalParentId", ObjectId.GenerateNewId()},
                 {"StartTime", dateTime},
                 {"EndTime", dateTime},
                 {"SourceIpAddress", "[daf::daf]"},
