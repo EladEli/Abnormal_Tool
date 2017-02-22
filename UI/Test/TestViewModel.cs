@@ -54,7 +54,7 @@ namespace Abnormal_UI.UI.Test
                 var suspicousActivitities = new List<BsonDocument>();
                 for (var i = 0; i < _saAmount; i++)
                 {
-                    suspicousActivitities.Add(DocumentCreator.SaFillerAe(userEntity, computerEntity, SelectedDomainControllers.FirstOrDefault(), DomainName));
+                    suspicousActivitities.Add(DocumentCreator.SaFillerAe(userEntity, computerEntity, SelectedDomainControllers.FirstOrDefault(), DomainObject.Name));
                 }
                 DbClient.InsertSaBatch(suspicousActivitities);
                 return true;
@@ -79,7 +79,7 @@ namespace Abnormal_UI.UI.Test
                 for (var loopIndex = 0; loopIndex <= _saAmount; loopIndex++)
                 {
                     tgsList.Add(DocumentCreator.KerberosCreator(userEntity, machineEntity,
-                        DomainControllers.FirstOrDefault(), DomainName, SourceGateway, $"{(Spn)(_random.Next(0, 5))}/{Machines[loopIndex].Name}", null, "Tgs"));
+                        DomainControllers.FirstOrDefault(), DomainObject.Name, SourceGateway, $"{(Spn)(_random.Next(0, 5))}/{Machines[loopIndex].Name}", null, "Tgs"));
                 }
                 DbClient.SetCenterProfileForReplay();
                 SvcCtrl.StopService("ATACenter");

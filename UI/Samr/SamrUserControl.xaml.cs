@@ -29,7 +29,7 @@ namespace Abnormal_UI.UI.Samr
             SaButton.IsEnabled = false;
             var result = await Task.Run(() => _model.GenerateSamr());
             MessageBox.Show(result ? "SAMR Activities time inserted succesfully" : "SA failed");
-            LearningButton.IsEnabled = true;
+            SaButton.IsEnabled = true;
         }
 
         private async void Test_Click(object sender, RoutedEventArgs e)

@@ -15,7 +15,7 @@ namespace Abnormal_UI.Infra
             EntityObject targetMachine = null, string actionType = "As", int daysToSubtruct = 0, int hoursToSubtract = 0,
             ObjectId parentId = new ObjectId())
         {
-            var oldTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 0, 0));
+            var kerberosTime = DateTime.UtcNow.Subtract(new TimeSpan(daysToSubtruct, hoursToSubtract, 0, 5, 0));
             var sourceAccount = new BsonDocument {{"DomainName", domainName}, {"Name", userEntity.Name}};
             var sourceComputerName = new BsonDocument {{"DomainName", domainName}, {"Name", computerEntity.Name}};
             var resourceIdentifier = new BsonDocument();
@@ -46,22 +46,22 @@ namespace Abnormal_UI.Infra
                     {"Entity", "NetworkActivity", "Kerberos", "KerberosKdc", "Kerberos" + actionType})
                 },
                 {"HorizontalParentId", ObjectId.GenerateNewId()},
-                {"StartTime", oldTime},
-                {"EndTime", oldTime},
+                {"StartTime", kerberosTime},
+                {"EndTime", kerberosTime},
                 {"SourceIpAddress", "[daf::daf]"},
-                {"SourcePort", 51510},
+                {"SourcePort", 38014},
                 {"SourceComputerId", computerEntity.Id},
                 {"SourceComputerSiteId", BsonValue.Create(null)},
                 {"SourceComputerCertainty", "High"},
                 {"SourceComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
-                {"DestinationIpAddress", "[daf::daf]"},
+                {"DestinationIpAddress", "[daf::200]"},
                 {"DestinationComputerId", domainController.Id},
                 {"DestinationComputerSiteId", BsonValue.Create(null)},
                 {"DestinationComputerCertainty", "High"},
                 {"DestinationComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
                 {"DestinationComputerName", destinationComputerName},
                 {"TransportProtocol", "Tcp"},
-                {"DomainControllerStartTime",oldTime},
+                {"DomainControllerStartTime",kerberosTime},
                 {"SourceAccountName", sourceAccount},
                 {"SourceAccountId", userEntity.Id},
                 {"ResourceIdentifier", resourceIdentifier},
@@ -471,13 +471,13 @@ namespace Abnormal_UI.Infra
                 {"StartTime", dateTime},
                 {"EndTime", dateTime},
                 {"SourceIpAddress", "[daf::daf]"},
-                {"SourcePort", 17393},
+                {"SourcePort", 38014},
                 {"SourceComputerName", sourceComputerName},
                 {"SourceComputerId", computerEntity.Id},
                 {"SourceComputerSiteId", BsonValue.Create(null)},
                 {"SourceComputerCertainty", "High"},
                 {"SourceComputerResolutionMethod", new BsonArray(new[] {"RpcNtlm"})},
-                {"DestinationIpAddress", "[daf::daf]"},
+                {"DestinationIpAddress", "[daf::200]"},
                 {"DestinationPort", 445},
                 {"DestinationComputerName", destinationComputerName},
                 {"DestinationComputerId", domainController.Id},

@@ -49,7 +49,7 @@ namespace Abnormal_UI.UI.Vpn
                 if (machinesIndex >= SelectedMachines.Count) { machinesIndex = 0;}
                 if (ipsIndex >= ExternalIPs.Count) { ipsIndex = 0;}
                 vpnActivities.Add(DocumentCreator.VpnEventCreator(SelectedUsers[usersIndex],
-                    SelectedMachines[machinesIndex], DomainControllers.FirstOrDefault(), DomainName,
+                    SelectedMachines[machinesIndex], DomainControllers.FirstOrDefault(), DomainObject.Name,
                     SourceGateway, ExternalIPs[ipsIndex]));
                 Logger.Debug($"Inserted Vpn activity for {SelectedUsers[usersIndex]} on IP: {ExternalIPs[ipsIndex]}");
                 usersIndex++;
@@ -81,7 +81,7 @@ namespace Abnormal_UI.UI.Vpn
                 var ipAddress = GetRandomIp();
                 System.Threading.Thread.Sleep(50);
                 vpnActivities.Add(DocumentCreator.VpnEventCreator(SelectedUsers[usersIndex],
-                    SelectedMachines[machinesIndex], DomainControllers.FirstOrDefault(), DomainName,
+                    SelectedMachines[machinesIndex], DomainControllers.FirstOrDefault(), DomainObject.Name,
                     SourceGateway, ipAddress));
                 Logger.Debug($"Inserted Vpn activity for {SelectedUsers[usersIndex]} on IP: {ipAddress}");
                 usersIndex++;

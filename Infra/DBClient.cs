@@ -115,6 +115,7 @@ namespace Abnormal_UI.Infra
             {
                 var configurationBson = centerProfile["Configuration"];
                 configurationBson["SamrReconnaissanceDetectorConfiguration"]["UpsertProfileConfiguration"]["Interval"] ="00:00:30";
+                configurationBson["SamrReconnaissanceDetectorConfiguration"]["OperationRetentionPeriod"] = "96:00:00";
                 centerProfile["Configuration"] = configurationBson;
                 SystemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", centerProfile["_id"]),centerProfile);
             }

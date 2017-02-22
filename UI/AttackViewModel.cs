@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using NLog;
 
 namespace Abnormal_UI.UI
@@ -37,7 +38,7 @@ namespace Abnormal_UI.UI
             DNS,
             RPC
         }
-        public string DomainName { get ; set; }
+        public EntityObject DomainObject { get; set; }
         #endregion
 
         #region Ctors
@@ -51,8 +52,8 @@ namespace Abnormal_UI.UI
             SelectedMachines = new ObservableCollection<EntityObject>();
             DomainControllers = new ObservableCollection<EntityObject>();
             SelectedDomainControllers = new ObservableCollection<EntityObject>();
-            DomainName = "domain1.test.local";
             SourceGateway = DbClient.GetGwOids().FirstOrDefault();
+            DomainObject = DbClient.GetUniqueEntity(UniqueEntityType.Domain).First(_ => _.Name == "domain1");
             Logger = LogManager.GetLogger("TestToolboxLog");
         }
 

@@ -200,12 +200,12 @@ namespace Abnormal_UI.UI.Abnormal
                                 networkActivities.Add(
                                     DocumentCreator.KerberosCreator(selectedUser,
                                         currentSelectedMachine,
-                                        SelectedDomainControllers.FirstOrDefault(),
-                                        DomainName, SourceGateway, null, null, "As", daysToGenerate));
+                                        SelectedDomainControllers.FirstOrDefault(),DomainObject.Name
+                                        , SourceGateway, null, null, "As", daysToGenerate));
                                 networkActivities.Add(
                                     DocumentCreator.KerberosCreator(selectedUser,
-                                        currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(),
-                                        DomainName, SourceGateway,
+                                        currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(),DomainObject.Name
+                                        , SourceGateway,
                                         $"{(Spn)(_random.Next(0, 5))}/{SelectedMachines[currentMachinesCounter].Name}",
                                         SelectedMachines[currentMachinesCounter + 1], "Tgs",
                                         daysToGenerate, 0, networkActivities.Last()["_id"].AsObjectId));
@@ -214,14 +214,14 @@ namespace Abnormal_UI.UI.Abnormal
                                 networkActivities.Add(
                                     DocumentCreator.EventCreator(selectedUser,
                                         currentSelectedMachine,
-                                        SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway,
+                                        SelectedDomainControllers.FirstOrDefault(), DomainObject.Name, SourceGateway,
                                         daysToGenerate));
                                 break;
                             case ActivityType.Ntlm:
                                 networkActivities.Add(
                                     DocumentCreator.NtlmCreator(selectedUser,
                                         currentSelectedMachine,
-                                        SelectedDomainControllers.FirstOrDefault(), DomainName, SourceGateway));
+                                        SelectedDomainControllers.FirstOrDefault(), DomainObject.Name, SourceGateway));
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException();
