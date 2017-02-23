@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -66,7 +67,7 @@ namespace Abnormal_UI.UI.Abnormal
             {
                 if (SelectedMachines.Count / SelectedUsers.Count < MaxMachines)
                 {
-                    LogString = Helper.Log("Not enough users",LogString);
+                    LogString = Helper.Log("Not enough users", LogString);
                     return false;
                 }
                 var choosenTypes = ChooseActivtyType();
@@ -82,16 +83,12 @@ namespace Abnormal_UI.UI.Abnormal
                 LogString = Helper.Log("Woke up!", LogString);
                 DbClient.ClearTestCollections();
                 SvcCtrl.RestartService("ATACenter");
-                var abnormalDetectorProfile =
-                    DbClient.SystemProfilesCollection.Find(
-                        Builders<BsonDocument>.Filter.Eq("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
+                var abnormalDetectorProfile = GetAbnoralDetectorProfile();
                 LogString = Helper.Log("Gone to sleep for tree build", LogString);
                 while (!abnormalDetectorProfile["AccountTypeToModelMapping"].AsBsonArray.Any())
                 {
                     Thread.Sleep(5000);
-                    abnormalDetectorProfile =
-                    DbClient.SystemProfilesCollection.Find(
-                        Builders<BsonDocument>.Filter.Eq("_t", "AbnormalBehaviorDetectorProfile").ToBsonDocument()).ToEnumerable().First();
+                    abnormalDetectorProfile = GetAbnoralDetectorProfile();
                 }
                 LogString = Helper.Log("Woke up!", LogString);
                 return true;
@@ -102,6 +99,10 @@ namespace Abnormal_UI.UI.Abnormal
                 return false;
             }
         }
+
+        private BsonDocument GetAbnoralDetectorProfile() => DbClient.SystemProfilesCollection.Find(
+            Builders<BsonDocument>.Filter.Eq("_t", "AbnormalBehaviorDetectorProfile")).ToList().First();
+
         public bool AbnormalActivity(ObservableCollection<EntityObject> specificUser = null)
         {
             try
@@ -149,7 +150,7 @@ namespace Abnormal_UI.UI.Abnormal
 
                 ActivateUsers();
 
-                SelectedMachines = new ObservableCollection<EntityObject>();
+                SelectedMachines.Clear();
                 for (var i = 0; i < 16; i++)
                 {
                     SelectedMachines.Add(Machines[400 + i]);
@@ -188,6 +189,7 @@ namespace Abnormal_UI.UI.Abnormal
                     computersUsedTodayCounter = isAbnormal ? SelectedMachines.Count : _random.Next(MinMachines, MaxMachines + 1);
                     for (var i = 0; i < computersUsedTodayCounter; i++)
                     {
+                        //Makes all resources on the same machine!!!
                         if (currentMachinesCounter + computersUsedTodayCounter >= SelectedMachines.Count - 1)
                         {
                             currentMachinesCounter = 0;
