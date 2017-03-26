@@ -3,6 +3,7 @@
     "Humanizer.Core": "2.1",
     "MongoDB.Bson": "2.4.3",
     "MongoDB.Driver": "2.4.3",
+    "morelinq": "2.2.0",
     "NLog.Config": "4.4.4",
     "NLog.Schema": "4.4.4"
   },
