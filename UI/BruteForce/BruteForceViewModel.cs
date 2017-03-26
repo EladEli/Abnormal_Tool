@@ -5,7 +5,6 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Win32;
-using MoreLinq;
 
 namespace Abnormal_UI.UI.BruteForce
 {
@@ -67,7 +66,7 @@ namespace Abnormal_UI.UI.BruteForce
                 browseWindow.ShowDialog();
                 var filePath = browseWindow.FileName;
                 PasswordList.Clear();
-                File.ReadAllText(filePath).Split(new[] { "\r\n" }, StringSplitOptions.None).ForEach(_ => PasswordList.Add(_));
+                PasswordList = new ObservableCollection<string>(File.ReadAllText(filePath).Split(new[] { "\r\n" }, StringSplitOptions.None));
                 return true;
             }
             catch (Exception)
