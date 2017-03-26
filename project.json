@@ -1,11 +1,11 @@
 ﻿{
   "dependencies": {
-    "NLog.Config": "4.3.10",
-    "NLog.Schema": "4.3.10",
-    "MongoDB.Driver": "2.3.0",
-    "morelinq": "2.0.0-beta03",
-    "MongoDB.Bson": "2.3.0",
-    "Humanizer.Core": "2.1"
+    "Humanizer.Core": "2.1",
+    "MongoDB.Bson": "2.4.3",
+    "MongoDB.Driver": "2.4.3",
+    "morelinq": "2.2.0",
+    "NLog.Config": "4.4.4",
+    "NLog.Schema": "4.4.4"
   },
   "frameworks": {
     "net461": {}

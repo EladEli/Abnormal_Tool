@@ -94,11 +94,11 @@ namespace Abnormal_UI.UI.Samr
                 }
 
                 DbClient.ClearTestCollections();
-                //SvcCtrl.StopService("ATACenter");
+                SvcCtrl.StopService("ATACenter");
                 DbClient.SetCenterProfileForReplay();
                 DbClient.SetDetecotorProfileForSamr();
                 DbClient.InsertBatch(ActivitiesList);
-                //SvcCtrl.StartService("ATACenter");
+                SvcCtrl.StartService("ATACenter");
                 Logger.Debug("Done inserting SAMR activities");
                 return true;
             }
