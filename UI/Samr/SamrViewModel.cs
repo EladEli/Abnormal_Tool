@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
@@ -9,12 +11,10 @@ namespace Abnormal_UI.UI.Samr
 {
     public class SamrViewModel : AttackViewModel
     {
-
         private List<EntityObject> GroupsList { get; set; }
         public List<EntityObject> SamrUsers { get; set; }
         public List<EntityObject> SamrMachins { get; set; }
         public List<BsonDocument> ActivitiesList { get; set; }
-
         public SamrViewModel()
         {
             GroupsList = DbClient.GetSensitiveGroups();
@@ -87,7 +87,7 @@ namespace Abnormal_UI.UI.Samr
                         $"{Spn.CIFS}/{SamrMachins[machineCounter].Name}", DomainControllers.FirstOrDefault(), "Ap", 2, 0,
                         ActivitiesList.Last()["_id"].AsObjectId));
 
-                    Logger.Debug("Inserted AS and TGS activity for {1} on {0}",
+                    Logger.Debug("Inserted As,Tgs,Ap activity for {1} on {0}",
                         SamrMachins[machineCounter].Name, samrUser.Name);
 
                     machineCounter++;
@@ -96,10 +96,11 @@ namespace Abnormal_UI.UI.Samr
                 DbClient.ClearTestCollections();
                 SvcCtrl.StopService("ATACenter");
                 DbClient.SetCenterProfileForReplay();
-                DbClient.SetDetecotorProfileForSamr();
+                DbClient.SetDetectorProfileForSamr("96:00:00");
                 DbClient.InsertBatch(ActivitiesList);
                 SvcCtrl.StartService("ATACenter");
                 Logger.Debug("Done inserting SAMR activities");
+                Thread.Sleep(270000);
                 return true;
             }
             catch (Exception e)
@@ -115,7 +116,7 @@ namespace Abnormal_UI.UI.Samr
             try
             {
                 ActivitiesList.Clear();
-                var sesitiveUser = Users.FirstOrDefault(_ => _.Name == "Administrator");
+                var sensitiveUser = Users.FirstOrDefault(_ => _.Name == "Administrator");
                 var domainId = DbClient.GetUniqueEntity(UniqueEntityType.Domain).First().Id;
 
                 //Create SA for first Low Rate Machine
@@ -125,7 +126,7 @@ namespace Abnormal_UI.UI.Samr
                     DomainObject.Name, GroupsList[4], SourceGateway, true,
                     SamrQueryType.QueryGroup,SamrQueryOperation.QueryInformationGroup, domainId));
 
-                ActivitiesList.Add(DocumentCreator.SamrCreator(sesitiveUser, SamrMachins[0],
+                ActivitiesList.Add(DocumentCreator.SamrCreator(sensitiveUser, SamrMachins[0],
                     DomainControllers.FirstOrDefault(),
                     DomainObject.Name, GroupsList[4], SourceGateway, true,
                     SamrQueryType.QueryUser,SamrQueryOperation.QueryInformationUser, domainId));
@@ -133,22 +134,20 @@ namespace Abnormal_UI.UI.Samr
                 //Create SA for first High Rate Machine
                 for (var i = 0; i < 6; i++)
                 {
-                        ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[4], SamrMachins[4],
-                            DomainControllers.FirstOrDefault(),
-                            DomainObject.Name, GroupsList[20+i], SourceGateway, true,
-                            SamrQueryType.QueryGroup, SamrQueryOperation.QueryInformationGroup, domainId));
-
+                    ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[4], SamrMachins[4],
+                        DomainControllers.FirstOrDefault(),
+                        DomainObject.Name, GroupsList[20+i], SourceGateway, true,
+                        SamrQueryType.QueryGroup, SamrQueryOperation.QueryInformationGroup, domainId));
                 }
-                ActivitiesList.Add(DocumentCreator.SamrCreator(sesitiveUser, SamrMachins[4],
+                ActivitiesList.Add(DocumentCreator.SamrCreator(sensitiveUser, SamrMachins[4],
                     DomainControllers.FirstOrDefault(),
                     DomainObject.Name, GroupsList[4], SourceGateway, true,
                     SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser, domainId));
 
                 DbClient.ClearTestCollections();
                 SvcCtrl.StopService("ATACenter");
-                DbClient.SetCenterProfileForReplay();
-                DbClient.SetDetecotorProfileForSamr();
                 DbClient.InsertBatch(ActivitiesList);
+                DbClient.SetDetectorProfileForSamr("00:03:00");
                 SvcCtrl.StartService("ATACenter");
                 Logger.Debug("Done inserting SAMR activities");
                 return true;
@@ -251,7 +250,7 @@ namespace Abnormal_UI.UI.Samr
                 DbClient.ClearTestCollections();
                 SvcCtrl.StopService("ATACenter");
                 DbClient.SetCenterProfileForReplay();
-                DbClient.SetDetecotorProfileForSamr();
+                DbClient.SetDetectorProfileForSamr("96:00:00");
                 DbClient.InsertBatch(ActivitiesList);
                 SvcCtrl.StartService("ATACenter");
                 Logger.Debug("Done inserting SAMR activities");

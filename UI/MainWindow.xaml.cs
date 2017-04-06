@@ -1,4 +1,5 @@
-﻿using Abnormal_UI.Infra;
+﻿using System.Windows;
+using Abnormal_UI.Infra;
 using Abnormal_UI.UI.Abnormal;
 using Abnormal_UI.UI.BruteForce;
 using Abnormal_UI.UI.Samr;
@@ -21,7 +22,7 @@ namespace Abnormal_UI.UI
         public MainWindow()
         {
             InitializeComponent();
-           
+            
             abnormalModel = new AbnormalViewModel();
             abnormalModel.PopulateModel();
             AbnormalAttackWindow = new AbnormalAttackUserControl(abnormalModel);

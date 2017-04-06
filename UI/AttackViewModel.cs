@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
-using MongoDB.Driver;
 using NLog;
 
 namespace Abnormal_UI.UI
@@ -53,7 +52,7 @@ namespace Abnormal_UI.UI
             DomainControllers = new ObservableCollection<EntityObject>();
             SelectedDomainControllers = new ObservableCollection<EntityObject>();
             SourceGateway = DbClient.GetGwOids().FirstOrDefault();
-            DomainObject = DbClient.GetUniqueEntity(UniqueEntityType.Domain).First(_ => _.Name == "domain1");
+            DomainObject = DbClient.GetUniqueEntity(UniqueEntityType.Domain).First(_=>_.Name == "domain1");
             Logger = LogManager.GetLogger("TestToolboxLog");
         }
 

@@ -87,7 +87,7 @@ namespace Abnormal_UI.Infra
                     .Select(gwProfile => gwProfile.GetElement("_id").Value.AsObjectId)
                     .ToList();
         }
-        public void SetDetecotorProfileForSamr()
+        public void SetDetectorProfileForSamr(string retentionPeriodTime)
         {
             var dateTime = DateTime.UtcNow.Subtract(new TimeSpan(1, 0, 0, 0, 0));
             var samrDetecotrSystemProfile = SystemProfilesCollection.Find(Builders<BsonDocument>.Filter.Eq("_t", "SamrReconnaissanceDetectorProfile")).ToEnumerable();
@@ -115,7 +115,8 @@ namespace Abnormal_UI.Infra
             {
                 var configurationBson = centerProfile["Configuration"];
                 configurationBson["SamrReconnaissanceDetectorConfiguration"]["UpsertProfileConfiguration"]["Interval"] ="00:00:30";
-                configurationBson["SamrReconnaissanceDetectorConfiguration"]["OperationRetentionPeriod"] = "96:00:00";
+                configurationBson["SamrReconnaissanceDetectorConfiguration"]["OperationRetentionPeriod"] = retentionPeriodTime;
+                configurationBson["SamrReconnaissanceDetectorConfiguration"]["RemoveOldOperationsConfiguration"]["Interval"] = "00:04:00";
                 centerProfile["Configuration"] = configurationBson;
                 SystemProfilesCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", centerProfile["_id"]),centerProfile);
             }
