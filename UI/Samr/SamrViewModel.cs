@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
@@ -25,7 +24,6 @@ namespace Abnormal_UI.UI.Samr
         {
             try
             {
-
                 //Get Samr Users and Machines
                 SamrUsers = GetSamrUsers();
                 SamrMachins = GetSamrMachins();
@@ -92,7 +90,6 @@ namespace Abnormal_UI.UI.Samr
 
                     machineCounter++;
                 }
-
                 DbClient.ClearTestCollections();
                 SvcCtrl.StopService("ATACenter");
                 DbClient.SetCenterProfileForReplay();
@@ -108,7 +105,6 @@ namespace Abnormal_UI.UI.Samr
                 Logger.Debug(e);
                 throw;
             }
-            
         }
 
         public bool GenerateSamr()
@@ -157,9 +153,7 @@ namespace Abnormal_UI.UI.Samr
                 Logger.Debug(e);
                 throw;
             }
-
         }
-
 
         public List<EntityObject> GetSamrUsers()
         {
