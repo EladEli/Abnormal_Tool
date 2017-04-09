@@ -445,12 +445,13 @@ namespace Abnormal_UI.Infra
                 {"SourceComputerName", sourceComputer},
                 {"SourceComputerId", computerEntity.Id},
                 {"ExternalSourceIpAddress", externalSourceIp},
+                {"InternalSourceIpAddress", BsonValue.Create(null)},
                 {"ServerName", serverName},
                 {"ServerInternalIpAddress", "192.168.0.200"},
-                {"ServerId", domainController.Id},
-                {"GeoLocationInformation", BsonValue.Create(null)},
-                {"NetworkInformation", BsonValue.Create(null)},
-                {"ProxyInformation", BsonValue.Create(null)}
+                {"SourceGeolocationId", BsonValue.Create(null)},
+                {"SourceGeolocationConfidenceLevel", "None"},
+                {"Carrier", BsonValue.Create(null)},
+                {"ServerId", domainController.Id}
             };
         }
 
