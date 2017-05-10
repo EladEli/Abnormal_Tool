@@ -97,7 +97,9 @@ namespace Abnormal_UI.UI.Samr
                 DbClient.InsertBatch(ActivitiesList);
                 SvcCtrl.StartService("ATACenter");
                 Logger.Debug("Done inserting SAMR activities");
+                Logger.Debug("Sleeping for 4.5 minutes");
                 Thread.Sleep(270000);
+                Logger.Debug("Woke up!");
                 return true;
             }
             catch (Exception e)
@@ -112,8 +114,10 @@ namespace Abnormal_UI.UI.Samr
             try
             {
                 ActivitiesList.Clear();
+                SamrUsers = GetSamrUsers();
+                SamrMachins = GetSamrMachins();
                 var sensitiveUser = Users.FirstOrDefault(_ => _.Name == "Administrator");
-                var domainId = DbClient.GetUniqueEntity(UniqueEntityType.Domain).First().Id;
+                var domainId = DomainObject.Id;
 
                 //Create SA for first Low Rate Machine
 

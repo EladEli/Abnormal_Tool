@@ -29,11 +29,11 @@ namespace Abnormal_UI.Infra
         #region Ctors
         private DbClient()
         {
-            StaticConfiguration.Initialize();
-            _logger = LogManager.GetLogger("TestToolboxLog");
             const string connectionString = "mongodb://127.0.0.1:27017";
             try
             {
+                StaticConfiguration.Initialize();
+                _logger = LogManager.GetLogger("TestToolboxLog");
                 var client = new MongoClient(connectionString);
                 Database = client.GetDatabase("ATA");
                 TestDatabase = client.GetDatabase("ATAActivitySimulator");

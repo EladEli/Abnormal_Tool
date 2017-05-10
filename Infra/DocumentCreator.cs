@@ -454,7 +454,6 @@ namespace Abnormal_UI.Infra
                 {"ServerId", domainController.Id}
             };
         }
-
         public static BsonDocument SamrCreator(EntityObject userEntity, EntityObject computerEntity,
             EntityObject domainController, string domainName, EntityObject group, ObjectId sourceGateway, bool sensitive,
             SamrViewModel.SamrQueryType queryType, SamrViewModel.SamrQueryOperation queryOperation, string domainId, int daysToSubtruct = 0)

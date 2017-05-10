@@ -53,6 +53,7 @@ namespace Abnormal_UI.UI
             SelectedDomainControllers = new ObservableCollection<EntityObject>();
             SourceGateway = DbClient.GetGwOids().FirstOrDefault();
             DomainObject = DbClient.GetUniqueEntity(UniqueEntityType.Domain).First(_=>_.Name == "domain1");
+            //DomainObject = DbClient.GetUniqueEntity(UniqueEntityType.Domain).First();
             Logger = LogManager.GetLogger("TestToolboxLog");
         }
 
