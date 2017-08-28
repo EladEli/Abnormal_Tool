@@ -50,16 +50,16 @@ namespace Abnormal_UI.UI.Samr
                 }
 
                 //Create High Rate Machines 
-                for (var i = 4; i < 8; i++)
+                for (var i = 4; i < SamrUsers.Count; i++)
                 {
-                    for (var j = 0; j < 20; j++)
+                    foreach (var group in GroupsList)
                     {
                         ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[i], SamrMachins[i],
                             DomainControllers.FirstOrDefault(),
-                            DomainObject.Name, GroupsList[j], SourceGateway, true,
+                            DomainObject.Name, group, SourceGateway, true,
                             SamrQueryType.QueryGroup, SamrQueryOperation.QueryInformationGroup,DomainObject.Id,2));
                         Logger.Debug("Inserted {3} {2} activity for {1} on {0}",
-                            SamrMachins[i].Name, SamrUsers[i].Name, GroupsList[j].Name, SamrQueryType.QueryGroup);
+                            SamrMachins[i].Name, SamrUsers[i].Name, group.Name, SamrQueryType.QueryGroup);
                     }
                     ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[i], SamrMachins[i],
                         DomainControllers.FirstOrDefault(),
