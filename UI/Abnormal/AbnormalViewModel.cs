@@ -100,7 +100,7 @@ namespace Abnormal_UI.UI.Abnormal
             }
         }
 
-        private BsonDocument GetAbnoralDetectorProfile() => DbClient.SystemProfileCollection.Find(
+        private BsonDocument GetAbnoralDetectorProfile() => DbClient.DataProfileCollection.Find(
             Builders<BsonDocument>.Filter.Eq("_t", "AbnormalBehaviorDetectorProfile")).ToList().First();
 
         public bool AbnormalActivity(ObservableCollection<EntityObject> specificUser = null)

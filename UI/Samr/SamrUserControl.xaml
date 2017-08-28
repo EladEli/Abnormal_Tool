@@ -5,50 +5,38 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
     <DockPanel>
-
-        <StackPanel Orientation="Vertical" Width="187">
-            <Button x:Name="Test1" Content="Query Sent From Domain Controller" Height="22" Width="170" Margin="5,5,0,5" FontSize="8" HorizontalAlignment="Left" HorizontalContentAlignment="Left"/>
-            <Button x:Name="Test2" Content="Query From a User On Himself" Height="22" Width="170" Margin="5" FontSize="8" HorizontalAlignment="Left" HorizontalContentAlignment="Left"/>
-            <Button x:Name="Test3"
-                    Height="42" Width="170" Margin="5,5,0,5" FontSize="8" HorizontalAlignment="Left">
-                <TextBlock Text="Query that has been done from the computer in the learning period" TextWrapping="Wrap"/>
-            </Button>
-            <Button x:Name="Test4"
-                    Height="42" Width="170" Margin="5,5,0,5" FontSize="8" HorizontalAlignment="Left">
-                <TextBlock Text="Query from a machine on a previously logged in user" TextWrapping="Wrap" HorizontalAlignment="Left"/>
-            </Button>
-            <Button x:Name="Test5"
-                    Height="42" Width="170" Margin="5,5,0,5" FontSize="8" HorizontalAlignment="Left">
-                <TextBlock Text="Query that has already been done from 3 or more different users in the learning period" TextWrapping="Wrap" HorizontalAlignment="Left" Width="163"/>
-            </Button>
-            <Button x:Name="Test6"
-                    Height="42" Width="170" Margin="5,5,0,5" FontSize="8" HorizontalAlignment="Left">
-                <TextBlock Text="Query From a High Rate Machine (More than 3 Other computers queried the same query)" TextWrapping="Wrap" HorizontalAlignment="Left"/>
-            </Button>
-            <Button x:Name="Test7"
-                    Height="42" Width="170" Margin="5,5,0,5" FontSize="8" HorizontalAlignment="Left">
-                <TextBlock Text="Query From a High Rate Machine (More than 5 different queires from the machine on sensitive accounts)" TextWrapping="Wrap" HorizontalAlignment="Left"/>
-            </Button>
-            <Button x:Name="Test8"
-                    Height="42" Width="170" Margin="5,5,0,5" FontSize="8" HorizontalAlignment="Left">
-                <TextBlock Text="Query From a Low Rate Machine (More than 3 Other computers queried the same query)" TextWrapping="Wrap" HorizontalAlignment="Left"/>
-            </Button>
-            <Button x:Name="Test9"
-                    Height="42" Width="170" Margin="5,5,0,5" FontSize="8" HorizontalAlignment="Left">
-                <TextBlock Text="Query From a Low Rate Machine (Less than 3 Other computers queried the same query)" TextWrapping="Wrap" HorizontalAlignment="Left"/>
-            </Button>
-            <Button x:Name="Test10"
-                    Height="42" Width="170" Margin="5,5,0,5" FontSize="8" HorizontalAlignment="Left">
-                <TextBlock Text="Query From a Low Rate Machine (that send suddenly high volumes)" TextWrapping="Wrap" HorizontalAlignment="Left"/>
-            </Button>
-            <Button x:Name="Test11"
-                    Height="42" Width="170" Margin="5,5,0,5" FontSize="8" HorizontalAlignment="Left">
-                <TextBlock Text="Query From a High Rate Machine (that send suddenly low volumes)" TextWrapping="Wrap" HorizontalAlignment="Left"/>
-            </Button>
+        <StackPanel Orientation="Horizontal">
+            <ListBox Width="250" 
+                     Height="Auto" 
+                     Margin="20"
+                     x:Name="BoxUsers" 
+                     ItemsSource="{Binding Users}" 
+                     DisplayMemberPath="Name"
+                     SelectionMode="Extended" 
+                     SelectedIndex="0">
+            </ListBox>
+            <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxUsers}" 
+                       Name="SelUsersCount"
+                       Width="20" 
+                       Height="20"
+                       VerticalAlignment="Bottom"
+                       Margin="-10 0 0 20"/>
+            <ListBox Width="250" 
+                     Height="Auto" 
+                     Margin="20"
+                     x:Name="BoxMachines" 
+                     ItemsSource="{Binding Machines}" 
+                     DisplayMemberPath="Name"
+                     SelectionMode="Extended"
+                     SelectedIndex="0">
+            </ListBox>
+            <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxMachines}" 
+                       Name="SelMachinesCount"
+                       Width="20" 
+                       Height="20"
+                       VerticalAlignment="Bottom"
+                       Margin="-10 0 0 20"/>
         </StackPanel>
-
-
-
         <StackPanel DockPanel.Dock="Right" >
             <ListBox Width="200" 
                      Height="100" 
@@ -73,20 +61,6 @@
                     x:Name="SaButton" 
                     Click="SaButton_OnClickAsync"/>
             </StackPanel>
-            <Button x:Name="Test" Content="Test" Height="34" Width="126" Click="Test_Click"/>
-        </StackPanel>
-        <StackPanel Orientation="Vertical" Width="225">
-            <Label x:Name="label1" Content="No SA Should Open" Height="22" Width="170" FontSize="9" Margin="5" HorizontalAlignment="Left"/>
-            <Label x:Name="label2" Content="No SA Should Open" Height="22" Width="170" FontSize="9" Margin="5,5,5,10" HorizontalAlignment="Left"/>
-            <Label x:Name="label3" Content="No SA Should Open" Height="22" Width="170" FontSize="9" Margin="5" HorizontalAlignment="Left"/>
-            <Label x:Name="label4" Content="No SA Should Open" Height="22" Width="170" FontSize="9" Margin="5,30,35,20" HorizontalAlignment="Left"/>
-            <Label x:Name="label5" Content="No SA Should Open" Height="22" Width="170" FontSize="9" Margin="5,10,35,20" HorizontalAlignment="Left"/>
-            <Label x:Name="label6" Content="No SA Should Open" Height="22" Width="170" FontSize="9" Margin="5,10,5,10" HorizontalAlignment="Left"/>
-            <Label x:Name="label7" Content="SA Should Be Open" Height="22" Width="170" FontSize="9" Margin="5,15,5,10" HorizontalAlignment="Left"/>
-            <Label x:Name="label8" Content="No SA Should Open" Height="22" Width="170" FontSize="9" Margin="5,25,5,10" HorizontalAlignment="Left"/>
-                <Label x:Name="label9" Content="SA Should Be Open" Height="22" Width="170" FontSize="9" Margin="5,20,5,10" HorizontalAlignment="Left"/>
-            <Label x:Name="label10" Content="SA Should Be Open" Height="22" Width="170" FontSize="9" Margin="5,20,5,10" HorizontalAlignment="Left"/>
-            <Label x:Name="label11" Content="SA Should Be Open" Height="22" Width="170" FontSize="9" Margin="5,20,5,10" HorizontalAlignment="Left"/>
         </StackPanel>
     </DockPanel>
 </UserControl>

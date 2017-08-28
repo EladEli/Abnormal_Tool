@@ -187,7 +187,6 @@ namespace Abnormal_UI.UI.Samr
             }
 
         }
-
         public List<EntityObject> GetSamrMachins()
         {
             try
@@ -214,53 +213,7 @@ namespace Abnormal_UI.UI.Samr
                 Logger.Debug(e);
                 return null;
             }
-
         }
-
-        public bool Test()
-        {
-            try
-            {
-                //Get Samr Users and Machines
-                SamrUsers = GetSamrUsers();
-                SamrMachins = GetSamrMachins();
-                ActivitiesList.Clear();
-                MessageBox.Show(SamrUsers.Count.ToString());
-                MessageBox.Show(ActivitiesList.Count.ToString());
-
-                var machineCounter = 0;
-                MessageBox.Show("1");
-                //Create login for the users
-                foreach (var samrUser in SamrUsers)
-                {
-                    ActivitiesList.Add(DocumentCreator.KerberosCreator(samrUser, SamrMachins[machineCounter],
-                        DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway,
-                        $"{Spn.CIFS}/{SamrMachins[machineCounter].Name}", SamrMachins[machineCounter], "Tgs", 2));
-
-                    MessageBox.Show("2");
-                    ActivitiesList.Add(DocumentCreator.KerberosCreator(samrUser, SamrMachins[machineCounter],
-                        DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway,
-                        $"{Spn.CIFS}/{DomainControllers.FirstOrDefault()?.Name}", DomainControllers.FirstOrDefault(),
-                        "Ap", 2,0, ActivitiesList.Last()["_id"].AsObjectId));
-                    machineCounter++;
-                }
-                MessageBox.Show("3");
-                DbClient.ClearTestCollections();
-                SvcCtrl.StopService("ATACenter");
-                DbClient.SetCenterProfileForReplay();
-                DbClient.SetDetectorProfileForSamr("96:00:00");
-                DbClient.InsertBatch(ActivitiesList);
-                SvcCtrl.StartService("ATACenter");
-                Logger.Debug("Done inserting SAMR activities");
-                return true;
-            }
-            catch (Exception e)
-            {
-                Logger.Debug(e);
-                throw;
-            }
-        }
-
         public enum SamrQueryType
         {
             EnumerateUsers,
@@ -268,7 +221,6 @@ namespace Abnormal_UI.UI.Samr
             QueryDisplayInformation2, //EnumerateGroups
             QueryUser
         }
-
         public enum SamrQueryOperation
         {
             EnumerateUsersInDomain,
@@ -276,7 +228,5 @@ namespace Abnormal_UI.UI.Samr
             QueryDisplayInformation2, //EnumerateGroups
             QueryInformationUser
         }
-
-
     }
 }
