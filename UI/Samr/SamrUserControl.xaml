@@ -12,7 +12,7 @@
                      x:Name="BoxUsers" 
                      ItemsSource="{Binding Users}" 
                      DisplayMemberPath="Name"
-                     SelectionMode="Extended" 
+                     SelectionMode="Single" 
                      SelectedIndex="0">
             </ListBox>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxUsers}" 
@@ -27,7 +27,7 @@
                      x:Name="BoxMachines" 
                      ItemsSource="{Binding Machines}" 
                      DisplayMemberPath="Name"
-                     SelectionMode="Extended"
+                     SelectionMode="Single"
                      SelectedIndex="0">
             </ListBox>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxMachines}" 
@@ -37,27 +37,51 @@
                        VerticalAlignment="Bottom"
                        Margin="-10 0 0 20"/>
         </StackPanel>
-        <StackPanel DockPanel.Dock="Right" >
+        <StackPanel DockPanel.Dock="Right">
             <ListBox Width="200" 
                      Height="100" 
                      Margin="25"
                      x:Name="BoxDCs" 
-                     ItemsSource="{Binding DomainControllers}" 
-                     DisplayMemberPath="Name"
+                     ItemsSource="{Binding SamrCouples}" 
                      SelectionMode="Extended"
                      SelectedIndex="0"
                      HorizontalAlignment="Left"/>
-            <StackPanel HorizontalAlignment="Left" Margin="20">
+            <RadioButton Content="Low Rate"
+                         x:Name="LowRateButton"
+                         Height="15"
+                         Margin="25 0 0 0"
+                         IsChecked="True"/>
+            <RadioButton Content="High Rate"
+                         x:Name="HighRateButton"
+                         Height="15"
+                         Margin="25 0 0 -50"/>
+            <Button Width="50" 
+                    Height="35" 
+                    Margin="30 -10 0 -30"
+                    Content="-->"
+                    x:Name="RatingButton" 
+                    Click="RatingButton_OnClick" 
+                    RenderTransformOrigin="0.5,0.5">
+                <Button.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="-90.246"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Button.RenderTransform>
+            </Button>
+            <StackPanel HorizontalAlignment="Left" Margin="20 50 0 10">
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
-                    Content="Generate Learning Time"
+                    Content="Execute Learning Time"
                     x:Name="LearningButton" 
                     Click="LearningButton_OnClickAsync"/>
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
-                    Content="Auto Generate Samr SAs"
+                    Content="Execute Samr detection"
                     x:Name="SaButton" 
                     Click="SaButton_OnClickAsync"/>
             </StackPanel>

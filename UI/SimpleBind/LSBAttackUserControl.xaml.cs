@@ -35,32 +35,32 @@ namespace Abnormal_UI.UI.SimpleBind
             selectedEntityObjects.Clear();
         }
 
-        private async void BtnLSBDistinct_OnClickAsync(object sender, RoutedEventArgs e)
+        private async void BtnLsbDistinct_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
-            BtnLSBDistinct.IsEnabled = false;
+            BtnLsbDistinct.IsEnabled = false;
             var result = await Task.Run(() => _model.LsbDistinct());
-            BtnLSBDistinct.IsEnabled = true;
+            BtnLsbDistinct.IsEnabled = true;
             MessageBox.Show(result
                 ? "User activity insertion ended."
                 : "Please select at least 11 users and at least 1 machine!");
         }
-        private async void BtnLSBDintense_OnClickAsync(object sender, RoutedEventArgs e)
+        private async void BtnLsbIntense_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
-            BtnLSBIntense.IsEnabled = false;
+            BtnLsbIntense.IsEnabled = false;
             var result = await Task.Run(() => _model.LsbIntense());
-            BtnLSBIntense.IsEnabled = true;
+            BtnLsbIntense.IsEnabled = true;
             MessageBox.Show(result
                 ? "User activity insertion ended." 
                 : "Please select at least 1 user and 1 machine!");
         }
-        private async void BtnLSBSpecific_OnClickAsync(object sender, RoutedEventArgs e)
+        private async void BtnLsbSpecific_OnClickAsync(object sender, RoutedEventArgs e)
         {
             UpdateSelected();
-            BtnLSBSpecific.IsEnabled = false;
+            BtnLsbSpecific.IsEnabled = false;
             var result = await Task.Run(() => _model.LsbSingle());
-            BtnLSBSpecific.IsEnabled = true;
+            BtnLsbSpecific.IsEnabled = true;
             MessageBox.Show(result ? "User activity insertion ended." : "Please select at least 1 user and 1 machine!");
         }
     }

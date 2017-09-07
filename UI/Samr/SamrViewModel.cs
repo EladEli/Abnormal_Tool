@@ -1,232 +1,178 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
-using System.Windows;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Abnormal_UI.UI.Samr
 {
     public class SamrViewModel : AttackViewModel
     {
-        private List<EntityObject> GroupsList { get; set; }
-        public List<EntityObject> SamrUsers { get; set; }
-        public List<EntityObject> SamrMachins { get; set; }
+        #region Data Members
         public List<BsonDocument> ActivitiesList { get; set; }
+        public ObservableCollection<CoupledSamr> SamrCouples { get; set; }
+        private BsonDocument SamrReconnaissanceDetectorProfile { get; set; }
+        private readonly Random _random = new Random();
+        #endregion
+
+        #region Ctors
         public SamrViewModel()
         {
-            GroupsList = DbClient.GetSensitiveGroups();
             ActivitiesList = new List<BsonDocument>();
+            SamrCouples = new ObservableCollection<CoupledSamr>();
         }
 
-        public bool GenerateLearningTime()
+        #endregion
+
+        #region Methods
+
+        public bool ExecuteLearningTime()
         {
             try
             {
-                //Get Samr Users and Machines
-                SamrUsers = GetSamrUsers();
-                SamrMachins = GetSamrMachins();
-                var machineCounter = 0;
-
-                //Create Low Rate Machines
-                for (var i = 0; i < 4; i++)
+                var sourceMachine = Machines.Last(_ => _.Name == "APP1");
+                var sourceUser = Users.Single(_ => _.Name == "triservice");
+                // Generate Samr for domainController learning time
+                foreach (var domainController in DomainControllers)
                 {
-                    for (var j = 0; j < 4; j++)
+                    ActivitiesList.Add(DocumentCreator.SamrCreator(sourceUser, sourceMachine,
+                        domainController,
+                        DomainList.Single(_ => _.Id == sourceUser.Domain).Name
+                        , DomainList.Single(_ => _.Id == sourceMachine.Domain).Name, SourceGateway, true,
+                        SamrQueryType.EnumerateUsers, SamrQueryOperation.EnumerateUsersInDomain,
+                        DomainList.Single(_ => _.Id == sourceMachine.Domain).Id, 35));
+                }
+
+                InsertActivities(true);
+
+                do
+                {
+                    SamrReconnaissanceDetectorProfile = GetSamrDetectorProfile();
+                } while (SamrReconnaissanceDetectorProfile["DestinationComputerIdToDetectionStartTimeMapping"]
+                             .AsBsonArray.Count != DomainControllers.Count);
+
+                foreach (var coupledSamr in SamrCouples)
+                {
+                    var samrAmount = coupledSamr.RatingType == "Low" ? 10 : 21;
+                    for (var samrIndex = 0; samrIndex < samrAmount; samrIndex++)
                     {
-                        ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[i], SamrMachins[i],
-                            DomainControllers.FirstOrDefault(),
-                            DomainObject.Name, GroupsList[j], SourceGateway, true,
-                            SamrQueryType.QueryGroup,SamrQueryOperation.QueryInformationGroup, DomainObject.Id,2));
-                        Logger.Debug("Inserted {3} {2} activity for {1} on {0}",
-                            SamrMachins[i].Name,SamrUsers[i].Name, GroupsList[j].Name, SamrQueryType.QueryGroup);
+                        ActivitiesList.Add(DocumentCreator.SamrCreator(coupledSamr.User, coupledSamr.Machine,
+                            DomainControllers.First(_=> _.Domain == DomainList.Single(__ => __.Id == coupledSamr.Machine.Domain).Id),
+                            DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
+                            , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway, true,
+                            SamrQueryType.EnumerateUsers, SamrQueryOperation.EnumerateUsersInDomain,
+                            DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Id, 10));
                     }
-                    ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[i], SamrMachins[i],
-                        DomainControllers.FirstOrDefault(),
-                        DomainObject.Name, null, SourceGateway, true,
-                        SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser, DomainObject.Id, 2));
-                    Logger.Debug("Inserted {3} {2} activity for {1} on {0}",
-                        SamrMachins[i].Name, SamrUsers[i].Name, "user", SamrQueryType.QueryUser);
                 }
 
-                //Create High Rate Machines 
-                for (var i = 4; i < SamrUsers.Count; i++)
+                InsertActivities();
+
+                do
                 {
-                    foreach (var group in GroupsList)
-                    {
-                        ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[i], SamrMachins[i],
-                            DomainControllers.FirstOrDefault(),
-                            DomainObject.Name, group, SourceGateway, true,
-                            SamrQueryType.QueryGroup, SamrQueryOperation.QueryInformationGroup,DomainObject.Id,2));
-                        Logger.Debug("Inserted {3} {2} activity for {1} on {0}",
-                            SamrMachins[i].Name, SamrUsers[i].Name, group.Name, SamrQueryType.QueryGroup);
-                    }
-                    ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[i], SamrMachins[i],
-                        DomainControllers.FirstOrDefault(),
-                        DomainObject.Name, null, SourceGateway, true,
-                        SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser, DomainObject.Id,2));
-                    Logger.Trace("Inserted {3} {2} activity for {1} on {0}",
-                        SamrMachins[i].Name, SamrUsers[i].Name, "user", SamrQueryType.QueryUser);
-                }
+                    SamrReconnaissanceDetectorProfile = GetSamrDetectorProfile();
+                } while (SamrReconnaissanceDetectorProfile["DateToQueryToSamrQueryDataMapping"]
+                             .AsBsonArray.Count == 0);
 
-                //Create login for the users
-                foreach (var samrUser in SamrUsers)
-                {
-                    ActivitiesList.Add(DocumentCreator.KerberosCreator(samrUser, SamrMachins[machineCounter],
-                        DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway, null, null, "As", 2));
-
-                    ActivitiesList.Add(DocumentCreator.KerberosCreator(samrUser, SamrMachins[machineCounter],
-                        DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway,
-                        $"{Spn.CIFS}/{SamrMachins[machineCounter].Name}", SamrMachins[machineCounter], "Tgs", 2, 0,
-                        ActivitiesList.Last()["_id"].AsObjectId));
-
-                    ActivitiesList.Add(DocumentCreator.KerberosCreator(samrUser, SamrMachins[machineCounter],
-                        DomainControllers.FirstOrDefault(), "domain1.test.local", SourceGateway,
-                        $"{Spn.CIFS}/{SamrMachins[machineCounter].Name}", DomainControllers.FirstOrDefault(), "Ap", 2, 0,
-                        ActivitiesList.Last()["_id"].AsObjectId));
-
-                    Logger.Debug("Inserted As,Tgs,Ap activity for {1} on {0}",
-                        SamrMachins[machineCounter].Name, samrUser.Name);
-
-                    machineCounter++;
-                }
-                DbClient.ClearTestCollections();
-                SvcCtrl.StopService("ATACenter");
-                DbClient.SetCenterProfileForReplay();
-                DbClient.SetDetectorProfileForSamr("96:00:00");
-                DbClient.InsertBatch(ActivitiesList);
-                SvcCtrl.StartService("ATACenter");
-                Logger.Debug("Done inserting SAMR activities");
-                Logger.Debug("Sleeping for 4.5 minutes");
-                Thread.Sleep(270000);
-                Logger.Debug("Woke up!");
                 return true;
             }
             catch (Exception e)
             {
                 Logger.Debug(e);
-                throw;
+                return false;
             }
         }
-
-        public bool GenerateSamr()
+        public bool ExecuteSamrDetection()
         {
             try
             {
-                ActivitiesList.Clear();
-                SamrUsers = GetSamrUsers();
-                SamrMachins = GetSamrMachins();
-                var sensitiveUser = Users.FirstOrDefault(_ => _.Name == "Administrator");
-                var domainId = DomainObject.Id;
-
-                //Create SA for first Low Rate Machine
-
-                ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[0], SamrMachins[0],
-                    DomainControllers.FirstOrDefault(),
-                    DomainObject.Name, GroupsList[4], SourceGateway, true,
-                    SamrQueryType.QueryGroup,SamrQueryOperation.QueryInformationGroup, domainId));
-
-                ActivitiesList.Add(DocumentCreator.SamrCreator(sensitiveUser, SamrMachins[0],
-                    DomainControllers.FirstOrDefault(),
-                    DomainObject.Name, GroupsList[4], SourceGateway, true,
-                    SamrQueryType.QueryUser,SamrQueryOperation.QueryInformationUser, domainId));
-
-                //Create SA for first High Rate Machine
-                for (var i = 0; i < 6; i++)
+                foreach (var coupledSamr in SamrCouples)
                 {
-                    ActivitiesList.Add(DocumentCreator.SamrCreator(SamrUsers[4], SamrMachins[4],
-                        DomainControllers.FirstOrDefault(),
-                        DomainObject.Name, GroupsList[20+i], SourceGateway, true,
-                        SamrQueryType.QueryGroup, SamrQueryOperation.QueryInformationGroup, domainId));
+                    if (coupledSamr.RatingType.ToLower() == "low")
+                    {
+                        var administratorObject = Users.First(_=>_.Name == "Administrator");
+                        var domainController = DomainControllers.First(_ =>
+                            _.Domain == DomainList.Single(__ => __.Id == coupledSamr.Machine.Domain).Id);
+                        ActivitiesList.Add(DocumentCreator.KerberosCreator(coupledSamr.User, coupledSamr.Machine,
+                            domainController, DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
+                            , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway));
+                        ActivitiesList.Add(DocumentCreator.KerberosCreator(coupledSamr.User, coupledSamr.Machine,
+                            domainController, DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
+                            , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway,
+                            $"{(Spn) _random.Next(0, 5)}/{DomainControllers.FirstOrDefault()?.Name}", null, "Tgs", 0,
+                            0, ActivitiesList.Last()["_id"].AsObjectId));
+                        ActivitiesList.Add(DocumentCreator.KerberosCreator(coupledSamr.User, coupledSamr.Machine,
+                            domainController, DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
+                            , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway,
+                            $"{(Spn) _random.Next(0, 5)}/{DomainControllers.FirstOrDefault()?.Name}", null, "Ap", 0,
+                            0, ActivitiesList.Last()["_id"].AsObjectId));
+                        ActivitiesList.Add(DocumentCreator.SamrCreator(coupledSamr.User, coupledSamr.Machine,
+                            domainController,
+                            DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
+                            , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway, true,
+                            SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser,
+                            DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Id, 0,
+                            administratorObject));
+                    }
                 }
-                ActivitiesList.Add(DocumentCreator.SamrCreator(sensitiveUser, SamrMachins[4],
-                    DomainControllers.FirstOrDefault(),
-                    DomainObject.Name, GroupsList[4], SourceGateway, true,
-                    SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser, domainId));
-
-                DbClient.ClearTestCollections();
-                SvcCtrl.StopService("ATACenter");
-                DbClient.InsertBatch(ActivitiesList);
-                DbClient.SetDetectorProfileForSamr("00:03:00");
-                SvcCtrl.StartService("ATACenter");
-                Logger.Debug("Done inserting SAMR activities");
+                InsertActivities();
                 return true;
             }
             catch (Exception e)
             {
                 Logger.Debug(e);
-                throw;
+                return false;
             }
         }
-
-        public List<EntityObject> GetSamrUsers()
-        {
-            try
-            {
-                var userCount = 0;
-                var temp = new List<EntityObject>();
-                var i = 0;
-                while (userCount < 8)
-                {
-                    if (Users[i].Name == "Administrator")
-                    {
-                        i++;
-                        continue;
-                    }
-                    temp.Add(Users[i]);
-                    Logger.Trace($"Inserted user {temp[userCount].Name} for for SamR Detection");
-                    userCount++;
-                    i++;
-                }
-                return temp;
-            }
-            catch (Exception e)
-            {
-                Logger.Debug(e);
-                return null;
-            }
-
-        }
-        public List<EntityObject> GetSamrMachins()
-        {
-            try
-            {
-                var machineCount = 0;
-                var temp = new List<EntityObject>();
-                var i = 0;
-                while (machineCount < 8)
-                {
-                    if (Machines[i].Name.Contains("DC") || Machines[i].Name.Contains("CLIENT4"))
-                    {
-                        i++;
-                        continue;
-                    }
-                    temp.Add(Machines[i]);
-                    Logger.Trace($"Inserted machine {temp[machineCount].Name} for for SamR Detection");
-                    machineCount++;
-                    i++;
-                }
-                return temp;
-            }
-            catch (Exception e)
-            {
-                Logger.Debug(e);
-                return null;
-            }
-        }
+        private BsonDocument GetSamrDetectorProfile() => DbClient.DataProfileCollection.Find(
+            Builders<BsonDocument>.Filter.Eq("_t", "SamrReconnaissanceDetectorProfile")).ToList().First();
         public enum SamrQueryType
         {
-            EnumerateUsers,
+            QueryUser,
             QueryGroup,
-            QueryDisplayInformation2, //EnumerateGroups
-            QueryUser
+            EnumerateUsers,
+            EnumerateGroups
         }
         public enum SamrQueryOperation
         {
             EnumerateUsersInDomain,
+            EnumerateGroupsInDomain,
             QueryInformationGroup,
             QueryDisplayInformation2, //EnumerateGroups
             QueryInformationUser
+        }
+
+        private void InsertActivities(bool isLearning=false)
+        {
+            DbClient.ClearTestCollections();
+            SvcCtrl.StopService("ATACenter");
+            if (isLearning)
+            {
+                DbClient.SetCenterProfileForReplay();
+                DbClient.SetDetectorProfileForSamr();
+            }
+            DbClient.InsertBatch(ActivitiesList);
+            ActivitiesList.Clear();
+            SvcCtrl.StartService("ATACenter");
+        }
+
+        #endregion
+
+        public class CoupledSamr
+        {
+            public EntityObject User { get; }
+            public EntityObject Machine { get; }
+            public string RatingType { get; }
+
+            public CoupledSamr(EntityObject user,EntityObject machine, string type)
+            {
+                User = user;
+                Machine = machine;
+                RatingType = type;
+            }
+
+            public override string ToString() => $"{User.Name} {Machine.Name} {RatingType}";
         }
     }
 }

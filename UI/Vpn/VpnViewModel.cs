@@ -13,7 +13,7 @@ namespace Abnormal_UI.UI.Vpn
         private int _recordsAmount;
         public int RecordsAmount
         {
-            get { return _recordsAmount; }
+            get => _recordsAmount;
             set
             {
                 _recordsAmount = value;
@@ -23,7 +23,7 @@ namespace Abnormal_UI.UI.Vpn
         public VpnViewModel()
         {
             ExternalIPs = new ObservableCollection<string>();
-            RecordsAmount = 1;
+            _recordsAmount = 1;
         }
  
         public string GetRandomIp()
@@ -49,7 +49,8 @@ namespace Abnormal_UI.UI.Vpn
                 if (machinesIndex >= SelectedMachines.Count) { machinesIndex = 0;}
                 if (ipsIndex >= ExternalIPs.Count) { ipsIndex = 0;}
                 vpnActivities.Add(DocumentCreator.VpnEventCreator(SelectedUsers[usersIndex],
-                    SelectedMachines[machinesIndex], DomainControllers.FirstOrDefault(), DomainObject.Name,
+                    SelectedMachines[machinesIndex], DomainControllers.FirstOrDefault(), DomainList.Single(_ => _.Id == SelectedUsers[usersIndex].Domain).Name
+                    , DomainList.Single(_ => _.Id == SelectedMachines[machinesIndex].Domain).Name,
                     SourceGateway, ExternalIPs[ipsIndex]));
                 Logger.Debug($"Inserted Vpn activity for {SelectedUsers[usersIndex]} on IP: {ExternalIPs[ipsIndex]}");
                 usersIndex++;
@@ -81,7 +82,8 @@ namespace Abnormal_UI.UI.Vpn
                 var ipAddress = GetRandomIp();
                 System.Threading.Thread.Sleep(50);
                 vpnActivities.Add(DocumentCreator.VpnEventCreator(SelectedUsers[usersIndex],
-                    SelectedMachines[machinesIndex], DomainControllers.FirstOrDefault(), DomainObject.Name,
+                    SelectedMachines[machinesIndex], DomainControllers.FirstOrDefault(), DomainList.Single(_ => _.Id == SelectedUsers[usersIndex].Domain).Name
+                    , DomainList.Single(_ => _.Id == SelectedMachines[machinesIndex].Domain).Name,
                     SourceGateway, ipAddress));
                 Logger.Debug($"Inserted Vpn activity for {SelectedUsers[usersIndex]} on IP: {ipAddress}");
                 usersIndex++;

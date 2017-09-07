@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Abnormal_UI.Infra;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -24,7 +23,7 @@ namespace Abnormal_UI.UI.Abnormal
         public bool IncludeEvent { get; set; }
         public string LogString
         {
-            get { return _logString; }
+            get => _logString;
             set
             {
                 _logString = value;
@@ -33,7 +32,7 @@ namespace Abnormal_UI.UI.Abnormal
         }
         public bool IsResultsShown
         {
-            get { return _isResultsShown; }
+            get => _isResultsShown;
             set
             {
                 _isResultsShown = value;
@@ -52,7 +51,7 @@ namespace Abnormal_UI.UI.Abnormal
             IncludeNtlm = false;
             IncludeEvent = false;
             _isResultsShown = false;
-            LogString = "";
+            _logString = "";
             MinMachines = 1;
             MaxMachines = 3;
         }
@@ -202,13 +201,17 @@ namespace Abnormal_UI.UI.Abnormal
                                 networkActivities.Add(
                                     DocumentCreator.KerberosCreator(selectedUser,
                                         currentSelectedMachine,
-                                        SelectedDomainControllers.FirstOrDefault(),DomainObject.Name
-                                        , SourceGateway, null, null, "As", daysToGenerate));
+                                        SelectedDomainControllers.FirstOrDefault(),
+                                        DomainList.Single(_ => _.Id == selectedUser.Domain).Name
+                                        , DomainList.Single(_ => _.Id == currentSelectedMachine.Domain).Name,
+                                        SourceGateway, null, null, "As", daysToGenerate));
                                 networkActivities.Add(
                                     DocumentCreator.KerberosCreator(selectedUser,
-                                        currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(),DomainObject.Name
-                                        , SourceGateway,
-                                        $"{(Spn)(_random.Next(0, 5))}/{SelectedMachines[currentMachinesCounter].Name}",
+                                        currentSelectedMachine, SelectedDomainControllers.FirstOrDefault(),
+                                        DomainList.Single(_ => _.Id == selectedUser.Domain).Name
+                                        , DomainList.Single(_ => _.Id == currentSelectedMachine.Domain).Name,
+                                        SourceGateway,
+                                        $"{(Spn) (_random.Next(0, 5))}/{SelectedMachines[currentMachinesCounter].Name}",
                                         SelectedMachines[currentMachinesCounter + 1], "Tgs",
                                         daysToGenerate, 0, networkActivities.Last()["_id"].AsObjectId));
                                 break;
@@ -216,14 +219,20 @@ namespace Abnormal_UI.UI.Abnormal
                                 networkActivities.Add(
                                     DocumentCreator.EventCreator(selectedUser,
                                         currentSelectedMachine,
-                                        SelectedDomainControllers.FirstOrDefault(), DomainObject.Name, SourceGateway,
+                                        SelectedDomainControllers.FirstOrDefault(),
+                                        DomainList.Single(_ => _.Id == selectedUser.Domain).Name
+                                        , DomainList.Single(_ => _.Id == currentSelectedMachine.Domain).Name,
+                                        SourceGateway,
                                         daysToGenerate));
                                 break;
                             case ActivityType.Ntlm:
                                 networkActivities.Add(
                                     DocumentCreator.NtlmCreator(selectedUser,
                                         currentSelectedMachine,
-                                        SelectedDomainControllers.FirstOrDefault(), DomainObject.Name, SourceGateway));
+                                        SelectedDomainControllers.FirstOrDefault(),
+                                        DomainList.Single(_ => _.Id == selectedUser.Domain).Name
+                                        , DomainList.Single(_ => _.Id == currentSelectedMachine.Domain).Name,
+                                        SourceGateway));
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException();

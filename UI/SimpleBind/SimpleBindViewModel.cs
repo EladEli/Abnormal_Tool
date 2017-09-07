@@ -24,7 +24,8 @@ namespace Abnormal_UI.UI.SimpleBind
                 for (var i = 0; i < 110; i++)
                 {
                     networkActivitities.Add(DocumentCreator.SimpleBindCreator(SelectedUsers.FirstOrDefault(),
-                        SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainObject.Name, SourceGateway));
+                        SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainList.Single(_ => _.Id == SelectedUsers.FirstOrDefault()?.Domain).Name
+                        , DomainList.Single(_ => _.Id == SelectedMachines[0].Domain).Name, SourceGateway));
                 }
                 DbClient.InsertBatch(networkActivitities);
                 Logger.Debug("Done inserting Ldap activities");
@@ -55,7 +56,8 @@ namespace Abnormal_UI.UI.SimpleBind
                     SelectedUsers.Select(
                         user =>
                             DocumentCreator.SimpleBindCreator(user, SelectedMachines[0],
-                                SelectedDomainControllers.FirstOrDefault(), DomainObject.Name, SourceGateway)));
+                                SelectedDomainControllers.FirstOrDefault(), DomainList.Single(_ => _.Id == user.Domain).Name
+                                , DomainList.Single(_ => _.Id == SelectedMachines[0].Domain).Name, SourceGateway)));
                 DbClient.InsertBatch(networkActivitities);
                 Logger.Debug("Done inserting Ldap activities");
                 SvcCtrl.StartService("ATACenter");
@@ -78,7 +80,8 @@ namespace Abnormal_UI.UI.SimpleBind
                     return false;
                 }
                 networkActivitities.Add(DocumentCreator.SimpleBindCreator(SelectedUsers.FirstOrDefault(),
-                    SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainObject.Name, SourceGateway));
+                    SelectedMachines[0], SelectedDomainControllers.FirstOrDefault(), DomainList.Single(_ => _.Id == SelectedUsers.FirstOrDefault()?.Domain).Name
+                    , DomainList.Single(_ => _.Id == SelectedMachines[0].Domain).Name, SourceGateway));
                 DbClient.InsertBatch(networkActivitities);
                 return true;
             }

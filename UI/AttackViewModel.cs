@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -12,21 +13,14 @@ namespace Abnormal_UI.UI
     {
         #region Data Members
         public DbClient DbClient;
-        
+        public List<EntityObject> DomainList { get; set; }
         public ObjectId SourceGateway;
-
         public ObservableCollection<EntityObject> Users { get; set; }
-
         public ObservableCollection<EntityObject> SelectedUsers { get; set; }
-
         public ObservableCollection<EntityObject> Machines { get; set; }
-
         public ObservableCollection<EntityObject> SelectedMachines { get; set; }
-
         public ObservableCollection<EntityObject> DomainControllers { get; set; }
-
         public ObservableCollection<EntityObject> SelectedDomainControllers { get; set; }
-
         public Logger Logger;
         public enum Spn
         {
@@ -37,7 +31,6 @@ namespace Abnormal_UI.UI
             DNS,
             RPC
         }
-        public EntityObject DomainObject { get; set; }
         #endregion
 
         #region Ctors
@@ -52,8 +45,7 @@ namespace Abnormal_UI.UI
             DomainControllers = new ObservableCollection<EntityObject>();
             SelectedDomainControllers = new ObservableCollection<EntityObject>();
             SourceGateway = DbClient.GetGwOids().FirstOrDefault();
-            //DomainObject = DbClient.GetUniqueEntity(UniqueEntityType.Domain).First(_=>_.Name == "domain1");
-            DomainObject = DbClient.GetUniqueEntity(UniqueEntityType.Domain).First();
+            DomainList = DbClient.GetUniqueEntity(UniqueEntityType.Domain);
             Logger = LogManager.GetLogger("TestToolboxLog");
         }
 

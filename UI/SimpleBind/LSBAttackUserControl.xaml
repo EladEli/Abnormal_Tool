@@ -6,13 +6,13 @@
              mc:Ignorable="d">
     <DockPanel>
         <StackPanel Orientation="Horizontal">
-            <ListBox Width="250" 
-                     Height="Auto" 
+            <ListBox Width="250"
+                     Height="Auto"
                      Margin="20"
-                     x:Name="BoxUsers" 
-                     ItemsSource="{Binding Users}" 
+                     x:Name="BoxUsers"
+                     ItemsSource="{Binding Users}"
                      DisplayMemberPath="Name"
-                     SelectionMode="Extended" 
+                     SelectionMode="Extended"
                      SelectedIndex="0">
             </ListBox>
             <TextBlock Text="{Binding SelectedItems.Count, ElementName=BoxUsers}" 
@@ -52,20 +52,20 @@
                     Height="30" 
                     Margin="5"
                     Content="LSBIntense"
-                    x:Name="BtnLSBIntense" 
-                    Click="BtnLSBDintense_OnClickAsync"/>
+                    x:Name="BtnLsbIntense" 
+                    Click="BtnLsbIntense_OnClickAsync"/>
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="LSB Distinct"
-                    x:Name="BtnLSBDistinct" 
-                    Click="BtnLSBDistinct_OnClickAsync"/>
+                    x:Name="BtnLsbDistinct" 
+                    Click="BtnLsbDistinct_OnClickAsync"/>
                 <Button Width="200" 
                     Height="30" 
                     Margin="5"
                     Content="LSB Specific"
-                    x:Name="BtnLSBSpecific" 
-                    Click="BtnLSBSpecific_OnClickAsync"/>
+                    x:Name="BtnLsbSpecific" 
+                    Click="BtnLsbSpecific_OnClickAsync"/>
             </StackPanel>
         </StackPanel>
     </DockPanel>
