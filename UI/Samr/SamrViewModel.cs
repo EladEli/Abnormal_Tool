@@ -32,7 +32,7 @@ namespace Abnormal_UI.UI.Samr
         {
             try
             {
-                var sourceMachine = Machines.Last(_ => _.Name == "APP1");
+                var sourceMachine = Machines.Single(_ => _.Name == "APP1");
                 var sourceUser = Users.Single(_ => _.Name == "triservice");
                 // Generate Samr for domainController learning time
                 foreach (var domainController in DomainControllers)
@@ -58,12 +58,13 @@ namespace Abnormal_UI.UI.Samr
                     var samrAmount = coupledSamr.RatingType == "Low" ? 10 : 21;
                     for (var samrIndex = 0; samrIndex < samrAmount; samrIndex++)
                     {
+                        var queriedObject = Users[_random.Next(Users.Count)];
                         ActivitiesList.Add(DocumentCreator.SamrCreator(coupledSamr.User, coupledSamr.Machine,
                             DomainControllers.First(_=> _.Domain == DomainList.Single(__ => __.Id == coupledSamr.Machine.Domain).Id),
                             DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
                             , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway, true,
-                            SamrQueryType.EnumerateUsers, SamrQueryOperation.EnumerateUsersInDomain,
-                            DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Id, 10));
+                            SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser,
+                            DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Id, 10, queriedObject));
                     }
                 }
 
@@ -87,13 +88,17 @@ namespace Abnormal_UI.UI.Samr
         {
             try
             {
+                var sensitiveGroupList = DbClient.GetSensitiveGroups();
+
                 foreach (var coupledSamr in SamrCouples)
                 {
+                    var domainController = DomainControllers.First(_ =>
+                        _.Domain == DomainList.Single(__ => __.Id == coupledSamr.Machine.Domain).Id);
+
                     if (coupledSamr.RatingType.ToLower() == "low")
                     {
                         var administratorObject = Users.First(_=>_.Name == "Administrator");
-                        var domainController = DomainControllers.First(_ =>
-                            _.Domain == DomainList.Single(__ => __.Id == coupledSamr.Machine.Domain).Id);
+                        
                         ActivitiesList.Add(DocumentCreator.KerberosCreator(coupledSamr.User, coupledSamr.Machine,
                             domainController, DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
                             , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway));
@@ -114,6 +119,33 @@ namespace Abnormal_UI.UI.Samr
                             SamrQueryType.QueryUser, SamrQueryOperation.QueryInformationUser,
                             DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Id, 0,
                             administratorObject));
+                    }
+                    else
+                    {
+                        ActivitiesList.Add(DocumentCreator.KerberosCreator(coupledSamr.User, coupledSamr.Machine,
+                            domainController, DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
+                            , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway));
+                        ActivitiesList.Add(DocumentCreator.KerberosCreator(coupledSamr.User, coupledSamr.Machine,
+                            domainController, DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
+                            , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway,
+                            $"{(Spn)_random.Next(0, 5)}/{DomainControllers.FirstOrDefault()?.Name}", null, "Tgs", 0,
+                            0, ActivitiesList.Last()["_id"].AsObjectId));
+                        ActivitiesList.Add(DocumentCreator.KerberosCreator(coupledSamr.User, coupledSamr.Machine,
+                            domainController, DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
+                            , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway,
+                            $"{(Spn)_random.Next(0, 5)}/{DomainControllers.FirstOrDefault()?.Name}", null, "Ap", 0,
+                            0, ActivitiesList.Last()["_id"].AsObjectId));
+
+                        foreach (var group in sensitiveGroupList)
+                        {
+                            ActivitiesList.Add(DocumentCreator.SamrCreator(coupledSamr.User, coupledSamr.Machine,
+                                domainController,
+                                DomainList.Single(_ => _.Id == coupledSamr.User.Domain).Name
+                                , DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Name, SourceGateway, true,
+                                SamrQueryType.QueryGroup, SamrQueryOperation.QueryInformationGroup,
+                                DomainList.Single(_ => _.Id == coupledSamr.Machine.Domain).Id, 0,
+                                group));
+                        }
                     }
                 }
                 InsertActivities();
